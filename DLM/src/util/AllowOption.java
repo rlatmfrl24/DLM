@@ -1,4 +1,4 @@
-package randomchooser.view;
+package util;
 
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import randomchooser.util.ConfigLoader;
+import main.ConfigLoader;
 
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
@@ -37,7 +37,7 @@ import org.eclipse.swt.layout.FillLayout;
 public class AllowOption extends Dialog implements Observer {
 
 	protected Object result;
-	protected Shell shlOption;
+	private Shell shlOption;
 	private ConfigLoader config;
 	private Table table;
 	private Text text;
@@ -62,10 +62,10 @@ public class AllowOption extends Dialog implements Observer {
 	 */
 	public Object open() {
 		createContents();
-		shlOption.open();
-		shlOption.layout();
+		getShlOption().open();
+		getShlOption().layout();
 		Display display = getParent().getDisplay();
-		while (!shlOption.isDisposed()) {
+		while (!getShlOption().isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -77,13 +77,13 @@ public class AllowOption extends Dialog implements Observer {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		shlOption = new Shell(getParent(), SWT.DIALOG_TRIM);
-		shlOption.setModified(true);
-		shlOption.setSize(745, 216);
-		shlOption.setText("Option");
-		shlOption.setLayout(new GridLayout(1, false));
+		setShlOption(new Shell(getParent(), SWT.DIALOG_TRIM));
+		getShlOption().setModified(true);
+		getShlOption().setSize(745, 216);
+		getShlOption().setText("Option");
+		getShlOption().setLayout(new GridLayout(1, false));
 
-		TabFolder tabFolder = new TabFolder(shlOption, SWT.NONE);
+		TabFolder tabFolder = new TabFolder(getShlOption(), SWT.NONE);
 		tabFolder.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 		
 		TabItem tbtmEx = new TabItem(tabFolder, SWT.NONE);
@@ -182,7 +182,7 @@ public class AllowOption extends Dialog implements Observer {
 		btnConfigure_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog flog = new FileDialog(shlOption, SWT.OPEN);
+				FileDialog flog = new FileDialog(getShlOption(), SWT.OPEN);
 				String selectd = flog.open();
 				if(selectd != null) {
 					text_imgpath.setText(selectd);
@@ -225,7 +225,7 @@ public class AllowOption extends Dialog implements Observer {
 		btnConfigure_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				FileDialog flog = new FileDialog(shlOption, SWT.OPEN);
+				FileDialog flog = new FileDialog(getShlOption(), SWT.OPEN);
 				String selectd = flog.open();
 				if(selectd != null) {
 					text_movpath.setText(selectd);
@@ -252,7 +252,7 @@ public class AllowOption extends Dialog implements Observer {
 			item.setChecked(e.getValue());
 		}
 		
-		Button btnDone = new Button(shlOption, SWT.NONE);
+		Button btnDone = new Button(getShlOption(), SWT.NONE);
 		btnDone.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -263,7 +263,7 @@ public class AllowOption extends Dialog implements Observer {
 					allows.put(item.getText(), item.getChecked());
 				}
 				//shlOption.close();
-				shlOption.dispose();
+				getShlOption().dispose();
 			}
 		});
 		btnDone.setText("Done");
@@ -281,5 +281,13 @@ public class AllowOption extends Dialog implements Observer {
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub
 		config = (ConfigLoader) o;
+	}
+
+	public Shell getShlOption() {
+		return shlOption;
+	}
+
+	public void setShlOption(Shell shlOption) {
+		this.shlOption = shlOption;
 	}
 }

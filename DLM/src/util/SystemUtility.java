@@ -1,7 +1,9 @@
-package randomchooser.util;
+package util;
 
 import java.util.Observable;
 import java.util.Observer;
+
+import main.ConfigLoader;
 
 public class SystemUtility implements Observer {
 
