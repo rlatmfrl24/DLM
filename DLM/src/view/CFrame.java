@@ -25,6 +25,7 @@ import main.ConfigLoader;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import util.AutoCategorizer;
 
 public class CFrame implements Observer {
 	private static Text text_path;
@@ -63,18 +64,29 @@ public class CFrame implements Observer {
 		SashForm sashForm = new SashForm(main_composite, SWT.NONE);
 		sashForm.setLayoutData(BorderLayout.CENTER);
 		
-		Composite composite_origin = new Composite(sashForm, SWT.NONE);
-		composite_origin.setLayout(new GridLayout(1, false));
+		Tree tree_origin = new Tree(sashForm, SWT.BORDER);
 		
-		Tree tree_origin = new Tree(composite_origin, SWT.BORDER);
-		tree_origin.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		Composite composite = new Composite(sashForm, SWT.NONE);
+		composite.setLayout(new GridLayout(1, true));
+
+		Tree tree_transform = new Tree(sashForm, SWT.BORDER);
+		sashForm.setWeights(new int[] {141, 27, 141});
 		
-		Composite composite_transform = new Composite(sashForm, SWT.NONE);
-		composite_transform.setLayout(new GridLayout(1, false));
-		
-		Tree tree_transform = new Tree(composite_transform, SWT.BORDER);
-		tree_transform.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		sashForm.setWeights(new int[] {1, 1});
+		Button button = new Button(composite, SWT.NONE);
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				AutoCategorizer ac = new AutoCategorizer();
+				for(TreeItem item : tree_origin.getItems()) {
+					String[] transform_path = ac.GetCategorizedName((File)item.getData(item.getText())).split("/");
+					for(String s : transform_path) {
+						System.out.println(s);
+					}
+				}
+			}
+		});
+		button.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		button.setText("→");
 		
 		Composite composite_1 = new Composite(main_composite, SWT.NONE);
 		composite_1.setLayoutData(BorderLayout.SOUTH);
@@ -102,6 +114,7 @@ public class CFrame implements Observer {
 				for(File f : current_directory.listFiles()) {
 					if(f.isFile()) {
 						TreeItem t = new TreeItem(tree_origin, 0);
+						t.setData(f.getName(), f);
 						t.setText(f.getName());
 					}
 				}
@@ -117,7 +130,6 @@ public class CFrame implements Observer {
 			}
 		}
 	}
-
 	@Override
 	public void update(Observable o, Object arg) {
 		// TODO Auto-generated method stub

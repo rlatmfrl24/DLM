@@ -33,6 +33,7 @@ import main.ConfigLoader;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Label;
 
 public class AllowOption extends Dialog implements Observer {
 
@@ -96,6 +97,7 @@ public class AllowOption extends Dialog implements Observer {
 		CheckboxTableViewer checkboxTableViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
 		table = checkboxTableViewer.getTable();
 		GridData gd_table = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		gd_table.widthHint = 276;
 		gd_table.heightHint = 91;
 		table.setLayoutData(gd_table);
 		table.setHeaderVisible(true);
@@ -104,21 +106,26 @@ public class AllowOption extends Dialog implements Observer {
 		TableColumn tblclmnExtension = tableViewerColumn.getColumn();
 		tblclmnExtension.setResizable(false);
 		tblclmnExtension.setText("extension");
-		tblclmnExtension.setWidth(290);
+		tblclmnExtension.setWidth(169);
 		
 		Group grpExtensionControl = new Group(composite, SWT.NONE);
-		grpExtensionControl.setLayout(new GridLayout(3, true));
-		GridData gd_grpExtensionControl = new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1);
+		grpExtensionControl.setLayout(new GridLayout(4, true));
+		GridData gd_grpExtensionControl = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_grpExtensionControl.heightHint = 102;
-		gd_grpExtensionControl.widthHint = 422;
+		gd_grpExtensionControl.widthHint = 650;
 		grpExtensionControl.setLayoutData(gd_grpExtensionControl);
 		grpExtensionControl.setText("Extension");
 		
 		text = new Text(grpExtensionControl, SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 3, 1));
+		GridData gd_text = new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1);
+		gd_text.widthHint = 116;
+		text.setLayoutData(gd_text);
+		new Label(grpExtensionControl, SWT.NONE);
+		new Label(grpExtensionControl, SWT.NONE);
+		new Label(grpExtensionControl, SWT.NONE);
 		
 		Button btnAdd = new Button(grpExtensionControl, SWT.NONE);
-		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -154,20 +161,88 @@ public class AllowOption extends Dialog implements Observer {
 		});
 		btnDelete.setText("Delete");
 		
+		Button btnClear = new Button(grpExtensionControl, SWT.NONE);
+		btnClear.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				table.removeAll();
+			}
+		});
+		btnClear.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		formToolkit.adapt(btnClear, true, true);
+		btnClear.setText("Clear");
+		
 		Button btnLoadImageFormat = new Button(grpExtensionControl, SWT.NONE);
 		btnLoadImageFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true, 1, 1));
+		btnLoadImageFormat.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				table.removeAll();
+				Expansion exp = new Expansion();
+				for(int i=0; i < exp.expansion_image.size(); i++) {
+					allows.put(exp.expansion_image.get(i), true);
+					TableItem item = new TableItem(table, 0);
+					item.setText(exp.expansion_image.get(i));
+					item.setChecked(true);
+				}
+			}
+		});
 		formToolkit.adapt(btnLoadImageFormat, true, true);
 		btnLoadImageFormat.setText("Image Format");
 		
 		Button btnLoadMovieFormat = new Button(grpExtensionControl, SWT.NONE);
 		btnLoadMovieFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true, 1, 1));
+		btnLoadMovieFormat.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				table.removeAll();
+				Expansion exp = new Expansion();
+				for(int i=0; i < exp.expansion_movie.size(); i++) {
+					allows.put(exp.expansion_movie.get(i), true);
+					TableItem item = new TableItem(table, 0);
+					item.setText(exp.expansion_movie.get(i));
+					item.setChecked(true);
+				}
+			}
+		});
 		formToolkit.adapt(btnLoadMovieFormat, true, true);
 		btnLoadMovieFormat.setText("Movie Format");
 		
 		Button btnLoadCompressedFormat = new Button(grpExtensionControl, SWT.NONE);
 		btnLoadCompressedFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnLoadCompressedFormat.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				table.removeAll();
+				Expansion exp = new Expansion();
+				for(int i=0; i < exp.expansion_compressed.size(); i++) {
+					allows.put(exp.expansion_compressed.get(i), true);
+					TableItem item = new TableItem(table, 0);
+					item.setText(exp.expansion_compressed.get(i));
+					item.setChecked(true);
+				}
+			}
+		});
 		formToolkit.adapt(btnLoadCompressedFormat, true, true);
 		btnLoadCompressedFormat.setText("Compress Format");
+		
+		Button btnMusicFormat = new Button(grpExtensionControl, SWT.NONE);
+		btnMusicFormat.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				table.removeAll();
+				Expansion exp = new Expansion();
+				for(int i=0; i < exp.expansion_music.size(); i++) {
+					allows.put(exp.expansion_music.get(i), true);
+					TableItem item = new TableItem(table, 0);
+					item.setText(exp.expansion_music.get(i));
+					item.setChecked(true);
+				}
+			}
+		});
+		btnMusicFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		formToolkit.adapt(btnMusicFormat, true, true);
+		btnMusicFormat.setText("Music Format");
 		
 		TabItem tbtmReference = new TabItem(tabFolder, SWT.NONE);
 		tbtmReference.setText("Reference");
@@ -269,6 +344,9 @@ public class AllowOption extends Dialog implements Observer {
 		}
 		
 		Button btnDone = new Button(getShlOption(), SWT.NONE);
+		GridData gd_btnDone = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_btnDone.widthHint = 58;
+		btnDone.setLayoutData(gd_btnDone);
 		btnDone.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
