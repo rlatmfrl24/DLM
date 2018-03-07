@@ -107,16 +107,18 @@ public class AllowOption extends Dialog implements Observer {
 		tblclmnExtension.setWidth(290);
 		
 		Group grpExtensionControl = new Group(composite, SWT.NONE);
-		GridData gd_grpExtensionControl = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		grpExtensionControl.setLayout(new GridLayout(3, true));
+		GridData gd_grpExtensionControl = new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1);
 		gd_grpExtensionControl.heightHint = 102;
 		gd_grpExtensionControl.widthHint = 422;
 		grpExtensionControl.setLayoutData(gd_grpExtensionControl);
 		grpExtensionControl.setText("Extension");
 		
 		text = new Text(grpExtensionControl, SWT.BORDER);
-		text.setBounds(10, 21, 234, 18);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 3, 1));
 		
 		Button btnAdd = new Button(grpExtensionControl, SWT.NONE);
+		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		btnAdd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -126,10 +128,10 @@ public class AllowOption extends Dialog implements Observer {
 				}
 			}
 		});
-		btnAdd.setBounds(10, 45, 74, 22);
 		btnAdd.setText("Add");
 		
 		Button btnModify = new Button(grpExtensionControl, SWT.NONE);
+		btnModify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		btnModify.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -138,10 +140,10 @@ public class AllowOption extends Dialog implements Observer {
 				}
 			}
 		});
-		btnModify.setBounds(90, 45, 74, 22);
 		btnModify.setText("Modify");
 		
 		Button btnDelete = new Button(grpExtensionControl, SWT.NONE);
+		btnDelete.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
 		btnDelete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -150,8 +152,22 @@ public class AllowOption extends Dialog implements Observer {
 				}
 			}
 		});
-		btnDelete.setBounds(170, 45, 74, 22);
 		btnDelete.setText("Delete");
+		
+		Button btnLoadImageFormat = new Button(grpExtensionControl, SWT.NONE);
+		btnLoadImageFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true, 1, 1));
+		formToolkit.adapt(btnLoadImageFormat, true, true);
+		btnLoadImageFormat.setText("Image Format");
+		
+		Button btnLoadMovieFormat = new Button(grpExtensionControl, SWT.NONE);
+		btnLoadMovieFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true, 1, 1));
+		formToolkit.adapt(btnLoadMovieFormat, true, true);
+		btnLoadMovieFormat.setText("Movie Format");
+		
+		Button btnLoadCompressedFormat = new Button(grpExtensionControl, SWT.NONE);
+		btnLoadCompressedFormat.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		formToolkit.adapt(btnLoadCompressedFormat, true, true);
+		btnLoadCompressedFormat.setText("Compress Format");
 		
 		TabItem tbtmReference = new TabItem(tabFolder, SWT.NONE);
 		tbtmReference.setText("Reference");
@@ -272,7 +288,7 @@ public class AllowOption extends Dialog implements Observer {
 	public ArrayList<String> getAllows() {
 		ArrayList<String> allow_list = new ArrayList<>();
 		for(Entry<String, Boolean> e : allows.entrySet()) {
-			if(e.getValue()) allow_list.add(e.getKey());
+			if(e.getValue()) allow_list.add(e.getKey().toLowerCase());
 		}
 		return allow_list;
 	}
