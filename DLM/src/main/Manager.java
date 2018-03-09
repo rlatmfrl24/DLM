@@ -1,11 +1,16 @@
 package main;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import randomchooser.util.ConfigLoader;
-import randomchooser.view.RCFrame;
+import view.CFrame;
+import view.RCFrame;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.layout.FillLayout;
@@ -16,13 +21,27 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 public class Manager extends Shell {
-
+	private static File TempPath = new File("./temp/");
+	private static ConfigLoader configLoader = new ConfigLoader();
 	/**
 	 * Launch the application.
 	 * @param args
 	 */
 	public static void main(String args[]) {
 		try {
+			if (!TempPath.exists()) {
+				TempPath.mkdirs();
+				File configFile = new File(TempPath + "/config.properties");
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile)));
+				bw.write("TargetPath=C:/");
+				bw.newLine();
+				bw.write("ImageViewerPath=DEFAULT");
+				bw.newLine();
+				bw.write("VideoViewerPath=DEFAULT");
+				bw.flush();
+				bw.close();
+			}
+			configLoader.loadConfig(TempPath+"/config.properties");
 			Display display = Display.getDefault();
 			Manager shell = new Manager(display);
 			shell.open();
@@ -53,9 +72,7 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				ConfigLoader configLoader = new ConfigLoader();
 				RCFrame mainFrame = new RCFrame(configLoader);
-				mainFrame.intialize();
 				mainFrame.FrameIntialize();
 			}
 		});
@@ -67,6 +84,8 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
+				CFrame mainFrame = new CFrame(configLoader);
+				mainFrame.FrameInitialize();
 			}
 		});
 		btnCategorizer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));

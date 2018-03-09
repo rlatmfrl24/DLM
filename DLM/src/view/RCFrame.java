@@ -1,4 +1,4 @@
-package randomchooser.view;
+package view;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -6,10 +6,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Observable;
@@ -25,11 +22,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import randomchooser.util.ConfigLoader;
-import randomchooser.util.Expansion;
-import randomchooser.util.Randomizer;
-import randomchooser.util.SystemUtility;
-import randomchooser.util.Expansion.Type;
+import main.ConfigLoader;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -44,6 +37,11 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import swing2swt.layout.BorderLayout;
+import util.AllowOption;
+import util.Expansion;
+import util.Randomizer;
+import util.SystemUtility;
+import util.Expansion.Type;
 
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -56,31 +54,13 @@ public class RCFrame implements Observer {
 	private static Expansion expansion = new Expansion();
 	private static ConfigLoader config;
 	private static Boolean ApplyAllows = false;
-	private static File TempPath = new File("./temp/");
 
 	public RCFrame(ConfigLoader c) {
 		config = c;
 		config.addObserver(this);
+		config.addObserver(util);
 	}
-	
-	public void intialize() {
-		try {
-			if (!TempPath.exists()) {
-				TempPath.mkdirs();
-				File configFile = new File(TempPath + "/config.properties");
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile)));
-				bw.write("TargetPath=C:/");
-				bw.flush();
-				bw.close();
-			} else {
-				config.loadConfig(TempPath + "/config.properties");
-				config.addObserver(util);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
+
 	/**
 	 * Launch the application.
 	 * 
@@ -273,7 +253,7 @@ public class RCFrame implements Observer {
 		btnOption.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (allowOption.shlOption == null || allowOption.shlOption.isDisposed()) {
+				if (allowOption.getShlOption() == null || allowOption.getShlOption().isDisposed()) {
 					allowOption.open();
 				}
 			}

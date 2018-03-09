@@ -1,4 +1,4 @@
-package randomchooser.util;
+package main;
 
 import java.io.FileInputStream;
 import java.util.Observable;
