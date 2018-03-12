@@ -1,5 +1,6 @@
 package util;
 
+import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -14,24 +15,25 @@ public class SystemUtility implements Observer {
 	String command_imgviewer = default_hv_path;
 	String command_movviewer = default_pp_path;
 	
-	public void open_explorer(String target){
-		try{
-			String command = command_explorer+target;
+	public void open_explorer(String target) {
+		try {
+			File f = new File(target);
+			String[] cmd = {"cmd", "/c", "start "+command_explorer+ f.getAbsolutePath()};
 			Runtime rt = Runtime.getRuntime();
-			Process p = rt.exec(command);
-			p.waitFor();
-		}catch(Exception e){
+			Process p = rt.exec(cmd);
+			p.waitFor();	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 	}
 	
 	public void open_imgview(String target) {
 		try{
-			String command = command_imgviewer+target;
-			System.out.println(command);
+			File f = new File(target);
+			String[] command = {command_imgviewer, f.getAbsolutePath()};
 			Runtime rt = Runtime.getRuntime();
-			Process p = rt.exec(command);
-			p.waitFor();
+			rt.exec(command);
 		}catch(Exception e){
 			e.printStackTrace();
 		}	
@@ -39,10 +41,10 @@ public class SystemUtility implements Observer {
 	
 	public void open_movview(String target) {
 		try{
-			String command = command_movviewer+target;
+			File f = new File(target);
+			String[] command = {command_movviewer, f.getAbsolutePath()};
 			Runtime rt = Runtime.getRuntime();
 			rt.exec(command);
-			//p.waitFor();
 		}catch(Exception e){
 			e.printStackTrace();
 		}	
