@@ -33,7 +33,7 @@ public class Expansion {
 		ArrayList<String> check_list = new ArrayList<>();
 		
 		if(s.contains(".")) {
-			input_expansion = s.substring(s.lastIndexOf('.'));			
+			input_expansion = s.substring(s.lastIndexOf('.')).toLowerCase();			
 			switch(t) {
 			case IMAGE:
 				check_list = expansion_image;

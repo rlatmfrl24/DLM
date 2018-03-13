@@ -31,6 +31,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -92,6 +94,42 @@ public class RCFrame implements Observer {
 				util.open_explorer(path);
 			}
 		});
+		
+		table.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.keyCode == SWT.F2 && table.getSelectionCount() == 1) {
+					String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
+					if (expansion.check_expansion(path, Type.IMAGE) || expansion.check_expansion(path, Type.COMPRESSED)) {
+						util.open_imgview(path);
+					}else {
+						MessageBox msg = new MessageBox(shell);
+						msg.setText("Alert");
+						msg.setMessage("Invaild File Type");
+						msg.open();
+					}
+				}else if(e.keyCode == SWT.F3 && table.getSelectionCount() == 1) {
+					String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
+					if (expansion.check_expansion(path, Type.IMAGE) || expansion.check_expansion(path, Type.MOVIE) || expansion.check_expansion(path, Type.MUSIC)) {
+						util.open_movview(path);
+					}else {
+						MessageBox msg = new MessageBox(shell);
+						msg.setText("Alert");
+						msg.setMessage("Invaild File Type");
+						msg.open();
+					}
+				}
+			}
+		});
+		
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 				TableColumn tblclmnFileName = new TableColumn(table, SWT.LEFT);
@@ -104,11 +142,10 @@ public class RCFrame implements Observer {
 		
 		Menu menu = new Menu(table);
 		table.setMenu(menu);
-		
 		MenuItem mntmViewOnHoneyview = new MenuItem(menu, SWT.NONE);
-		mntmViewOnHoneyview.setText("View on Image Viewer");
+		mntmViewOnHoneyview.setText("View on Image Viewer	(F2)");
 		MenuItem mntmViewOnPotplayer = new MenuItem(menu, SWT.NONE);
-		mntmViewOnPotplayer.setText("View on Video Viewver");
+		mntmViewOnPotplayer.setText("View on Video Viewver	(F3)");
 		mntmViewOnHoneyview.addListener(SWT.Selection ,new Listener() {
 			@Override
 			public void handleEvent(Event e) {
@@ -145,6 +182,7 @@ public class RCFrame implements Observer {
 				}
 			}
 		});
+		
 		
 		composite_table.addControlListener(new ControlListener() {
 			@Override
