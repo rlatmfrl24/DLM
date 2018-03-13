@@ -1,10 +1,6 @@
 package test;
 
-import java.awt.Desktop;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class test {
 	private static String default_explorer_path = "explorer.exe /select,";
