@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import main.ConfigLoader;
 
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import util.AutoCategorizer;
@@ -75,15 +77,39 @@ public class CFrame implements Observer {
 			public void widgetSelected(SelectionEvent e) {
 				for(TreeItem item : tree_origin.getItems()) {
 					String transform_path = ac.GetCategorizedName((File)item.getData(item.getText()));
-					tree_transform = addPath(transform_path, tree_transform);
+					tree_transform = addPath(transform_path, (File) item.getData(item.getText()), tree_transform);
 				}
 			}
 		});
 		button.setText("→");
 		
-				tree_transform = new Tree(composite_center, SWT.BORDER);
-				tree_transform.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		
+		tree_transform = new Tree(composite_center, SWT.BORDER);
+		tree_transform.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+/*		tree_transform.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(e.keyCode == SWT.DEL && tree_transform.getSelectionCount() > 0 && tree_transform.getSelection()[0].getParentItem()!=null) {
+					TreeItem moveItem;
+					if(tree_transform.getSelection()[0].getParentItem().getParentItem() == null) {
+						moveItem = new TreeItem(tree_transform., 0);
+					}else {
+						moveItem = new TreeItem(tree_transform.getSelection()[0].getParentItem().getParentItem(), 0);
+					}
+					moveItem.setText(tree_transform.getSelection()[0].getText());
+					moveItem.setData(tree_transform.getSelection()[0].getData());
+					tree_transform.getSelection()[0].dispose();
+				}
+			}
+		});*/
+				
 		Group grpTargetPath = new Group(composite_path, SWT.NONE);
 		grpTargetPath.setText("Target Path");
 		grpTargetPath.setLayout(new GridLayout(2, false));
@@ -171,7 +197,7 @@ public class CFrame implements Observer {
 		}
 	}
 	
-public Tree addPath(String s, Tree root) {	
+public Tree addPath(String s, File f, Tree root) {	
 		
 		TreeItem parent = null;
 		for(TreeItem item : root.getItems()) {
@@ -200,12 +226,14 @@ public Tree addPath(String s, Tree root) {
 			if(subitem == null) {
 				subitem = new TreeItem(parent, 0);
 				subitem.setText(s.split("/")[0]);
+				subitem.setData(f);
 				s = s.substring(s.indexOf('/')+1, s.length());
 				parent = subitem;
 			}
 		}
 		TreeItem subitem = new TreeItem(parent, 0);
 		subitem.setText(s);
+		subitem.setData(f);
 		return root;
 	}
 	
