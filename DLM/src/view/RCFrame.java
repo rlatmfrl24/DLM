@@ -7,11 +7,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -27,6 +29,7 @@ import main.ConfigLoader;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.events.ControlEvent;
@@ -43,6 +46,7 @@ import util.AllowOption;
 import util.Expansion;
 import util.Randomizer;
 import util.SystemUtility;
+import util.Thumbnail;
 import util.Expansion.Type;
 
 import org.eclipse.swt.widgets.Menu;
@@ -87,11 +91,15 @@ public class RCFrame implements Observer {
 		composite_table.setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		table = new Table(composite_table, SWT.BORDER | SWT.FULL_SELECTION);
+		table.setLinesVisible(true);
+
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
-				String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
-				util.open_explorer(path);
+				if(table.getSelectionCount() > 0) {
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
+					util.open_explorer(path);
+				}
 			}
 		});
 		
@@ -107,7 +115,7 @@ public class RCFrame implements Observer {
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
 				if (e.keyCode == SWT.F2 && table.getSelectionCount() == 1) {
-					String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
 					if (expansion.check_expansion(path, Type.IMAGE) || expansion.check_expansion(path, Type.COMPRESSED)) {
 						util.open_imgview(path);
 					}else {
@@ -117,7 +125,7 @@ public class RCFrame implements Observer {
 						msg.open();
 					}
 				}else if(e.keyCode == SWT.F3 && table.getSelectionCount() == 1) {
-					String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
 					if (expansion.check_expansion(path, Type.IMAGE) || expansion.check_expansion(path, Type.MOVIE) || expansion.check_expansion(path, Type.MUSIC)) {
 						util.open_movview(path);
 					}else {
@@ -126,12 +134,36 @@ public class RCFrame implements Observer {
 						msg.setMessage("Invaild File Type");
 						msg.open();
 					}
+				}else if(e.keyCode == SWT.DEL && table.getSelectionCount() == 1) {
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
+					table.remove(table.getSelectionIndex());
+					File delFile = new File(path);
+					try {
+						FileUtils.moveFile(delFile, new File("./temp/deleted/"+delFile.getName()));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else if(e.keyCode == SWT.F5 && table.getSelectionCount() == 1) {
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
+					File delFile = new File(path);
+					table.remove(table.getSelectionIndex());
+					try {
+						FileUtils.moveFile(delFile, new File("./temp/moved/"+delFile.getName()));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
 				}
 			}
 		});
 		
 		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+				
+				TableColumn tblclmnThumbnail = new TableColumn(table, SWT.NONE);
+				tblclmnThumbnail.setWidth(100);
+				tblclmnThumbnail.setText("Thumbnail");
 				TableColumn tblclmnFileName = new TableColumn(table, SWT.LEFT);
 				tblclmnFileName.setWidth(200);
 				tblclmnFileName.setText("File Name");
@@ -151,7 +183,7 @@ public class RCFrame implements Observer {
 			public void handleEvent(Event e) {
 				// TODO Auto-generated method stub
 				if(table.getSelectionCount() != 0) {
-					String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
 					if(expansion.check_expansion(path, Type.IMAGE) || expansion.check_expansion(path, Type.COMPRESSED)) {
 						util.open_imgview(path);
 					}else {
@@ -169,7 +201,7 @@ public class RCFrame implements Observer {
 			public void handleEvent(Event e) {
 				// TODO Auto-generated method stub
 				if(table.getSelectionCount() != 0) {
-					String path = table.getSelection()[0].getText(1) + "\\" + table.getSelection()[0].getText(0);
+					String path = table.getSelection()[0].getText(2) + "\\" + table.getSelection()[0].getText(1);
 					if(expansion.check_expansion(path, Type.IMAGE) || expansion.check_expansion(path, Type.MOVIE) || expansion.check_expansion(path, Type.MUSIC)) {
 						util.open_movview(path);
 					}else {
@@ -180,38 +212,6 @@ public class RCFrame implements Observer {
 						msg.open();
 					}
 				}
-			}
-		});
-		
-		
-		composite_table.addControlListener(new ControlListener() {
-			@Override
-			public void controlResized(ControlEvent arg0) {
-				// TODO Auto-generated method stub
-				Rectangle area = composite_table.getClientArea();
-				Point preferredSize = table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				int width = area.width - 2 * table.getBorderWidth();
-				if (preferredSize.y > area.height + table.getHeaderHeight()) {
-					Point vBarSize = table.getVerticalBar().getSize();
-					width -= vBarSize.x;
-				}
-				Point oldSize = table.getSize();
-				if (oldSize.x > area.width) {
-					tblclmnFileName.setWidth(width / 3);
-					tblclmnPath.setWidth(width - tblclmnFileName.getWidth());
-					table.setSize(area.width, area.height);
-				} else {
-
-					table.setSize(area.width, area.height);
-					tblclmnFileName.setWidth(width / 3);
-					tblclmnPath.setWidth(width - tblclmnFileName.getWidth());
-				}
-			}
-
-			@Override
-			public void controlMoved(ControlEvent arg0) {
-				// TODO Auto-generated method stub
-
 			}
 		});
 
@@ -278,15 +278,59 @@ public class RCFrame implements Observer {
 					else
 						recommand_set = randomizer.getRandomSet(config.GetCurrentPath(), Integer.valueOf(text.getText()));
 					for (Entry<File, String> en : recommand_set.entrySet()) {
-						String[] s = {en.getKey().getName(),  en.getValue()};
+						//String[] s = {en.getKey().getName(),  en.getValue()};
 						TableItem item = new TableItem(table, SWT.NONE);
-						item.setText(s);
+						item.setText(1, en.getKey().getName());
+						item.setText(2, en.getValue());
+						
+						Thumbnail tb = new Thumbnail();
+						if(item.getText(1).contains(".zip")) {
+							Image thumbnail = new Image(display, tb.getStreamFromZip(en.getValue()+"/"+en.getKey().getName()));
+							thumbnail = tb.resize(thumbnail, tblclmnThumbnail.getWidth(), thumbnail.getBounds().height*tblclmnThumbnail.getWidth()/thumbnail.getBounds().width);
+							item.setImage(0, thumbnail);
+						}else if(expansion.check_expansion(item.getText(1), Type.IMAGE)) {
+							Image thumbnail = new Image(display, en.getValue()+"/"+en.getKey().getName());
+							thumbnail = tb.resize(thumbnail, tblclmnThumbnail.getWidth(), thumbnail.getBounds().height*tblclmnThumbnail.getWidth()/thumbnail.getBounds().width);
+							item.setImage(0, thumbnail);
+						}
 					}
 				}
 			}
 		});
 		btnRoll.setText("ROLL!");
 
+		composite_table.addControlListener(new ControlListener() {
+			@Override
+			public void controlResized(ControlEvent arg0) {
+				// TODO Auto-generated method stub
+				Rectangle area = composite_table.getClientArea();
+				Point preferredSize = table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				int width = area.width - 2 * table.getBorderWidth();
+				if (preferredSize.y > area.height + table.getHeaderHeight()) {
+					Point vBarSize = table.getVerticalBar().getSize();
+					width -= vBarSize.x;
+				}
+				Point oldSize = table.getSize();
+				if (oldSize.x > area.width) {
+					tblclmnFileName.setWidth(width / 4);
+					tblclmnThumbnail.setWidth(width / 4);
+					tblclmnPath.setWidth(width - tblclmnFileName.getWidth() - tblclmnThumbnail.getWidth());
+					table.setSize(area.width, area.height);
+				} else {
+					table.setSize(area.width, area.height);					
+					tblclmnFileName.setWidth(width / 4);
+					tblclmnThumbnail.setWidth(width / 4);
+					tblclmnPath.setWidth(width - tblclmnFileName.getWidth() - tblclmnThumbnail.getWidth());
+				}
+			}
+
+			@Override
+			public void controlMoved(ControlEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		
 		Button btnOption = new Button(composite_roll, SWT.NONE);
 		btnOption.addSelectionListener(new SelectionAdapter() {
 			@Override

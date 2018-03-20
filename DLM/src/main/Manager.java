@@ -22,6 +22,8 @@ import org.eclipse.swt.events.SelectionEvent;
 
 public class Manager extends Shell {
 	private static File TempPath = new File("./temp/");
+	private static File deletedItemPath = new File("./temp/deleted/");
+	private static File moveItemPath = new File("./temp/moved/");
 	private static ConfigLoader configLoader = new ConfigLoader();
 	/**
 	 * Launch the application.
@@ -41,6 +43,14 @@ public class Manager extends Shell {
 				bw.flush();
 				bw.close();
 			}
+			
+			if(!deletedItemPath.exists()) {
+				deletedItemPath.mkdirs();
+			}
+			if(!moveItemPath.exists()) {
+				moveItemPath.mkdirs();
+			}
+			
 			configLoader.loadConfig(TempPath+"/config.properties");
 			Display display = Display.getDefault();
 			Manager shell = new Manager(display);
