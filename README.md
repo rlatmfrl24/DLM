@@ -24,5 +24,9 @@
 	
 > 1.3. One-Click Downloader
 
+	HiyobiDownloader 생성
+	+ Thread 활용한 다운로드 속도 개선
+	+ 진행상황 확인가능하도록 구조 변경
+	흐름은 잠시 보류(동적 웹페이지)
 	hiyobi/흐름 자동다운로드
 	배페는 링크 입력시 자동 다운로드

@@ -11,19 +11,14 @@ import org.eclipse.swt.widgets.Display;
 
 public class Thumbnail {
 
-	public InputStream getStreamFromZip(String filepath) {
-		try {
-			ZipFile zipFile = new ZipFile(filepath);
-			ZipEntry zipEntry = zipFile.entries().nextElement();
-			InputStream entryStream = zipFile.getInputStream(zipEntry);
-			return entryStream;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+	public InputStream getStreamFromZip(String filepath) throws Exception {
+		ZipFile zipFile = new ZipFile(filepath);
+		ZipEntry zipEntry = zipFile.entries().nextElement();
+		InputStream entryStream = zipFile.getInputStream(zipEntry);
+		return entryStream;
 	}
 
-	public Image resize(Image image, int width, int height) {
+	public Image resize(Image image, int width, int height) throws Exception {
 		Image scaled = new Image(Display.getDefault(), width, height);
 		GC gc = new GC(scaled);
 		gc.setAntialias(SWT.ON);

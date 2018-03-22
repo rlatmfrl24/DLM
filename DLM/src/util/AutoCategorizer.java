@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class AutoCategorizer {
 	
@@ -51,7 +51,8 @@ public class AutoCategorizer {
 			directory+="미분류/";
 		}
 		directory = directory.replaceAll("\\[(.*?)\\]|\\((.*?)\\)", "");
-		directory = WordUtils.capitalizeFully(directory);
+		directory = StringUtils.capitalize(directory);
+		//directory = WordUtils.capitalizeFully(directory);
 		return directory.trim()+transform_name.trim();
 	}
 }

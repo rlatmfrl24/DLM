@@ -139,7 +139,9 @@ public class RCFrame implements Observer {
 					table.remove(table.getSelectionIndex());
 					File delFile = new File(path);
 					try {
-						FileUtils.moveFile(delFile, new File("./temp/deleted/"+delFile.getName()));
+						//FileUtils.moveFile(delFile, new File("./temp/deleted/"+delFile.getName()));
+						FileUtils.copyFileToDirectory(delFile, new File("./temp/deleted/"), true);
+						delFile.delete();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -149,7 +151,8 @@ public class RCFrame implements Observer {
 					File delFile = new File(path);
 					table.remove(table.getSelectionIndex());
 					try {
-						FileUtils.moveFile(delFile, new File("./temp/moved/"+delFile.getName()));
+						FileUtils.copyFileToDirectory(delFile, new File("./temp/moved/"), true);
+						delFile.delete();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -283,15 +286,22 @@ public class RCFrame implements Observer {
 						item.setText(1, en.getKey().getName());
 						item.setText(2, en.getValue());
 						
-						Thumbnail tb = new Thumbnail();
-						if(item.getText(1).contains(".zip")) {
-							Image thumbnail = new Image(display, tb.getStreamFromZip(en.getValue()+"/"+en.getKey().getName()));
-							thumbnail = tb.resize(thumbnail, tblclmnThumbnail.getWidth(), thumbnail.getBounds().height*tblclmnThumbnail.getWidth()/thumbnail.getBounds().width);
-							item.setImage(0, thumbnail);
-						}else if(expansion.check_expansion(item.getText(1), Type.IMAGE)) {
-							Image thumbnail = new Image(display, en.getValue()+"/"+en.getKey().getName());
-							thumbnail = tb.resize(thumbnail, tblclmnThumbnail.getWidth(), thumbnail.getBounds().height*tblclmnThumbnail.getWidth()/thumbnail.getBounds().width);
-							item.setImage(0, thumbnail);
+						try {
+							Thumbnail tb = new Thumbnail();
+							if(item.getText(1).contains(".zip")) {
+								Image thumbnail = new Image(display, tb.getStreamFromZip(en.getValue()+"/"+en.getKey().getName()));
+								thumbnail = tb.resize(thumbnail, tblclmnThumbnail.getWidth(), thumbnail.getBounds().height*tblclmnThumbnail.getWidth()/thumbnail.getBounds().width);
+								item.setImage(0, thumbnail);
+							}else if(expansion.check_expansion(item.getText(1), Type.IMAGE)) {
+								Image thumbnail = new Image(display, en.getValue()+"/"+en.getKey().getName());
+								thumbnail = tb.resize(thumbnail, tblclmnThumbnail.getWidth(), thumbnail.getBounds().height*tblclmnThumbnail.getWidth()/thumbnail.getBounds().width);
+								item.setImage(0, thumbnail);
+							}
+						}catch(Exception ex) {
+							MessageBox msg = new MessageBox(shell);
+							msg.setText("Alert");
+							msg.setMessage(ex.getMessage());
+							msg.open();
 						}
 					}
 				}
