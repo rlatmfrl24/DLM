@@ -1,4 +1,4 @@
-package util;
+package util.hd;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,13 +22,19 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class hiyobiDownloader {
+public class hiyobiDownloader implements Runnable {
 
 	private static List<Gallery> gallery_list = new ArrayList<>();
 	private static List<String> download_log = new ArrayList<>();
 	private static File downlog = new File("./hiyobi/downlog.log");
 	private static File homepath = new File("./hiyobi/");
 
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public hiyobiDownloader(int pages, int itemcount) {
 		try {
 			if(!homepath.exists()) homepath.mkdirs();
@@ -128,7 +134,7 @@ public class hiyobiDownloader {
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		inputStream = con.getInputStream();
 		outputStream = new FileOutputStream(path);
-		byte[] buffer = new byte[2048];
+		byte[] buffer = new byte[8192];
 		int length;
 		while ((length = inputStream.read(buffer)) != -1) {
 			outputStream.write(buffer, 0, length);
@@ -183,6 +189,8 @@ public class hiyobiDownloader {
 			e.printStackTrace();
 		}
 	}
+
+
 }
 
 class Gallery{

@@ -1,4 +1,4 @@
-package util;
+package util.rc;
 
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;

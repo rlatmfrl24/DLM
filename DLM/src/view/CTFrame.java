@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 
 import swing2swt.layout.BorderLayout;
+import util.tc.AutoCategorizer;
+
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
@@ -27,16 +29,15 @@ import main.ConfigLoader;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import util.AutoCategorizer;
 import org.eclipse.swt.layout.RowLayout;
 
-public class CFrame implements Observer {
+public class CTFrame implements Observer {
 	private static Text text_path;
 	private static ConfigLoader config;
 	private static Tree tree_transform;
 	private static AutoCategorizer ac = new AutoCategorizer();
 	
-	public CFrame(ConfigLoader c) {
+	public CTFrame(ConfigLoader c) {
 		config = c;
 		c.addObserver(this);
 	}

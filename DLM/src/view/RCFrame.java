@@ -42,12 +42,12 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import swing2swt.layout.BorderLayout;
-import util.AllowOption;
-import util.Expansion;
-import util.Randomizer;
-import util.SystemUtility;
-import util.Thumbnail;
-import util.Expansion.Type;
+import util.rc.AllowOption;
+import util.rc.Expansion;
+import util.rc.Randomizer;
+import util.rc.SystemUtility;
+import util.rc.Thumbnail;
+import util.rc.Expansion.Type;
 
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;

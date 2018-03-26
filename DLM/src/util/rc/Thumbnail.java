@@ -1,4 +1,4 @@
-package util;
+package util.rc;
 
 import java.io.InputStream;
 import java.util.zip.ZipEntry;

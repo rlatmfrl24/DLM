@@ -9,8 +9,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import view.CFrame;
-import view.HFrame;
+import view.CTFrame;
+import view.HDFrame;
 import view.RCFrame;
 
 import org.eclipse.swt.widgets.Composite;
@@ -100,7 +100,7 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				CFrame mainFrame = new CFrame(configLoader);
+				CTFrame mainFrame = new CTFrame(configLoader);
 				mainFrame.FrameInitialize();
 			}
 		});
@@ -112,7 +112,7 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				HFrame mainFrame = new HFrame();
+				HDFrame mainFrame = new HDFrame();
 				mainFrame.open();
 			}
 		});

@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
-import util.hiyobiDownloader;
+import util.hd.hiyobiDownloader;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.FillLayout;
@@ -17,7 +17,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
-public class HFrame {
+public class HDFrame {
 	private Text cnt_searchpage;
 	private Text cnt_itemcount;
 
