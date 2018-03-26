@@ -5,40 +5,36 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.swt.widgets.Label;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class hiyobiDownloader implements Runnable {
+public class DownlaodManager {
 
 	private static List<Gallery> gallery_list = new ArrayList<>();
 	private static List<String> download_log = new ArrayList<>();
 	private static File downlog = new File("./hiyobi/downlog.log");
 	private static File homepath = new File("./hiyobi/");
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	public hiyobiDownloader(int pages, int itemcount) {
+	public DownlaodManager(int pages, int itemcount) {
+		// TODO Auto-generated constructor stub
+		
+		int current_process = 0;
 		try {
 			if(!homepath.exists()) homepath.mkdirs();
 			if(!downlog.exists()) downlog.createNewFile();
+			
+			download_log.clear();
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(downlog)));
 			String tmp;
@@ -53,8 +49,9 @@ public class hiyobiDownloader implements Runnable {
 			}
 
 			if(itemcount == 0) itemcount = gallery_list.size();
-			for(int i = 0; i<itemcount; i++) {
-				getGalleryImages(gallery_list.get(i));
+
+			for(current_process = 0; current_process<itemcount; current_process++) {
+				getGalleryImages(gallery_list.get(current_process));
 			}
 			compressZip();
 			
@@ -68,8 +65,9 @@ public class hiyobiDownloader implements Runnable {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
-	
+
 	public void compressZip() {
 		ziputil zu = new ziputil();
 
@@ -100,14 +98,33 @@ public class hiyobiDownloader implements Runnable {
 		try {
 			Document doc = Jsoup.connect(gal.getUrl()).get();
 			Elements imgurl = doc.select("div.img-url");
-			
-			String folderpath = homepath.getPath()+"/"+"["+StringUtils.capitalize(gal.getArtist())+"]"+gal.getTitle().replaceAll("[/|\\|:|\\*|\\?|\"|<|>|\\|]", "_");
+			List<Thread> threads = new ArrayList<>();
+
+			String folderpath = homepath.getPath()+"/";
+			if(!gal.getArtist().isEmpty()) {
+				folderpath += "["+StringUtils.capitalize(gal.getArtist())+"]";
+			}
+			folderpath += gal.getTitle().replaceAll("[/|\\|:|\\*|\\?|\"|<|>|\\|]", "_");
+			folderpath += "("+gal.getCode()+")";
+
 			File folder = new File(folderpath);
 			
 			if(!folder.exists()) folder.mkdirs();
 			else return;
 			
 			System.out.println("Download to "+gal.getUrl());
+			for(int i=0; i<imgurl.size(); i++) {
+				Thread t = new Thread(new GalleryDownloader(i, imgurl.get(i).text(), folderpath));
+				t.start();
+				threads.add(t);
+			}
+	        for(int i=0; i<threads.size(); i++) {
+	            Thread t = threads.get(i);
+                t.join();
+	        }
+			download_log.add(0 ,gal.getUrl());
+
+	        /*
 			for(Element e : imgurl) {
 				System.out.println(e.text());
 				File f = new File(folderpath+"/"+e.text().substring(e.text().lastIndexOf('/')));
@@ -115,32 +132,11 @@ public class hiyobiDownloader implements Runnable {
 					DownloadImage(e.text(), f.getPath());
 				}
 			}
-			download_log.add(0 ,gal.getUrl());
-			
+			*/
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		
-	}
-	
-	public void DownloadImage(String search, String path) throws Exception {
-
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-		URL url = new URL(search);
-		String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
-
-		URLConnection con = url.openConnection();
-		con.setRequestProperty("User-Agent", USER_AGENT);
-		inputStream = con.getInputStream();
-		outputStream = new FileOutputStream(path);
-		byte[] buffer = new byte[8192];
-		int length;
-		while ((length = inputStream.read(buffer)) != -1) {
-			outputStream.write(buffer, 0, length);
-		}
-		outputStream.close();
-		inputStream.close();
 	}
 	
 	public void printGalleryInfos() {
@@ -167,28 +163,31 @@ public class hiyobiDownloader implements Runnable {
 				Gallery g = new Gallery();
 				g.setTitle(content.select("b").text());
 				g.setUrl("https://hiyobi.me"+content.child(0).attr("href"));
-				if(download_log.contains(g.getUrl())) continue;
-				g.setCode(g.getUrl().substring(g.getUrl().lastIndexOf("/")+1));
-				Element artist = content.getElementsByTag("td").get(1);
-				Element original = content.getElementsByTag("td").get(3);
-				Element type = content.getElementsByTag("td").get(5);
-				Element keyword = content.getElementsByTag("td").get(7);
-				
-				Pattern p = Pattern.compile("\\((.*?)\\)");
-				Matcher m = p.matcher(artist.text());
-				while(m.find()) {
-					g.setGroup(m.group(0).replaceAll("[\\(|\\)]", "").trim());
+				if(!download_log.contains(g.getUrl())) {
+					g.setCode(g.getUrl().substring(g.getUrl().lastIndexOf("/")+1));
+					Element artist = content.getElementsByTag("td").get(1);
+					Element original = content.getElementsByTag("td").get(3);
+					Element type = content.getElementsByTag("td").get(5);
+					Element keyword = content.getElementsByTag("td").get(7);
+					
+					Pattern p = Pattern.compile("\\((.*?)\\)");
+					Matcher m = p.matcher(artist.text());
+					while(m.find()) {
+						g.setGroup(m.group(0).replaceAll("[\\(|\\)]", "").trim());
+					}
+					g.setArtist(artist.text().replaceAll("\\((.*?)\\)", "").trim());
+					g.setOriginal(original.text().trim());
+					g.setType(type.text());
+					g.setKeyword(keyword.text());
+					gallery_list.add(g);
 				}
-				g.setArtist(artist.text().replaceAll("\\((.*?)\\)", "").trim());
-				g.setOriginal(original.text().trim());
-				g.setType(type.text());
-				g.setKeyword(keyword.text());
-				gallery_list.add(g);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+
 
 
 }

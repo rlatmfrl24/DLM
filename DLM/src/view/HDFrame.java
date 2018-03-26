@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
-import util.hd.hiyobiDownloader;
+import util.hd.DownlaodManager;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.FillLayout;
@@ -23,11 +23,12 @@ public class HDFrame {
 
 	/**
 	 * Open the window.
+	 * @wbp.parser.entryPoint
 	 */
 	public void open() {
 		Display display = Display.getDefault();
 		Shell shlHiyobi = new Shell();
-		shlHiyobi.setSize(210, 119);
+		shlHiyobi.setSize(230, 118);
 		shlHiyobi.setText("Hiyobi");
 		shlHiyobi.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
@@ -39,7 +40,7 @@ public class HDFrame {
 		lblSearchPage.setText("Search Page : ");
 		
 		cnt_searchpage = new Text(composite, SWT.BORDER);
-		GridData gd_cnt_searchpage = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		GridData gd_cnt_searchpage = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gd_cnt_searchpage.widthHint = 79;
 		cnt_searchpage.setLayoutData(gd_cnt_searchpage);
 		
@@ -59,11 +60,12 @@ public class HDFrame {
 		
 		Button btnCrawl = new Button(composite, SWT.NONE);
 		btnCrawl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
+		btnCrawl.setText("Crawl!");
 		btnCrawl.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				lblProgress.setText("Progressing..");
-				new hiyobiDownloader(Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()));
+				new DownlaodManager(Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()));
 				lblProgress.setText("Done.");
 				MessageBox msg = new MessageBox(shlHiyobi);
 				msg.setText("Alert");
@@ -71,8 +73,7 @@ public class HDFrame {
 				msg.open();
 			}
 		});
-		btnCrawl.setText("Crawl!");
-
+		
 		shlHiyobi.open();
 		shlHiyobi.layout();
 		while (!shlHiyobi.isDisposed()) {
