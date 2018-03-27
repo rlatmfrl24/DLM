@@ -16,5 +16,7 @@
 	<classpathentry kind="lib" path="C:/Users/kimseulki.PHILL-IT/.p2/pool/plugins/org.eclipse.ui.forms_3.7.101.v20170815-1446.jar" sourcepath="C:/Users/kimseulki.PHILL-IT/.p2/pool/plugins/org.eclipse.ui.forms_3.7.101.v20170815-1446.jar"/>
 	<classpathentry kind="lib" path="C:/Users/kimseulki.PHILL-IT/git/DLM/DLM/lib/commons-io-2.6.jar"/>
 	<classpathentry kind="lib" path="C:/Users/kimseulki.PHILL-IT/git/DLM/DLM/lib/swing2swt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kimseulki.PHILL-IT/git/DLM/DLM/lib/commons-lang3-3.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/kimseulki.PHILL-IT/git/DLM/DLM/lib/jsoup-1.8.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

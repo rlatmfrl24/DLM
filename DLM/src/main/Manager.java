@@ -9,7 +9,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import view.CFrame;
+import view.CTFrame;
+import view.HDFrame;
 import view.RCFrame;
 
 import org.eclipse.swt.widgets.Composite;
@@ -22,6 +23,9 @@ import org.eclipse.swt.events.SelectionEvent;
 
 public class Manager extends Shell {
 	private static File TempPath = new File("./temp/");
+	private static File HiyobiPath = new File("./hiyobi/");
+	private static File deletedItemPath = new File("./temp/deleted/");
+	private static File moveItemPath = new File("./temp/moved/");
 	private static ConfigLoader configLoader = new ConfigLoader();
 	/**
 	 * Launch the application.
@@ -41,6 +45,18 @@ public class Manager extends Shell {
 				bw.flush();
 				bw.close();
 			}
+			
+			if(!deletedItemPath.exists()) {
+				deletedItemPath.mkdirs();
+			}
+			if(!moveItemPath.exists()) {
+				moveItemPath.mkdirs();
+			}
+			
+			if(!HiyobiPath.exists()) {
+				HiyobiPath.mkdirs();
+			}
+			
 			configLoader.loadConfig(TempPath+"/config.properties");
 			Display display = Display.getDefault();
 			Manager shell = new Manager(display);
@@ -84,12 +100,24 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				CFrame mainFrame = new CFrame(configLoader);
+				CTFrame mainFrame = new CTFrame(configLoader);
 				mainFrame.FrameInitialize();
 			}
 		});
 		btnCategorizer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		btnCategorizer.setText("Categorizer");
+		
+		Button btnHiyobiDownloader = new Button(composite, SWT.NONE);
+		btnHiyobiDownloader.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dispose();
+				HDFrame mainFrame = new HDFrame();
+				mainFrame.open();
+			}
+		});
+		btnHiyobiDownloader.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		btnHiyobiDownloader.setText("Hiyobi Downloader");
 		createContents();
 	}
 
@@ -99,7 +127,6 @@ public class Manager extends Shell {
 	protected void createContents() {
 		setText("Select Module");
 		setSize(270, 168);
-
 	}
 
 	@Override

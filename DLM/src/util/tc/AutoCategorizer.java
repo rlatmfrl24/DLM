@@ -1,9 +1,11 @@
-package util;
+package util.tc;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class AutoCategorizer {
 	
@@ -32,6 +34,7 @@ public class AutoCategorizer {
 				keyword.contains("망가") ||
 				keyword.contains("만화") ||
 				keyword.contains("한글") ||
+				keyword.contains("노모") ||
 				keyword.contains("풀컬러")) {
 				transform_name = transform_name.replace(keyword, "");
 			}else if(keyword.contains("동인지") || keyword.contains("동인")) {
@@ -40,13 +43,16 @@ public class AutoCategorizer {
 				directory+=keyword.substring(1, keyword.length()-1).trim()+"/";
 				//transform_name = transform_name.replace(keyword, "");
 			}else if(keyword.contains("(") && transform_name.trim().startsWith(keyword)) {
-				directory+=keyword.replaceAll("[\\(|\\)|\\[|\\]]", "")+"/";
+				directory+=keyword.replaceAll("[\\(|\\)|\\[|\\]]", "").trim()+"/";
 				//transform_name = transform_name.replace(keyword, "");
 			}
 		}
 		if(directory.length() < 1) {
 			directory+="미분류/";
 		}
-		return directory+transform_name;
+		directory = directory.replaceAll("\\[(.*?)\\]|\\((.*?)\\)", "");
+		directory = StringUtils.capitalize(directory);
+		//directory = WordUtils.capitalizeFully(directory);
+		return directory.trim()+transform_name.trim();
 	}
 }
