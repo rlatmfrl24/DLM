@@ -19,22 +19,27 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class DownlaodManager {
+public class DownlaodManager implements Runnable {
 
 	private static List<Gallery> gallery_list = new ArrayList<>();
 	private static List<String> download_log = new ArrayList<>();
 	private static File downlog = new File("./hiyobi/downlog.log");
 	private static File homepath = new File("./hiyobi/");
+
+	int pages;
+	int itemcount;
+	int current_process=0;
+	Label lblprogress;
 	
-	public DownlaodManager(int pages, int itemcount) {
-		// TODO Auto-generated constructor stub
-		
-		int current_process = 0;
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
 		try {
 			if(!homepath.exists()) homepath.mkdirs();
 			if(!downlog.exists()) downlog.createNewFile();
 			
 			download_log.clear();
+			gallery_list.clear();
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(downlog)));
 			String tmp;
@@ -47,14 +52,25 @@ public class DownlaodManager {
 				Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
 				getGalleryDataFromPage(doc);
 			}
-
+			
 			if(itemcount == 0) itemcount = gallery_list.size();
+			ziputil zu = new ziputil();
 
 			for(current_process = 0; current_process<itemcount; current_process++) {
-				getGalleryImages(gallery_list.get(current_process));
+				Gallery g = gallery_list.get(current_process);
+				getGalleryImages(g);
+				String toPath = homepath.getPath()+"/";
+				if(!g.getOriginal().equals("N/A")) {
+					toPath += g.getType()+"/"+g.getOriginal()+"/";
+				}else {
+					toPath += g.getType()+"/";
+				}
+				if(!new File(toPath).exists()) new File(toPath).mkdirs();
+				
+				zu.createZipFile(homepath.getPath()+"/"+g.getPath()+"/", toPath, g.getPath()+".zip");
+				deleteDirectory(new File(homepath.getPath()+"/"+g.getPath()+"/"));
 			}
-			compressZip();
-			
+
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(downlog)));
 			for(int i=0; i<download_log.size(); i++) {
 				bw.write(download_log.get(i)+"\n");
@@ -65,18 +81,12 @@ public class DownlaodManager {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
-
-	public void compressZip() {
-		ziputil zu = new ziputil();
-
-		for(File gal : homepath.listFiles()) {
-			if(gal.isDirectory()) {
-				zu.createZipFile(gal.getPath(), homepath.getPath(), gal.getName()+".zip");
-				deleteDirectory(gal);
-			}
-		}
+	
+	public DownlaodManager(int pages, int itemcount) {
+		// TODO Auto-generated constructor stub
+		this.pages = pages;
+		this.itemcount = itemcount;
 	}
 	
 	public boolean deleteDirectory(File path) {
@@ -99,22 +109,14 @@ public class DownlaodManager {
 			Document doc = Jsoup.connect(gal.getUrl()).get();
 			Elements imgurl = doc.select("div.img-url");
 			List<Thread> threads = new ArrayList<>();
-
-			String folderpath = homepath.getPath()+"/";
-			if(!gal.getArtist().isEmpty()) {
-				folderpath += "["+StringUtils.capitalize(gal.getArtist())+"]";
-			}
-			folderpath += gal.getTitle().replaceAll("[/|\\|:|\\*|\\?|\"|<|>|\\|]", "_");
-			folderpath += "("+gal.getCode()+")";
-
-			File folder = new File(folderpath);
+			File folder = new File(homepath.getPath()+"/"+gal.getPath()+"/");
 			
 			if(!folder.exists()) folder.mkdirs();
 			else return;
 			
 			System.out.println("Download to "+gal.getUrl());
 			for(int i=0; i<imgurl.size(); i++) {
-				Thread t = new Thread(new GalleryDownloader(i, imgurl.get(i).text(), folderpath));
+				Thread t = new Thread(new GalleryDownloader(i, imgurl.get(i).text(), folder.getPath()));
 				t.start();
 				threads.add(t);
 			}
@@ -124,15 +126,6 @@ public class DownlaodManager {
 	        }
 			download_log.add(0 ,gal.getUrl());
 
-	        /*
-			for(Element e : imgurl) {
-				System.out.println(e.text());
-				File f = new File(folderpath+"/"+e.text().substring(e.text().lastIndexOf('/')));
-				while(f.length() < 1000) {
-					DownloadImage(e.text(), f.getPath());
-				}
-			}
-			*/
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -163,6 +156,7 @@ public class DownlaodManager {
 				Gallery g = new Gallery();
 				g.setTitle(content.select("b").text());
 				g.setUrl("https://hiyobi.me"+content.child(0).attr("href"));
+						
 				if(!download_log.contains(g.getUrl())) {
 					g.setCode(g.getUrl().substring(g.getUrl().lastIndexOf("/")+1));
 					Element artist = content.getElementsByTag("td").get(1);
@@ -179,6 +173,15 @@ public class DownlaodManager {
 					g.setOriginal(original.text().trim());
 					g.setType(type.text());
 					g.setKeyword(keyword.text());
+					
+					String tmp="";
+					if(!g.getArtist().isEmpty()) {
+						tmp += "["+StringUtils.capitalize(g.getArtist())+"]";
+					}
+					tmp += g.getTitle().replaceAll("[/|\\|:|\\*|\\?|\"|<|>|\\|]", "_");
+					tmp += "("+g.getCode()+")";
+					g.setPath(tmp);
+					
 					gallery_list.add(g);
 				}
 			}
@@ -186,10 +189,6 @@ public class DownlaodManager {
 			e.printStackTrace();
 		}
 	}
-
-
-
-
 }
 
 class Gallery{
@@ -202,6 +201,7 @@ class Gallery{
 	private String original;
 	private String type;
 	private String keyword;
+	private String path;
 	
 	public String getTitle() {
 		return title;
@@ -250,5 +250,11 @@ class Gallery{
 	}
 	public void setCode(String code) {
 		this.code = code;
+	}
+	public String getPath() {
+		return path;
+	}
+	public void setPath(String path) {
+		this.path = path;
 	}
 }

@@ -3,6 +3,9 @@ package view;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Composite;
+
+import java.lang.Thread.State;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
@@ -20,6 +23,7 @@ import org.eclipse.swt.events.SelectionEvent;
 public class HDFrame {
 	private Text cnt_searchpage;
 	private Text cnt_itemcount;
+	public Thread downloader;
 
 	/**
 	 * Open the window.
@@ -65,18 +69,32 @@ public class HDFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				lblProgress.setText("Progressing..");
-				new DownlaodManager(Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()));
-				lblProgress.setText("Done.");
-				MessageBox msg = new MessageBox(shlHiyobi);
-				msg.setText("Alert");
-				msg.setMessage("Download Complete.");
-				msg.open();
+				downloader = new Thread(new DownlaodManager(Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText())));
+				downloader.start();
 			}
 		});
 		
 		shlHiyobi.open();
 		shlHiyobi.layout();
+		State before_state = State.TERMINATED;
 		while (!shlHiyobi.isDisposed()) {
+			
+			if(downloader!=null) {
+				if(downloader.isAlive()) {
+					btnCrawl.setEnabled(false);
+				}else if(!downloader.isAlive()) {
+					btnCrawl.setEnabled(true);
+				}
+				if(before_state!=downloader.getState() && downloader.getState() == State.TERMINATED) {
+					MessageBox msg = new MessageBox(shlHiyobi);
+					msg.setText("Alert");
+					msg.setMessage("Download Complete.");
+					msg.open();
+					lblProgress.setText("Done.");
+				}
+				before_state=downloader.getState();
+			}
+			
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
