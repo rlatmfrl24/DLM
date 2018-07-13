@@ -56,7 +56,6 @@ public class HDFrame {
 		cnt_itemcount.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		cnt_itemcount.setText("0");
 		
-		
 		Label lblProgress = new Label(composite, SWT.NONE);
 		lblProgress.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		lblProgress.setAlignment(SWT.CENTER);
