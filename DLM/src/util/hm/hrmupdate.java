@@ -4,10 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,8 +26,8 @@ public class hrmupdate {
 	private static final File LOG_FILE = new File("./temp/hrm.log");
 	private static WebDriver driver;
 	private Map<String, String> Filter_Map = new HashMap<>();
-	private Trie linkTrie;
 	private Map<String, List<String>> res_map = new HashMap<>();
+	private Trie linkTrie;
 	private List<String> log_list = new ArrayList<>();
 	
 	public hrmupdate() {
