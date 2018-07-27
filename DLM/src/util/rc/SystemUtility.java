@@ -1,6 +1,7 @@
 package util.rc;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -48,6 +49,16 @@ public class SystemUtility implements Observer {
 		}catch(Exception e){
 			e.printStackTrace();
 		}	
+	}
+	
+	public void open_browser(String url) {
+		try {
+			Runtime rt = Runtime.getRuntime();
+			rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override

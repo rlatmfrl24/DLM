@@ -2,31 +2,42 @@ package view;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+
+import util.hm.hrmupdate;
+import util.rc.SystemUtility;
+
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Label;
 
 public class HMFrame {
 	private Table table;
-
+	private hrmupdate hu = new hrmupdate();
+	private SystemUtility su = new SystemUtility();
+	
 	/**
 	 * Launch the application.
 	 * @param args
@@ -69,6 +80,17 @@ public class HMFrame {
 		table.setLayoutData(gd_table);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				if(table.getSelectionCount() > 0) {
+					String link = table.getSelection()[0].getText(1);
+					System.out.println(link);
+					su.open_browser(link);
+					table.getSelection()[0].setChecked(true);
+				}
+			}
+		});
 		
 		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn tblclmnCategory = tableViewerColumn.getColumn();
@@ -110,23 +132,67 @@ public class HMFrame {
 			}
 		});
 		
-		TableItem i = new TableItem(table, 0);
-		i.setText(0, "1");
-		i.setText(1, "te");
-		
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
 		tbtmBattlepage.setText("Battlepage");
 		
 		Composite composite_1 = new Composite(shlHrm, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		composite_1.setLayout(new GridLayout(2, false));
+		composite_1.setLayout(new GridLayout(3, false));
 		
 		Button btnUpdate = new Button(composite_1, SWT.NONE);
 		btnUpdate.setText("Update");
 		
 		Button btnRefresh = new Button(composite_1, SWT.NONE);
 		btnRefresh.setText("Refresh");
+		
+		Label lblReady = new Label(composite_1, SWT.NONE);
+		lblReady.setAlignment(SWT.RIGHT);
+		GridData gd_lblReady = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		gd_lblReady.widthHint = 640;
+		lblReady.setLayoutData(gd_lblReady);
+		lblReady.setText("Ready..");
 
+		btnRefresh.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				table.removeAll();
+				btnRefresh.setEnabled(false);
+				lblReady.setText("Refreshing Hrm Pages..");
+				hu.LoadHrm();
+				Map<String, List<String>> refreshed = hu.getResMap();
+				for(String tag : refreshed.keySet()) {
+					for(String url : refreshed.get(tag)) {
+						TableItem ti = new TableItem(table, 0);
+						ti.setText(0, tag);
+						ti.setText(1, url);
+					}
+				}
+				btnRefresh.setEnabled(true);
+				lblReady.setText("Done.");
+			}
+		});
+		btnUpdate.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> visited = new ArrayList<>();
+					List<Integer> idx = new ArrayList<>();
+					for(TableItem item : table.getItems()) {
+						if(item.getChecked()) {
+							visited.add(item.getText(1));
+							idx.add(table.indexOf(item));
+						}
+					}
+					int[] remove_idx = new int[idx.size()];
+					for(int i = 0; i < idx.size(); i++) remove_idx[i] = idx.get(i);
+					table.remove(remove_idx);
+					hu.SaveLog(visited);
+					lblReady.setText("Log Updated.");
+				} catch(Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		shlHrm.open();
 		shlHrm.layout();
 		while (!shlHrm.isDisposed()) {

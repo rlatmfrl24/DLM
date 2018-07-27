@@ -10,7 +10,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
-
 import util.hd.DownlaodManager;
 
 import org.eclipse.swt.widgets.Button;
@@ -19,12 +18,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class HDFrame {
 	private Text cnt_searchpage;
 	private Text cnt_itemcount;
 	public Thread downloader;
-
+	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
+	private int selection_driver = 0;
+	
 	/**
 	 * Open the window.
 	 * @wbp.parser.entryPoint
@@ -32,43 +35,65 @@ public class HDFrame {
 	public void open() {
 		Display display = Display.getDefault();
 		Shell shlHiyobi = new Shell();
-		shlHiyobi.setSize(230, 118);
+		shlHiyobi.setSize(483, 129);
 		shlHiyobi.setText("Hiyobi");
 		shlHiyobi.setLayout(new FillLayout(SWT.HORIZONTAL));
+		formToolkit.setBackground(null);
 		
 		Composite composite = new Composite(shlHiyobi, SWT.NONE);
-		composite.setLayout(new GridLayout(2, false));
-		
+		composite.setLayout(new GridLayout(3, false));
+
 		Label lblSearchPage = new Label(composite, SWT.NONE);
-		lblSearchPage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 		lblSearchPage.setText("Search Page : ");
 		
 		cnt_searchpage = new Text(composite, SWT.BORDER);
 		GridData gd_cnt_searchpage = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-		gd_cnt_searchpage.widthHint = 79;
+		gd_cnt_searchpage.widthHint = 183;
 		cnt_searchpage.setLayoutData(gd_cnt_searchpage);
 		
+		Button btnCrawl = new Button(composite, SWT.NONE);
+		btnCrawl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnCrawl.setText("Crawl!");
+		
 		Label lblDownloadCount = new Label(composite, SWT.NONE);
-		lblDownloadCount.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 		lblDownloadCount.setText("Download Count : ");
 		
 		cnt_itemcount = new Text(composite, SWT.BORDER);
 		cnt_itemcount.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		cnt_itemcount.setText("0");
 		
-		Label lblProgress = new Label(composite, SWT.NONE);
-		lblProgress.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		lblProgress.setAlignment(SWT.CENTER);
-		lblProgress.setText("Ready..");
+		Composite composite_combo = new Composite(composite, SWT.NONE);
+		composite_combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		composite_combo.setLayout(new FillLayout(SWT.HORIZONTAL));
+		Button btnPhantom = new Button(composite_combo, SWT.RADIO);
+		btnPhantom.setSelection(true);
+		formToolkit.adapt(btnPhantom, true, true);
+		btnPhantom.setText("Phantom");
 		
-		Button btnCrawl = new Button(composite, SWT.NONE);
-		btnCrawl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, 1, 1));
-		btnCrawl.setText("Crawl!");
+		Button btnChrome = new Button(composite_combo, SWT.RADIO);
+		formToolkit.adapt(btnChrome, true, true);
+		btnChrome.setText("Chrome");
+		
+		
+		Label label = new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
+		formToolkit.adapt(label, true, true);
+
+		Label lblCurrenttitle = new Label(composite, SWT.NONE);
+		lblCurrenttitle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		lblCurrenttitle.setAlignment(SWT.CENTER);
+		lblCurrenttitle.setText("Waiting for start..");
+		
+		ProgressBar progressBar = new ProgressBar(composite, SWT.NONE);
+		progressBar.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+		progressBar.setToolTipText("");
+
 		btnCrawl.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				lblProgress.setText("Progressing..");
-				downloader = new Thread(new DownlaodManager(Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText())));
+				if(btnPhantom.getSelection() && !btnChrome.getSelection()) selection_driver = 1;
+				else if(btnChrome.getSelection() && !btnPhantom.getSelection()) selection_driver = 2;
+				downloader = new Thread(new DownlaodManager(lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()), selection_driver));
 				downloader.start();
 			}
 		});
@@ -89,7 +114,6 @@ public class HDFrame {
 					msg.setText("Alert");
 					msg.setMessage("Download Complete.");
 					msg.open();
-					lblProgress.setText("Done.");
 				}
 				before_state=downloader.getState();
 			}

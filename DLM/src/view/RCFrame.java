@@ -164,12 +164,12 @@ public class RCFrame implements Observer {
 		
 		table.setHeaderVisible(true);
 				
-				TableColumn tblclmnThumbnail = new TableColumn(table, SWT.NONE);
-				tblclmnThumbnail.setWidth(100);
-				tblclmnThumbnail.setText("Thumbnail");
-				TableColumn tblclmnFileName = new TableColumn(table, SWT.LEFT);
-				tblclmnFileName.setWidth(200);
-				tblclmnFileName.setText("File Name");
+		TableColumn tblclmnThumbnail = new TableColumn(table, SWT.NONE);
+		tblclmnThumbnail.setWidth(100);
+		tblclmnThumbnail.setText("Thumbnail");
+		TableColumn tblclmnFileName = new TableColumn(table, SWT.LEFT);
+		tblclmnFileName.setWidth(200);
+		tblclmnFileName.setText("File Name");
 		TableColumn tblclmnPath = new TableColumn(table, SWT.NONE);
 		tblclmnPath.setWidth(200);
 		tblclmnPath.setText("Path");

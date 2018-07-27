@@ -18,16 +18,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.eclipse.swt.SWT;
 
 public class DownlaodManager implements Runnable{
 
@@ -37,12 +37,16 @@ public class DownlaodManager implements Runnable{
 	private static File homepath = new File("./hiyobi/");
 	private static WebDriver driver;
 
-	int pages;
-	int itemcount;
-	int current_process=0;
+	private int pages;
+	private int itemcount;
+	private int current_process=0;
+	private int selection_drvier;
+	private Label lbl;
+	private ProgressBar pbar;
 
 	@Override
 	public void run() {
+
 		// TODO Auto-generated method stub
 		try {
 			if(!homepath.exists()) homepath.mkdirs();
@@ -58,20 +62,44 @@ public class DownlaodManager implements Runnable{
 			}
 			br.close();
 			
-			for(int i = 0; i<pages; i++) {
+			for(int i = 1; i<pages+1; i++) {
 				Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
 				getGalleryDataFromPage(doc);
 			}
 			
 			if(itemcount == 0) itemcount = gallery_list.size();
 			ziputil zu = new ziputil();
-			System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
-			driver = new PhantomJSDriver();
+			
+			switch(selection_drvier) {
+			case 1:
+				System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
+				driver = new PhantomJSDriver();
+				break;
+			case 2:
+				System.setProperty("webdriver.chrome.driver", "./driver/chromedriver/chromedriver.exe");
+				ChromeOptions options = new ChromeOptions();
+				options.addArguments("--headless");
+				options.addArguments("--no-sandbox");
+				//options.addArguments("--disable-gpu");
+				options.setBinary("./driver/chromedriver/chromedriver.exe");
+				driver = new ChromeDriver(options);
+				break;
+			}
 			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			
 			for(current_process = 0; current_process<itemcount; current_process++) {
+				if(gallery_list.size()==0) break;
 				Gallery g = gallery_list.get(current_process);
 				download_log.add(g.getCode());
+				lbl.getDisplay().asyncExec(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						lbl.setText(g.getTitle());
+						pbar.setSelection(0);
+					}
+				});
 				getGalleryImages(g);
 				String toPath = homepath.getPath()+"/";
 				if(g.getOriginal()!=null && !g.getOriginal().contains(",")) {
@@ -96,13 +124,15 @@ public class DownlaodManager implements Runnable{
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
-	public DownlaodManager(int pages, int itemcount) {
+	
+	public DownlaodManager(Label lbl, ProgressBar pbar, int pages, int itemcount, int selection) {
 		// TODO Auto-generated constructor stub
 		this.pages = pages;
 		this.itemcount = itemcount;
+		this.lbl = lbl;
+		this.pbar = pbar;
+		this.selection_drvier = selection;
 	}
 	
 	public boolean deleteDirectory(File path) {
@@ -133,9 +163,16 @@ public class DownlaodManager implements Runnable{
 				Document doc = Jsoup.parse(driver.getPageSource());
 				img_list = doc.select(".img-url");
 			}
-			
+			int max_size = img_list.size();
+			pbar.getDisplay().asyncExec(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					pbar.setMaximum(max_size);
+				}
+			});
 			for(Element e : img_list) {
-				//System.out.println(e.text());
 				InputStream inputStream = null;
 				OutputStream outputStream = null;
 				URL url = new URL(e.text());
@@ -151,43 +188,16 @@ public class DownlaodManager implements Runnable{
 				}
 				outputStream.close();
 				inputStream.close();
-			}
-			Thread.sleep(1000);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	public void getGalleryImages(Display display, Gallery gal) {
-		File folder = new File(homepath.getPath()+"/"+gal.getPath()+"/");
-		if(!folder.exists()) folder.mkdirs();
-		else return;
-		
-		try {
-			Elements img_list = new Elements();
-			while(img_list.size() == 0) {
-				driver.get(gal.getUrl());
-				Thread.sleep(1000);
-				Document doc = Jsoup.parse(driver.getPageSource());
-				img_list = doc.select(".img-url");
-			}
-			
-			for(Element e : img_list) {
-				//System.out.println(e.text());
-				InputStream inputStream = null;
-				OutputStream outputStream = null;
-				URL url = new URL(e.text());
-				String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
-				URLConnection con = url.openConnection();
-				con.setRequestProperty("User-Agent", USER_AGENT);
-				inputStream = con.getInputStream();
-				outputStream = new FileOutputStream(folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".jpg");
-				byte[] buffer = new byte[2048];
-				int length;
-				while ((length = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, length);
-				}
-				outputStream.close();
-				inputStream.close();
+				int selection = img_list.indexOf(e);
+				pbar.getDisplay().asyncExec(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						pbar.setSelection(selection+1);
+						
+					}
+				});
 			}
 			Thread.sleep(1000);
 		}catch(Exception e) {
