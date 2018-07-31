@@ -71,11 +71,11 @@ public class hrmupdate {
 		}
 	}
 	
-	public void LoadHrm() {
+	public Map<String, List<String>> LoadHrm() {
 		try {
 			res_map.clear();
 			log_list.clear();
-			log_list = dm.getHrmLog();
+			log_list = dm.getLogs();
 			
 			//파폭 드라이버
 			/*
@@ -108,9 +108,6 @@ public class hrmupdate {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public Map<String, List<String>> getResMap() {
-		return this.res_map;
+		return res_map;
 	}
 }

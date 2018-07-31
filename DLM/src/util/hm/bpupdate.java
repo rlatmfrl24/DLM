@@ -44,7 +44,7 @@ public class bpupdate {
 	public Map<String, List<String>> LoadBP() {
 		Map<String, List<String>> data_map = new TreeMap<>();
 		try {
-			log_list = dm.getBPLog();
+			log_list = dm.getLogs("v12.battlepage.com");
 			for(int i=1; i<=num_search_page; i++) {
 				Document doc = Jsoup.connect(board_humor+"&page="+i).get();
 				Element table = doc.select("#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable").get(0);
@@ -81,18 +81,5 @@ public class bpupdate {
 			e.printStackTrace();
 		}
 		return data_map;
-	}
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try {
-			bpupdate bu = new bpupdate(new dbManager());
-			bu.dm.Connect();
-			bu.log_list = bu.dm.getBPLog();
-			bu.Login();
-			bu.LoadBP();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

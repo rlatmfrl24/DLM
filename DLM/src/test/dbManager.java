@@ -47,24 +47,32 @@ public class dbManager {
 		}
 	}
 	
-	public List<String> getHrmLog() throws Exception {
+	public List<String> getLogs(){
 		List<String> loglist = new ArrayList<>();
-		String sql = "SELECT link FROM tb_link_info;";
-		Statement stmt = connection.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		while(rs.next()) {
-			loglist.add(rs.getString(1));
+		try {
+			String sql = "SELECT link FROM tb_link_info;";
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				loglist.add(rs.getString(1));
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 		return loglist;
 	}
 	
-	public List<String> getBPLog() throws Exception {
+	public List<String> getLogs(String domain){
 		List<String> loglist = new ArrayList<>();
-		String sql = "SELECT link FROM tb_link_info WHERE domain like 'v12.battlepage.com';";
-		Statement stmt = connection.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		while(rs.next()) {
-			loglist.add(rs.getString(1));
+		try {
+			String sql = "SELECT link FROM tb_link_info WHERE domain like '"+domain+"';";
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				loglist.add(rs.getString(1));
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 		return loglist;
 	}

@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import view.CTFrame;
 import view.HDFrame;
+import view.HMFrame;
 import view.RCFrame;
 
 import org.eclipse.swt.widgets.Composite;
@@ -118,6 +119,18 @@ public class Manager extends Shell {
 		});
 		btnHiyobiDownloader.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		btnHiyobiDownloader.setText("Hiyobi Downloader");
+		
+		Button btnTrendChecker = new Button(composite, SWT.NONE);
+		btnTrendChecker.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dispose();
+				HMFrame mainFrame = new HMFrame();
+				mainFrame.open();
+			}
+		});
+		btnTrendChecker.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		btnTrendChecker.setText("Trend Checker");
 		createContents();
 	}
 
@@ -126,7 +139,7 @@ public class Manager extends Shell {
 	 */
 	protected void createContents() {
 		setText("Select Module");
-		setSize(270, 168);
+		setSize(273, 227);
 	}
 
 	@Override

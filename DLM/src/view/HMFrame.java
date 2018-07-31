@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 import test.dbManager;
 import util.hm.bpupdate;
+import util.hm.ddupdate;
 import util.hm.hrmupdate;
 import util.rc.SystemUtility;
 
@@ -35,12 +35,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.FillLayout;
 
 public class HMFrame {
 	private Table table_hrm;
+	private Table table_dd;
+	private Table table_bp;
 	private hrmupdate hu;
 	private bpupdate bp;
+	private ddupdate du;
 	private dbManager dm = new dbManager();
 	private SystemUtility su = new SystemUtility();
 	
@@ -65,6 +67,7 @@ public class HMFrame {
 		dm.initialize();
 		hu = new hrmupdate(dm);
 		bp = new bpupdate(dm);
+		du = new ddupdate(dm);
 		Display display = Display.getDefault();
 		Shell shlHrm = new Shell();
 		shlHrm.setSize(786, 573);
@@ -108,9 +111,9 @@ public class HMFrame {
 		tblclmnCategory.setText("Category");
 		
 		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer_hrm, SWT.NONE);
-		TableColumn tblclmnUrl = tableViewerColumn_1.getColumn();
-		tblclmnUrl.setWidth(100);
-		tblclmnUrl.setText("URL");
+		TableColumn tblclmnUrl_hrm = tableViewerColumn_1.getColumn();
+		tblclmnUrl_hrm.setWidth(100);
+		tblclmnUrl_hrm.setText("URL");
 
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
 		tbtmBattlepage.setText("Battlepage");
@@ -119,7 +122,6 @@ public class HMFrame {
 		tbtmBattlepage.setControl(composite_bp);
 		composite_bp.setLayout(new GridLayout(1, false));
 		
-		Table table_bp;
 		TableViewer tableViewer_bp = new TableViewer(composite_bp, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
 		table_bp = tableViewer_bp.getTable();
 		table_bp.setLinesVisible(true);
@@ -146,14 +148,48 @@ public class HMFrame {
 		tblclmnBoard.setText("Board");
 		
 		TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer_bp, SWT.NONE);
-		TableColumn tblclmnTitle = tableViewerColumn_3.getColumn();
-		tblclmnTitle.setWidth(100);
-		tblclmnTitle.setText("Title");
+		TableColumn tblclmnTitle_bp = tableViewerColumn_3.getColumn();
+		tblclmnTitle_bp.setWidth(100);
+		tblclmnTitle_bp.setText("Title");
 		
 		TableViewerColumn tableViewerColumn_4 = new TableViewerColumn(tableViewer_bp, SWT.NONE);
-		TableColumn tblclmnUrl_1 = tableViewerColumn_4.getColumn();
-		tblclmnUrl_1.setWidth(100);
-		tblclmnUrl_1.setText("URL");
+		TableColumn tblclmnUrl_bp = tableViewerColumn_4.getColumn();
+		tblclmnUrl_bp.setWidth(100);
+		tblclmnUrl_bp.setText("URL");
+		
+		TabItem tbtmDogdrip = new TabItem(tabFolder, SWT.NONE);
+		tbtmDogdrip.setText("Dogdrip");
+		
+		Composite composite_dd = new Composite(tabFolder, SWT.NONE);
+		tbtmDogdrip.setControl(composite_dd);
+		composite_dd.setLayout(new GridLayout(1, false));
+		
+		TableViewer tableViewer = new TableViewer(composite_dd, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		table_dd = tableViewer.getTable();
+		table_dd.setLinesVisible(true);
+		table_dd.setHeaderVisible(true);
+		table_dd.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		table_dd.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				if(table_dd.getSelectionCount() > 0) {
+					String link = table_dd.getSelection()[0].getText(1);
+					System.out.println(link);
+					su.open_browser(link);
+					table_dd.getSelection()[0].setChecked(true);
+				}
+			}
+		});
+		
+		TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnTitle_dd = tableViewerColumn_5.getColumn();
+		tblclmnTitle_dd.setWidth(100);
+		tblclmnTitle_dd.setText("Title");
+		
+		TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnUrl_dd = tableViewerColumn_6.getColumn();
+		tblclmnUrl_dd.setWidth(100);
+		tblclmnUrl_dd.setText("URL");
 		
 		tabFolder.addControlListener(new ControlListener() {
 			@Override
@@ -169,12 +205,12 @@ public class HMFrame {
 				Point oldSize = table_hrm.getSize();
 				if (oldSize.x > area.width) {
 					tblclmnCategory.setWidth(width / 4);
-					tblclmnUrl.setWidth(width - tblclmnCategory.getWidth());
+					tblclmnUrl_hrm.setWidth(width - tblclmnCategory.getWidth());
 					table_hrm.setSize(area.width, area.height);
 				} else {
 					table_hrm.setSize(area.width, area.height);					
 					tblclmnCategory.setWidth(width / 4);
-					tblclmnUrl.setWidth(width - tblclmnCategory.getWidth());
+					tblclmnUrl_hrm.setWidth(width - tblclmnCategory.getWidth());
 				}
 				
 				preferredSize = table_bp.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -185,15 +221,32 @@ public class HMFrame {
 				}
 				oldSize = table_bp.getSize();
 				if (oldSize.x > area.width) {
-					tblclmnBoard.setWidth(width / 4);
-					tblclmnTitle.setWidth(width / 4);
-					tblclmnUrl_1.setWidth(width - tblclmnBoard.getWidth() - tblclmnTitle.getWidth());
+					tblclmnBoard.setWidth(width / 5);
+					tblclmnTitle_bp.setWidth(width / 5 * 2);
+					tblclmnUrl_bp.setWidth(width - tblclmnBoard.getWidth() - tblclmnTitle_bp.getWidth());
 					table_bp.setSize(area.width, area.height);
 				} else {
 					table_bp.setSize(area.width, area.height);					
 					tblclmnBoard.setWidth(width / 5);
-					tblclmnTitle.setWidth(width / 5 * 2);
-					tblclmnUrl_1.setWidth(width - tblclmnBoard.getWidth() - tblclmnTitle.getWidth());
+					tblclmnTitle_bp.setWidth(width / 5 * 2);
+					tblclmnUrl_bp.setWidth(width - tblclmnBoard.getWidth() - tblclmnTitle_bp.getWidth());
+				}
+				
+				preferredSize = table_dd.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				width = area.width - 2 * table_dd.getBorderWidth();
+				if (preferredSize.y > area.height + table_dd.getHeaderHeight()) {
+					Point vBarSize = table_dd.getVerticalBar().getSize();
+					width -= vBarSize.x;
+				}
+				oldSize = table_dd.getSize();
+				if (oldSize.x > area.width) {
+					tblclmnTitle_dd.setWidth(width / 2);
+					tblclmnUrl_dd.setWidth(width - tblclmnTitle_dd.getWidth());
+					table_dd.setSize(area.width, area.height);
+				} else {
+					table_dd.setSize(area.width, area.height);					
+					tblclmnTitle_dd.setWidth(width / 2);
+					tblclmnUrl_dd.setWidth(width - tblclmnTitle_dd.getWidth());
 				}
 			}
 
@@ -225,14 +278,13 @@ public class HMFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Map<String, List<String>> refreshed;
+				btnRefresh.setEnabled(false);
 				switch(tabFolder.getSelectionIndex()) {
 				case 0:
 					//Hrm
 					table_hrm.removeAll();
-					btnRefresh.setEnabled(false);
 					lblReady.setText("Refreshing Hrm Pages..");
-					hu.LoadHrm();
-					refreshed = hu.getResMap();
+					refreshed = hu.LoadHrm();
 					for(String tag : refreshed.keySet()) {
 						for(String url : refreshed.get(tag)) {
 							TableItem ti = new TableItem(table_hrm, 0);
@@ -240,13 +292,10 @@ public class HMFrame {
 							ti.setText(1, url);
 						}
 					}
-					btnRefresh.setEnabled(true);
-					lblReady.setText("Done.");
 					break;
 				case 1:
 					//BP
 					table_bp.removeAll();
-					btnRefresh.setEnabled(false);
 					lblReady.setText("Refreshing BP Pages..");
 					refreshed = bp.LoadBP();
 					for(String id : refreshed.keySet()) {
@@ -255,10 +304,21 @@ public class HMFrame {
 						ti.setText(1, refreshed.get(id).get(1));
 						ti.setText(2, refreshed.get(id).get(2));
 					}
-					btnRefresh.setEnabled(true);
-					lblReady.setText("Done.");
+					break;
+				case 2:
+					//DD
+					table_dd.removeAll();
+					lblReady.setText("Refreshing DD Pages..");
+					refreshed = du.LoadDD();
+					for(String id : refreshed.keySet()) {
+						TableItem ti = new TableItem(table_dd, 0);
+						ti.setText(0, refreshed.get(id).get(0));
+						ti.setText(1, refreshed.get(id).get(1));
+					}
 					break;
 				}
+				btnRefresh.setEnabled(true);
+				lblReady.setText("Done.");
 			}
 		});
 		btnUpdate.addSelectionListener(new SelectionAdapter() {
@@ -291,6 +351,16 @@ public class HMFrame {
 						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
 						table_bp.remove(remove_idx);
 						break;
+					case 2:
+						for(TableItem item : table_dd.getItems()) {
+							if(item.getChecked()) {
+								visited.add(item.getText(1));
+								selected_idx.add(table_dd.indexOf(item));
+							}
+						}
+						remove_idx = new int[selected_idx.size()];
+						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
+						table_dd.remove(remove_idx);
 					}
 					dm.insertLog(visited);
 					lblReady.setText("Log Updated.");
