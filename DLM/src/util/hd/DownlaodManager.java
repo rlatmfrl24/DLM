@@ -189,8 +189,7 @@ public class DownlaodManager implements Runnable{
 				outputStream.close();
 				inputStream.close();
 				int selection = img_list.indexOf(e);
-				pbar.getDisplay().asyncExec(new Runnable() {
-					
+				pbar.getDisplay().asyncExec(new Runnable() {					
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
