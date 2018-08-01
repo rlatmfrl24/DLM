@@ -86,12 +86,14 @@ public class hrmupdate {
 			driver.findElement(By.cssSelector("#hrmbodyexpand")).click();
 			Thread.sleep(1000);
 			*/
+			
 			System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
 			driver = new PhantomJSDriver();
 			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			driver.get("http://insagirl-toto.appspot.com/hrm/?where=2");
 			driver.findElement(By.cssSelector("#hrmbodyexpand")).click();
 			Thread.sleep(1000);
+			
 			WebElement we = driver.findElement(By.cssSelector("#hrmbody"));
 			Element elements = Jsoup.parse(we.getAttribute("innerHTML"));
 			driver.close();

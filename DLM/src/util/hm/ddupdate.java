@@ -14,7 +14,7 @@ import test.dbManager;
 
 public class ddupdate {
 	private dbManager dm;
-	private static final int num_search_page = 3;
+	private static final int num_search_page = 6;
 	private List<String> log_list = new ArrayList<>();
 
 	public ddupdate(dbManager dm) {
