@@ -45,8 +45,12 @@ public class HMFrame {
 	private hrmupdate hu;
 	private bpupdate bp;
 	private ddupdate du;
-	private dbManager dm = new dbManager();
+	private dbManager dm;
 	private SystemUtility su = new SystemUtility();
+	
+	public HMFrame(dbManager dm) {
+		this.dm = dm;
+	}
 	
 	/**
 	 * Launch the application.
@@ -54,7 +58,10 @@ public class HMFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			HMFrame window = new HMFrame();
+			dbManager dm = new dbManager();
+			dm.Connect();
+			dm.initialize();
+			HMFrame window = new HMFrame(dm);
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -64,8 +71,6 @@ public class HMFrame {
 	 * Open the window.
 	 */
 	public void open() {
-		dm.Connect();
-		dm.initialize();
 		hu = new hrmupdate(dm);
 		bp = new bpupdate(dm);
 		du = new ddupdate(dm);

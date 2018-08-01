@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import test.dbManager;
 import view.CTFrame;
 import view.HDFrame;
 import view.HMFrame;
@@ -28,6 +29,7 @@ public class Manager extends Shell {
 	private static final File deletedItemPath = new File("./temp/deleted/");
 	private static final File moveItemPath = new File("./temp/moved/");
 	private static ConfigLoader configLoader = new ConfigLoader();
+	private static dbManager dbManager = new dbManager();
 	
 	/**
 	 * Launch the application.
@@ -60,6 +62,8 @@ public class Manager extends Shell {
 			}
 			
 			configLoader.loadConfig(TempPath+"/config.properties");
+			dbManager.Connect();
+			dbManager.initialize();
 			Display display = Display.getDefault();
 			Manager shell = new Manager(display);
 			shell.open();
@@ -114,7 +118,7 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				HDFrame mainFrame = new HDFrame();
+				HDFrame mainFrame = new HDFrame(dbManager);
 				mainFrame.open();
 			}
 		});
@@ -126,7 +130,7 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				HMFrame mainFrame = new HMFrame();
+				HMFrame mainFrame = new HMFrame(dbManager);
 				mainFrame.open();
 			}
 		});

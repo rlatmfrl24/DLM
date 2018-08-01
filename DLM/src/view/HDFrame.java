@@ -21,12 +21,23 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import test.dbManager;
+
 public class HDFrame {
 	private Text cnt_searchpage;
 	private Text cnt_itemcount;
 	public Thread downloader;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private int selection_driver = 0;
+	private dbManager dm;
+	
+	public HDFrame() {
+		
+	}
+	
+	public HDFrame(dbManager dm) {
+		this.dm = dm;
+	}
 	
 	/**
 	 * Open the window.
@@ -93,7 +104,7 @@ public class HDFrame {
 			public void widgetSelected(SelectionEvent e) {
 				if(btnPhantom.getSelection() && !btnChrome.getSelection()) selection_driver = 1;
 				else if(btnChrome.getSelection() && !btnPhantom.getSelection()) selection_driver = 2;
-				downloader = new Thread(new DownlaodManager(lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()), selection_driver));
+				downloader = new Thread(new DownlaodManager(dm, lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()), selection_driver));
 				downloader.start();
 			}
 		});

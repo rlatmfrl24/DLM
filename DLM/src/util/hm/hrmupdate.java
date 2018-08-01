@@ -75,7 +75,7 @@ public class hrmupdate {
 		try {
 			res_map.clear();
 			log_list.clear();
-			log_list = dm.getLogs();
+			log_list = dm.getDataFromDB("link", "tb_link_info");
 			
 			//파폭 드라이버
 			/*
