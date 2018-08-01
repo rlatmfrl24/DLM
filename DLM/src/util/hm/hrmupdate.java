@@ -15,7 +15,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.phantomjs.*;
 
-import test.dbManager;
+import main.dbManager;
 
 public class hrmupdate {
 

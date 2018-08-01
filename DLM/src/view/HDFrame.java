@@ -21,7 +21,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import test.dbManager;
+import main.dbManager;
 
 public class HDFrame {
 	private Text cnt_searchpage;

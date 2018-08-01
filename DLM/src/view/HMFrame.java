@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import test.dbManager;
+import main.dbManager;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
 import util.hm.hrmupdate;

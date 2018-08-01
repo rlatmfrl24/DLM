@@ -9,7 +9,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import test.dbManager;
 import view.CTFrame;
 import view.HDFrame;
 import view.HMFrame;

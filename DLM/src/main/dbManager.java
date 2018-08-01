@@ -1,4 +1,4 @@
-package test;
+package main;
 
 import java.net.URL;
 import java.sql.Connection;

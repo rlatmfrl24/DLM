@@ -24,13 +24,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
-import test.dbManager;
+import main.dbManager;
 
 public class DownlaodManager implements Runnable{
 
 	private static List<Gallery> gallery_list = new ArrayList<>();
 	private static List<String> download_log = new ArrayList<>();
-	private static File downlog = new File("./hiyobi/downlog.log");
 	private static File homepath = new File("./hiyobi/");
 	private static WebDriver driver;
 
@@ -38,6 +37,7 @@ public class DownlaodManager implements Runnable{
 	private int itemcount;
 	private int current_process=0;
 	private int selection_drvier;
+	private int pbar_selection = 1;
 	private Label lbl;
 	private ProgressBar pbar;
 	private dbManager dm;
@@ -48,8 +48,6 @@ public class DownlaodManager implements Runnable{
 		// TODO Auto-generated method stub
 		try {
 			if(!homepath.exists()) homepath.mkdirs();
-			if(!downlog.exists()) downlog.createNewFile();
-			
 			download_log.clear();
 			gallery_list.clear();
 			
@@ -139,7 +137,25 @@ public class DownlaodManager implements Runnable{
 		}
 		return path.delete();
 	}
-
+	
+	public void download(String link, String path) throws Exception {
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+		URL url = new URL(link);
+		String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+		URLConnection con = url.openConnection();
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		inputStream = con.getInputStream();
+		outputStream = new FileOutputStream(path);
+		byte[] buffer = new byte[2048];
+		int length;
+		while ((length = inputStream.read(buffer)) != -1) {
+			outputStream.write(buffer, 0, length);
+		}
+		outputStream.close();
+		inputStream.close();
+	}
+	
 	public void getGalleryImages(Gallery gal) {
 		File folder = new File(homepath.getPath()+"/"+gal.getPath()+"/");
 		if(!folder.exists()) folder.mkdirs();
@@ -162,33 +178,35 @@ public class DownlaodManager implements Runnable{
 					pbar.setMaximum(max_size);
 				}
 			});
+			
+			pbar_selection=1;
+			List<Thread> threads = new ArrayList<>();
 			for(Element e : img_list) {
-				InputStream inputStream = null;
-				OutputStream outputStream = null;
-				URL url = new URL(e.text());
-				String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
-				URLConnection con = url.openConnection();
-				con.setRequestProperty("User-Agent", USER_AGENT);
-				inputStream = con.getInputStream();
-				outputStream = new FileOutputStream(folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".jpg");
-				byte[] buffer = new byte[2048];
-				int length;
-				while ((length = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, length);
-				}
-				outputStream.close();
-				inputStream.close();
-				int selection = img_list.indexOf(e);
-				pbar.getDisplay().asyncExec(new Runnable() {					
+				String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".jpg";
+				Runnable task = new Runnable() {					
 					@Override
 					public void run() {
-						// TODO Auto-generated method stub
-						pbar.setSelection(selection+1);
-						
+						try {
+							download(e.text(), save_path);
+							pbar.getDisplay().asyncExec(new Runnable() {					
+								@Override
+								public void run() {
+									pbar.setSelection(pbar_selection);
+									pbar_selection++;
+								}
+							});
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-				});
+				};
+				Thread t = new Thread(task);
+				t.start();
+				threads.add(t);
 			}
-			Thread.sleep(1000);
+			for(Thread t : threads) {
+				t.join();
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

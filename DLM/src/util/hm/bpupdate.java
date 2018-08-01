@@ -13,7 +13,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-import test.dbManager;
+import main.dbManager;
 
 public class bpupdate {
 	private static WebDriver driver;
