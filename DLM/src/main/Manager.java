@@ -28,6 +28,7 @@ public class Manager extends Shell {
 	private static final File deletedItemPath = new File("./temp/deleted/");
 	private static final File moveItemPath = new File("./temp/moved/");
 	private static ConfigLoader configLoader = new ConfigLoader();
+	
 	/**
 	 * Launch the application.
 	 * @param args

@@ -35,6 +35,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 public class HMFrame {
 	private Table table_hrm;
@@ -58,7 +60,6 @@ public class HMFrame {
 			e.printStackTrace();
 		}
 	}
-
 	/**
 	 * Open the window.
 	 */
@@ -86,7 +87,7 @@ public class HMFrame {
 		tbtmHrm.setControl(composite_hrm);
 		composite_hrm.setLayout(new GridLayout(1, false));
 		
-		TableViewer tableViewer_hrm = new TableViewer(composite_hrm, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		TableViewer tableViewer_hrm = new TableViewer(composite_hrm, SWT.BORDER | SWT.MULTI | SWT.CHECK | SWT.FULL_SELECTION);
 		table_hrm = tableViewer_hrm.getTable();
 		GridData gd_table_hrm = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_table_hrm.heightHint = 471;
@@ -114,6 +115,31 @@ public class HMFrame {
 		TableColumn tblclmnUrl_hrm = tableViewerColumn_1.getColumn();
 		tblclmnUrl_hrm.setWidth(100);
 		tblclmnUrl_hrm.setText("URL");
+		
+		Menu menu_hrm = new Menu(table_hrm);
+		table_hrm.setMenu(menu_hrm);
+		
+		MenuItem mntmCheckAllSelected = new MenuItem(menu_hrm, SWT.NONE);
+		mntmCheckAllSelected.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(TableItem selected : table_hrm.getSelection()) {
+					selected.setChecked(true);
+				}
+			}
+		});
+		mntmCheckAllSelected.setText("Check All Selected Item");
+		MenuItem mntmOpenSelectedLink = new MenuItem(menu_hrm, SWT.NONE);
+		mntmOpenSelectedLink.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(TableItem selected : table_hrm.getSelection()) {
+					su.open_browser(selected.getText(1));
+					selected.setChecked(true);
+				}
+			}
+		});
+		mntmOpenSelectedLink.setText("Open Selected link");
 
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
 		tbtmBattlepage.setText("Battlepage");
@@ -122,7 +148,7 @@ public class HMFrame {
 		tbtmBattlepage.setControl(composite_bp);
 		composite_bp.setLayout(new GridLayout(1, false));
 		
-		TableViewer tableViewer_bp = new TableViewer(composite_bp, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		TableViewer tableViewer_bp = new TableViewer(composite_bp, SWT.BORDER | SWT.MULTI | SWT.CHECK | SWT.FULL_SELECTION);
 		table_bp = tableViewer_bp.getTable();
 		table_bp.setLinesVisible(true);
 		table_bp.setHeaderVisible(true);
@@ -157,6 +183,32 @@ public class HMFrame {
 		tblclmnUrl_bp.setWidth(100);
 		tblclmnUrl_bp.setText("URL");
 		
+		Menu menu_bp = new Menu(table_bp);
+		table_bp.setMenu(menu_bp);
+		
+		MenuItem menuItem = new MenuItem(menu_bp, SWT.NONE);
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(TableItem selected : table_bp.getSelection()) {
+					selected.setChecked(true);
+				}
+			}
+		});
+		menuItem.setText("Check All Selected Item");
+		
+		MenuItem menuItem_1 = new MenuItem(menu_bp, SWT.NONE);
+		menuItem_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(TableItem selected : table_bp.getSelection()) {
+					su.open_browser(selected.getText(2));
+					selected.setChecked(true);
+				}
+			}
+		});
+		menuItem_1.setText("Open Selected link");
+		
 		TabItem tbtmDogdrip = new TabItem(tabFolder, SWT.NONE);
 		tbtmDogdrip.setText("Dogdrip");
 		
@@ -164,7 +216,7 @@ public class HMFrame {
 		tbtmDogdrip.setControl(composite_dd);
 		composite_dd.setLayout(new GridLayout(1, false));
 		
-		TableViewer tableViewer = new TableViewer(composite_dd, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		TableViewer tableViewer = new TableViewer(composite_dd, SWT.BORDER | SWT.MULTI | SWT.CHECK | SWT.FULL_SELECTION);
 		table_dd = tableViewer.getTable();
 		table_dd.setLinesVisible(true);
 		table_dd.setHeaderVisible(true);
@@ -190,6 +242,32 @@ public class HMFrame {
 		TableColumn tblclmnUrl_dd = tableViewerColumn_6.getColumn();
 		tblclmnUrl_dd.setWidth(100);
 		tblclmnUrl_dd.setText("URL");
+		
+		Menu menu_dd = new Menu(table_dd);
+		table_dd.setMenu(menu_dd);
+		
+		MenuItem menuItem_2 = new MenuItem(menu_dd, SWT.NONE);
+		menuItem_2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(TableItem selected : table_dd.getSelection()) {
+					selected.setChecked(true);
+				}
+			}
+		});
+		menuItem_2.setText("Check All Selected Item");
+		
+		MenuItem menuItem_3 = new MenuItem(menu_dd, SWT.NONE);
+		menuItem_3.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				for(TableItem selected : table_dd.getSelection()) {
+					su.open_browser(selected.getText(1));
+					selected.setChecked(true);
+				}
+			}
+		});
+		menuItem_3.setText("Open Selected link");
 		
 		tabFolder.addControlListener(new ControlListener() {
 			@Override
@@ -268,6 +346,12 @@ public class HMFrame {
 		btnRefresh.setText("Refresh");
 		
 		Label lblReady = new Label(composite_1, SWT.NONE);
+		lblReady.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				System.out.println(display.getShells()[0].getText());
+			}
+		});
 		lblReady.setAlignment(SWT.RIGHT);
 		GridData gd_lblReady = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
 		gd_lblReady.widthHint = 640;
