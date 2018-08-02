@@ -31,17 +31,6 @@ public class dbManager {
 		return rs.getBoolean(1);
 	}
 	
-	public void temp(List<String> source_link) throws Exception {
-		Statement stmt = connection.createStatement();
-		for(String s : source_link) {
-			String target = s.replaceAll("\\&page=[0-9]", "");
-			String sql = "UPDATE tb_link_info SET link='"+target+"' WHERE link='"+s+"';";
-			stmt.addBatch(sql);
-		}
-		stmt.executeBatch();
-		stmt.close();
-	}
-	
 	public void initialize() {
 		try {
 			Statement stmt = connection.createStatement();
@@ -65,6 +54,14 @@ public class dbManager {
 						"type     VARCHAR," + 
 						"keyword  TEXT," + 
 						"path     TEXT" + 
+						");";
+				stmt.executeUpdate(sql);
+			}
+			if(!isTableExists("tb_bookmark_info")) {
+				String sql = "CREATE TABLE tb_bookmark_info (" + 
+						"idx    INTEGER PRIMARY KEY ASC AUTOINCREMENT, " + 
+						"domain VARCHAR, " + 
+						"link   TEXT" + 
 						");";
 				stmt.executeUpdate(sql);
 			}
@@ -106,6 +103,23 @@ public class dbManager {
 
 	public void insertLog(List<String> list) throws Exception {
 		String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
+		PreparedStatement stmt = connection.prepareStatement(sql);
+		for(String link : list) {
+			URL url = new URL(link);
+			stmt.setString(1, url.getAuthority());
+			stmt.setString(2, link);
+			stmt.addBatch();
+		}
+		stmt.executeBatch();
+		stmt.close();
+	}
+	
+	public void UpdateBookmark(List<String> list) throws Exception {
+		String sql = "DELETE FROM tb_bookmark_info";
+		Statement del_stmt = connection.createStatement();
+		del_stmt.executeUpdate(sql);
+		del_stmt.close();
+		sql = "INSERT INTO tb_bookmark_info (domain, link) VALUES (?, ?);";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		for(String link : list) {
 			URL url = new URL(link);

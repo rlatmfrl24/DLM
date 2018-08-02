@@ -39,6 +39,8 @@ public class bpupdate {
 		driver.findElement(By.cssSelector("#login_id")).sendKeys("rlatmfrl24");
 		driver.findElement(By.cssSelector("#login_pw")).sendKeys("397love");
 		driver.findElement(By.cssSelector("body > form > table > tbody > tr:nth-child(1) > td:nth-child(3) > input")).click();
+		driver.close();
+		driver.quit();
 	}
 	
 	public Map<String, List<String>> LoadBP() {

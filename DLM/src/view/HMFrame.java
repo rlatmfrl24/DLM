@@ -1,6 +1,7 @@
 package view;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.SWT;
@@ -14,6 +15,13 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +43,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -47,6 +56,7 @@ public class HMFrame {
 	private ddupdate du;
 	private dbManager dm;
 	private SystemUtility su = new SystemUtility();
+	private Table table_bmk;
 	
 	public HMFrame(dbManager dm) {
 		this.dm = dm;
@@ -221,8 +231,8 @@ public class HMFrame {
 		tbtmDogdrip.setControl(composite_dd);
 		composite_dd.setLayout(new GridLayout(1, false));
 		
-		TableViewer tableViewer = new TableViewer(composite_dd, SWT.BORDER | SWT.MULTI | SWT.CHECK | SWT.FULL_SELECTION);
-		table_dd = tableViewer.getTable();
+		TableViewer tableViewer_dd = new TableViewer(composite_dd, SWT.BORDER | SWT.MULTI | SWT.CHECK | SWT.FULL_SELECTION);
+		table_dd = tableViewer_dd.getTable();
 		table_dd.setLinesVisible(true);
 		table_dd.setHeaderVisible(true);
 		table_dd.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -238,12 +248,12 @@ public class HMFrame {
 			}
 		});
 		
-		TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableViewerColumn tableViewerColumn_5 = new TableViewerColumn(tableViewer_dd, SWT.NONE);
 		TableColumn tblclmnTitle_dd = tableViewerColumn_5.getColumn();
 		tblclmnTitle_dd.setWidth(100);
 		tblclmnTitle_dd.setText("Title");
 		
-		TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableViewerColumn tableViewerColumn_6 = new TableViewerColumn(tableViewer_dd, SWT.NONE);
 		TableColumn tblclmnUrl_dd = tableViewerColumn_6.getColumn();
 		tblclmnUrl_dd.setWidth(100);
 		tblclmnUrl_dd.setText("URL");
@@ -274,6 +284,89 @@ public class HMFrame {
 		});
 		menuItem_3.setText("Open Selected link");
 		
+		TabItem tbtmBookmark = new TabItem(tabFolder, SWT.NONE);
+		tbtmBookmark.setText("Bookmark");
+		
+		Composite composite_bmk = new Composite(tabFolder, SWT.NONE);
+		tbtmBookmark.setControl(composite_bmk);
+		composite_bmk.setLayout(new GridLayout(1, false));
+		
+		TableViewer tableViewer_bmk = new TableViewer(composite_bmk, SWT.BORDER | SWT.FULL_SELECTION);
+		table_bmk = tableViewer_bmk.getTable();
+		table_bmk.setLinesVisible(true);
+		table_bmk.setHeaderVisible(true);
+		table_bmk.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		
+		TableViewerColumn tableViewerColumn_7 = new TableViewerColumn(tableViewer_bmk, SWT.NONE);
+		TableColumn tblclmnDomain = tableViewerColumn_7.getColumn();
+		tblclmnDomain.setWidth(100);
+		tblclmnDomain.setText("Domain");
+		
+		TableViewerColumn tableViewerColumn_8 = new TableViewerColumn(tableViewer_bmk, SWT.NONE);
+		TableColumn tblclmnLink = tableViewerColumn_8.getColumn();
+		tblclmnLink.setWidth(100);
+		tblclmnLink.setText("Link");
+
+		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
+			try {
+				URL url = new URL(link);
+				TableItem item = new TableItem(table_bmk, 0);
+				item.setText(0, url.getAuthority());
+				item.setText(1, link);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		table_bmk.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				if(table_bmk.getSelectionCount() > 0) {
+					String link = table_bmk.getSelection()[0].getText(1);
+					System.out.println(link);
+					su.open_browser(link);
+					table_bmk.getSelection()[0].setChecked(true);
+				}
+			}
+		});
+		
+		display.addFilter(SWT.KeyDown, new Listener() {	
+			@Override
+			public void handleEvent(Event e) {
+				// TODO Auto-generated method stub
+				if((e.stateMask & SWT.CTRL)==SWT.CTRL && e.keyCode=='v' && tabFolder.getSelectionIndex()==3) {
+					try {
+						String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+						System.out.println(data);
+						URL url = new URL(data);
+						
+						List<String> list_bmk = new ArrayList<>();
+						for(TableItem item : table_bmk.getItems()) {
+							list_bmk.add(item.getText(1));
+						}
+						if(!list_bmk.contains(data)) {
+							TableItem item = new TableItem(table_bmk, 0);
+							item.setText(1, data);
+							item.setText(0, url.getAuthority());
+						}
+					} catch (MalformedURLException me) {  
+				        System.out.println("URL is not vaild");
+				    } catch (HeadlessException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (UnsupportedFlavorException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else if(e.keyCode==SWT.DEL) {
+					table_bmk.remove(table_bmk.getSelectionIndex());
+				}
+			}
+		});
+
 		tabFolder.addControlListener(new ControlListener() {
 			@Override
 			public void controlResized(ControlEvent arg0) {
@@ -330,6 +423,23 @@ public class HMFrame {
 					table_dd.setSize(area.width, area.height);					
 					tblclmnTitle_dd.setWidth(width / 2);
 					tblclmnUrl_dd.setWidth(width - tblclmnTitle_dd.getWidth());
+				}
+				
+				preferredSize = table_bmk.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				width = area.width - 2 * table_bmk.getBorderWidth();
+				if (preferredSize.y > area.height + table_bmk.getHeaderHeight()) {
+					Point vBarSize = table_bmk.getVerticalBar().getSize();
+					width -= vBarSize.x;
+				}
+				oldSize = table_bmk.getSize();
+				if (oldSize.x > area.width) {
+					tblclmnDomain.setWidth(width / 4);
+					tblclmnLink.setWidth(width - tblclmnDomain.getWidth());
+					table_bmk.setSize(area.width, area.height);
+				} else {
+					table_bmk.setSize(area.width, area.height);					
+					tblclmnDomain.setWidth(width / 4);
+					tblclmnLink.setWidth(width - tblclmnDomain.getWidth());
 				}
 			}
 
@@ -428,6 +538,7 @@ public class HMFrame {
 						remove_idx = new int[selected_idx.size()];
 						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
 						table_hrm.remove(remove_idx);
+						dm.insertLog(visited);
 						break;
 					case 1:
 						for(TableItem item : table_bp.getItems()) {
@@ -439,6 +550,7 @@ public class HMFrame {
 						remove_idx = new int[selected_idx.size()];
 						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
 						table_bp.remove(remove_idx);
+						dm.insertLog(visited);
 						break;
 					case 2:
 						for(TableItem item : table_dd.getItems()) {
@@ -450,8 +562,15 @@ public class HMFrame {
 						remove_idx = new int[selected_idx.size()];
 						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
 						table_dd.remove(remove_idx);
+						dm.insertLog(visited);
+						break;
+					case 3:
+						for(TableItem item : table_bmk.getItems()) {
+							visited.add(item.getText(1));
+						}
+						dm.UpdateBookmark(visited);
+						break;
 					}
-					dm.insertLog(visited);
 					lblReady.setText("Log Updated.");
 				}catch(Exception e1) {
 					e1.printStackTrace();
