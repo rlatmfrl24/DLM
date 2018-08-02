@@ -20,8 +20,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import main.dbManager;
@@ -36,7 +34,6 @@ public class DownlaodManager implements Runnable{
 	private int pages;
 	private int itemcount;
 	private int current_process=0;
-	private int selection_drvier;
 	private int pbar_selection = 1;
 	private Label lbl;
 	private ProgressBar pbar;
@@ -63,21 +60,8 @@ public class DownlaodManager implements Runnable{
 			if(itemcount == 0) itemcount = gallery_list.size();
 			ziputil zu = new ziputil();
 			
-			switch(selection_drvier) {
-			case 1:
-				System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
-				driver = new PhantomJSDriver();
-				break;
-			case 2:
-				System.setProperty("webdriver.chrome.driver", "./driver/chromedriver/chromedriver.exe");
-				ChromeOptions options = new ChromeOptions();
-				options.addArguments("--headless");
-				options.addArguments("--no-sandbox");
-				//options.addArguments("--disable-gpu");
-				options.setBinary("./driver/chromedriver/chromedriver.exe");
-				driver = new ChromeDriver(options);
-				break;
-			}
+			System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
+			driver = new PhantomJSDriver();
 			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			
 			for(current_process = 0; current_process<itemcount; current_process++) {
@@ -113,13 +97,12 @@ public class DownlaodManager implements Runnable{
 		}
 	}
 	
-	public DownlaodManager(dbManager dm, Label lbl, ProgressBar pbar, int pages, int itemcount, int selection) {
+	public DownlaodManager(dbManager dm, Label lbl, ProgressBar pbar, int pages, int itemcount) {
 		// TODO Auto-generated constructor stub
 		this.pages = pages;
 		this.itemcount = itemcount;
 		this.lbl = lbl;
 		this.pbar = pbar;
-		this.selection_drvier = selection;
 		this.dm = dm;
 	}
 	

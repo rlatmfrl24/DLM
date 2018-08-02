@@ -28,7 +28,6 @@ public class HDFrame {
 	private Text cnt_itemcount;
 	public Thread downloader;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
-	private int selection_driver = 0;
 	private dbManager dm;
 	
 	public HDFrame() {
@@ -46,7 +45,7 @@ public class HDFrame {
 	public void open() {
 		Display display = Display.getDefault();
 		Shell shlHiyobi = new Shell();
-		shlHiyobi.setSize(483, 129);
+		shlHiyobi.setSize(483, 200);
 		shlHiyobi.setText("Hiyobi");
 		shlHiyobi.setLayout(new FillLayout(SWT.HORIZONTAL));
 		formToolkit.setBackground(null);
@@ -73,19 +72,6 @@ public class HDFrame {
 		cnt_itemcount.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		cnt_itemcount.setText("0");
 		
-		Composite composite_combo = new Composite(composite, SWT.NONE);
-		composite_combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		composite_combo.setLayout(new FillLayout(SWT.HORIZONTAL));
-		Button btnPhantom = new Button(composite_combo, SWT.RADIO);
-		btnPhantom.setSelection(true);
-		formToolkit.adapt(btnPhantom, true, true);
-		btnPhantom.setText("Phantom");
-		
-		Button btnChrome = new Button(composite_combo, SWT.RADIO);
-		formToolkit.adapt(btnChrome, true, true);
-		btnChrome.setText("Chrome");
-		
-		
 		Label label = new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
 		formToolkit.adapt(label, true, true);
@@ -102,9 +88,7 @@ public class HDFrame {
 		btnCrawl.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(btnPhantom.getSelection() && !btnChrome.getSelection()) selection_driver = 1;
-				else if(btnChrome.getSelection() && !btnPhantom.getSelection()) selection_driver = 2;
-				downloader = new Thread(new DownlaodManager(dm, lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText()), selection_driver));
+				downloader = new Thread(new DownlaodManager(dm, lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText())));
 				downloader.start();
 			}
 		});
