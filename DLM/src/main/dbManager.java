@@ -31,6 +31,17 @@ public class dbManager {
 		return rs.getBoolean(1);
 	}
 	
+	public void temp(List<String> source_link) throws Exception {
+		Statement stmt = connection.createStatement();
+		for(String s : source_link) {
+			String target = s.replaceAll("\\&page=[0-9]", "");
+			String sql = "UPDATE tb_link_info SET link='"+target+"' WHERE link='"+s+"';";
+			stmt.addBatch(sql);
+		}
+		stmt.executeBatch();
+		stmt.close();
+	}
+	
 	public void initialize() {
 		try {
 			Statement stmt = connection.createStatement();

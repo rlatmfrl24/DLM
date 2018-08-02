@@ -49,8 +49,8 @@ public class bpupdate {
 				Document doc = Jsoup.connect(board_humor+"&page="+i).get();
 				Element table = doc.select("#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable").get(0);
 				for(Element e : table.getElementsByAttribute("href")) {
-					String url = e.attr("href");
-					if(!log_list.contains(url)) {
+					String url = e.attr("href").replace("&page="+i, "");
+					if(!log_list.contains(url) && url.contains("no=")) {
 						String title = e.getElementsByClass("search_title").get(0).text();
 						String id = url.substring(url.indexOf("no=")).replace("no=", "");
 						List<String> entry = new ArrayList<>();
@@ -65,8 +65,8 @@ public class bpupdate {
 				Document doc = Jsoup.connect(board_etc+"&page="+i).get();
 				Element table = doc.select("#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable").get(0);
 				for(Element e : table.getElementsByAttribute("href")) {
-					String url = e.attr("href");
-					if(!log_list.contains(url)) {
+					String url = e.attr("href").replace("&page="+i, "");
+					if(!log_list.contains(url) && url.contains("no=")) {
 						String title = e.getElementsByClass("search_title").get(0).text();
 						String id = url.substring(url.indexOf("no=")).replace("no=", "");
 						List<String> entry = new ArrayList<>();
