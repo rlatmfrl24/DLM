@@ -1,4 +1,4 @@
-package test;
+package deprecated;
 
 import java.io.File;
 

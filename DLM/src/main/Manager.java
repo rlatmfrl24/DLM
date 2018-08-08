@@ -10,7 +10,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import view.CTFrame;
-import view.HDFrame;
+import view.HMFrame;
+import view.NHDFrame;
 import view.RCFrame;
 
 import org.eclipse.swt.widgets.Composite;
@@ -22,11 +23,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
 public class Manager extends Shell {
-	private static File TempPath = new File("./temp/");
-	private static File HiyobiPath = new File("./hiyobi/");
-	private static File deletedItemPath = new File("./temp/deleted/");
-	private static File moveItemPath = new File("./temp/moved/");
+	private static final File TempPath = new File("./temp/");
+	private static final File HiyobiPath = new File("./hiyobi/");
+	private static final File deletedItemPath = new File("./temp/deleted/");
+	private static final File moveItemPath = new File("./temp/moved/");
 	private static ConfigLoader configLoader = new ConfigLoader();
+	private static dbManager dbManager = new dbManager();
+	
 	/**
 	 * Launch the application.
 	 * @param args
@@ -58,6 +61,8 @@ public class Manager extends Shell {
 			}
 			
 			configLoader.loadConfig(TempPath+"/config.properties");
+			dbManager.Connect();
+			dbManager.initialize();
 			Display display = Display.getDefault();
 			Manager shell = new Manager(display);
 			shell.open();
@@ -112,12 +117,24 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				HDFrame mainFrame = new HDFrame();
+				NHDFrame mainFrame = new NHDFrame(dbManager);
 				mainFrame.open();
 			}
 		});
 		btnHiyobiDownloader.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		btnHiyobiDownloader.setText("Hiyobi Downloader");
+		
+		Button btnTrendChecker = new Button(composite, SWT.NONE);
+		btnTrendChecker.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				dispose();
+				HMFrame mainFrame = new HMFrame(dbManager);
+				mainFrame.open();
+			}
+		});
+		btnTrendChecker.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		btnTrendChecker.setText("Trend Checker");
 		createContents();
 	}
 
@@ -126,7 +143,7 @@ public class Manager extends Shell {
 	 */
 	protected void createContents() {
 		setText("Select Module");
-		setSize(270, 168);
+		setSize(273, 227);
 	}
 
 	@Override
