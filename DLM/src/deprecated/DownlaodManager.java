@@ -1,4 +1,4 @@
-package util.hd;
+package deprecated;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,6 +23,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import main.dbManager;
+import util.hd.Gallery;
+import util.hd.ziputil;
 
 public class DownlaodManager implements Runnable{
 

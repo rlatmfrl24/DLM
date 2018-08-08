@@ -10,8 +10,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import view.CTFrame;
-import view.HDFrame;
 import view.HMFrame;
+import view.NHDFrame;
 import view.RCFrame;
 
 import org.eclipse.swt.widgets.Composite;
@@ -117,7 +117,7 @@ public class Manager extends Shell {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				dispose();
-				HDFrame mainFrame = new HDFrame(dbManager);
+				NHDFrame mainFrame = new NHDFrame(dbManager);
 				mainFrame.open();
 			}
 		});

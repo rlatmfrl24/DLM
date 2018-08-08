@@ -334,6 +334,21 @@ public class HMFrame {
 			@Override
 			public void handleEvent(Event e) {
 				// TODO Auto-generated method stub
+				Table current_table=null;
+				switch (tabFolder.getSelectionIndex()) {
+				case 0:
+					current_table = table_hrm;
+					break;
+				case 1:
+					current_table = table_bp;
+					break;
+				case 2:
+					current_table = table_dd;
+					break;
+				default:
+					break;
+				}
+				
 				if((e.stateMask & SWT.CTRL)==SWT.CTRL && e.keyCode=='v' && tabFolder.getSelectionIndex()==3) {
 					try {
 						String data = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
@@ -363,6 +378,26 @@ public class HMFrame {
 					}
 				}else if(e.keyCode==SWT.DEL) {
 					table_bmk.remove(table_bmk.getSelectionIndex());
+				}else if((e.stateMask & SWT.CTRL)==SWT.CTRL && e.keyCode=='a') {
+					try {
+						current_table.setSelection(current_table.getItems());
+					} catch (Exception e1) {  
+				        e1.printStackTrace();
+				    }
+				}else if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
+					if(current_table.getSelectionCount() > 0) {
+						for(TableItem item : current_table.getSelection()) {
+							String link;
+							if(current_table == table_bp) {
+								link = item.getText(2);
+							}else {
+								link = item.getText(1);
+							}
+							System.out.println(link);
+							su.open_browser(link);
+							item.setChecked(true);
+						}
+					}
 				}
 			}
 		});
