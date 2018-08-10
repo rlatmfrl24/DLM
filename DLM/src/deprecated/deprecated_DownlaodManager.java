@@ -26,7 +26,7 @@ import main.dbManager;
 import util.hd.Gallery;
 import util.hd.ziputil;
 
-public class DownlaodManager implements Runnable{
+public class deprecated_DownlaodManager implements Runnable{
 
 	private static List<Gallery> gallery_list = new ArrayList<>();
 	private static List<String> download_log = new ArrayList<>();
@@ -99,7 +99,7 @@ public class DownlaodManager implements Runnable{
 		}
 	}
 	
-	public DownlaodManager(dbManager dm, Label lbl, ProgressBar pbar, int pages, int itemcount) {
+	public deprecated_DownlaodManager(dbManager dm, Label lbl, ProgressBar pbar, int pages, int itemcount) {
 		// TODO Auto-generated constructor stub
 		this.pages = pages;
 		this.itemcount = itemcount;

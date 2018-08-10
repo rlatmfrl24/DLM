@@ -189,6 +189,8 @@ public class DownloadUtil {
 			for(Entry<String, TableItem> entry : item_map.entrySet()) {
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
+						table.setSelection(entry.getValue());
+						table.showItem(entry.getValue());
 						entry.getValue().setText(2, "Fetch..");
 					}
 				});
@@ -267,16 +269,11 @@ public class DownloadUtil {
 	}
 	
 	public boolean deleteDirectory(File path) {
-		if (!path.exists()) {
-			return false;
-		}
+		if (!path.exists()) return false;
 		File[] files = path.listFiles();
 		for (File file : files) {
-			if (file.isDirectory()) {
-				deleteDirectory(file);
-			} else {
-				file.delete();
-			}
+			if (file.isDirectory()) deleteDirectory(file);
+		    else file.delete();
 		}
 		return path.delete();
 	}

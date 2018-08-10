@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import main.Manager;
 import main.dbManager;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
@@ -38,6 +39,7 @@ import util.rc.SystemUtility;
 
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -155,6 +157,8 @@ public class HMFrame {
 			}
 		});
 		mntmOpenSelectedLink.setText("Open Selected link");
+		
+		
 
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
 		tbtmBattlepage.setText("Battlepage");
@@ -291,7 +295,7 @@ public class HMFrame {
 		tbtmBookmark.setControl(composite_bmk);
 		composite_bmk.setLayout(new GridLayout(1, false));
 		
-		TableViewer tableViewer_bmk = new TableViewer(composite_bmk, SWT.BORDER | SWT.FULL_SELECTION);
+		TableViewer tableViewer_bmk = new TableViewer(composite_bmk, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		table_bmk = tableViewer_bmk.getTable();
 		table_bmk.setLinesVisible(true);
 		table_bmk.setHeaderVisible(true);
@@ -330,6 +334,7 @@ public class HMFrame {
 			}
 		});
 		
+		
 		display.addFilter(SWT.KeyDown, new Listener() {	
 			@Override
 			public void handleEvent(Event e) {
@@ -345,6 +350,8 @@ public class HMFrame {
 				case 2:
 					current_table = table_dd;
 					break;
+				case 3:
+					current_table = table_bmk;
 				default:
 					break;
 				}
@@ -377,7 +384,9 @@ public class HMFrame {
 						e1.printStackTrace();
 					}
 				}else if(e.keyCode==SWT.DEL) {
-					table_bmk.remove(table_bmk.getSelectionIndex());
+					if(table_bmk.getSelectionCount()>0) {
+						table_bmk.remove(table_bmk.getSelectionIndices());
+					}
 				}else if((e.stateMask & SWT.CTRL)==SWT.CTRL && e.keyCode=='a') {
 					try {
 						current_table.setSelection(current_table.getItems());
@@ -614,10 +623,69 @@ public class HMFrame {
 		});
 		shlHrm.open();
 		shlHrm.layout();
+		
+		Thread thread_load = new Thread(new Runnable() {
+			public void run() {
+				open_load(shlHrm);
+			}
+		});
+		thread_load.start();
 		while (!shlHrm.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
+		System.gc();
+		Manager m = new Manager();
+		m.open();
+	}
+	public void open_load(Shell shlHrm) {
+		shlHrm.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				Shell popup_load = new Shell(shlHrm, 0);
+				popup_load.setText("Alert");
+				popup_load.setSize(449, 166);
+				popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
+				Composite composite = new Composite(popup_load, 0);
+				composite.setLayout(new GridLayout(1, false));
+				
+				Label lblMsg = new Label(composite, SWT.NONE);
+				lblMsg.setAlignment(SWT.CENTER);
+				lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
+				lblMsg.setText("Load new pages.. Please Wait..");
+				
+				Label lblProgress = new Label(composite, SWT.NONE);
+				lblProgress.setAlignment(SWT.CENTER);
+				lblProgress.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
+				lblProgress.setText("Open headless webdriver..");
+				
+				popup_load.open();
+				Map<String, List<String>> refreshed;
+				refreshed = hu.LoadHrm();
+				for(String tag : refreshed.keySet()) {
+					for(String url : refreshed.get(tag)) {
+						TableItem ti = new TableItem(table_hrm, 0);
+						ti.setText(0, tag);
+						ti.setText(1, url);
+					}
+				}
+				refreshed = bp.LoadBP();
+				for(String id : refreshed.keySet()) {
+					TableItem ti = new TableItem(table_bp, 0);
+					ti.setText(0, refreshed.get(id).get(0));
+					ti.setText(1, refreshed.get(id).get(1));
+					ti.setText(2, refreshed.get(id).get(2));
+				}
+				refreshed = du.LoadDD();
+				for(String id : refreshed.keySet()) {
+					TableItem ti = new TableItem(table_dd, 0);
+					ti.setText(0, refreshed.get(id).get(0));
+					ti.setText(1, refreshed.get(id).get(1));
+				}
+				popup_load.dispose();
+			}
+		});
 	}
 }

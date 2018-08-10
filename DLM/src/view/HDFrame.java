@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
+import main.Manager;
 import main.dbManager;
 import util.hd.DownloadUtil;
 
@@ -28,17 +29,17 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.jface.viewers.TableViewerColumn;
 
-public class NHDFrame {
+public class HDFrame {
 	private Text text;
 	private Table table;
 	private DownloadUtil downloadUtil;
 	private Thread download;
 	
-	public NHDFrame() {
+	public HDFrame() {
 		
 	}
 	
-	public NHDFrame(dbManager dbManager) {
+	public HDFrame(dbManager dbManager) {
 		downloadUtil = new DownloadUtil(dbManager);
 	}
 	
@@ -50,7 +51,7 @@ public class NHDFrame {
 		try {
 			dbManager dm = new dbManager();
 			dm.Connect();
-			NHDFrame window = new NHDFrame(dm);
+			HDFrame window = new HDFrame(dm);
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -200,5 +201,8 @@ public class NHDFrame {
 				display.sleep();
 			}
 		}
+		System.gc();
+		Manager m = new Manager();
+		m.open();
 	}
 }

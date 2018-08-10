@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import main.ConfigLoader;
+import main.Manager;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -358,6 +359,9 @@ public class RCFrame implements Observer {
 				display.sleep();
 			}
 		}
+		System.gc();
+		Manager m = new Manager();
+		m.open();
 	}
 
 	@Override

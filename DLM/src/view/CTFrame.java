@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import main.ConfigLoader;
+import main.Manager;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -74,6 +75,7 @@ public class CTFrame implements Observer {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				tree_transform.removeAll();
 				for(TreeItem item : tree_origin.getItems()) {
 					String transform_path = ac.GetCategorizedName((File)item.getData(item.getText()));
 					tree_transform = addPath(transform_path, (File) item.getData(item.getText()), tree_transform);
@@ -194,6 +196,9 @@ public class CTFrame implements Observer {
 				display.sleep();
 			}
 		}
+		System.gc();
+		Manager m = new Manager();
+		m.open();
 	}
 	
 public Tree addPath(String s, File f, Tree root) {	
