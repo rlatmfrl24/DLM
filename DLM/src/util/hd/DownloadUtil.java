@@ -238,34 +238,47 @@ public class DownloadUtil {
 			}
 			pbar_selection = 1;
 			int max_selection = img_list.size();
-			
 			List<Thread> threads = new ArrayList<>();
-			for(Element e : img_list) {
-				String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".jpg";
-				Runnable task = new Runnable() {					
-					@Override
-					public void run() {
-						ImageDownload(e.text(), save_path, 0);
-						item.getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								item.setText(2, String.valueOf(pbar_selection)+"/"+String.valueOf(max_selection));
-								pbar_selection++;
-							}
-						});
-					}
-				};
-				Thread download_thread = new Thread(task);
-				download_thread.start();
-				threads.add(download_thread);
+			List<Elements> work_pool = new ArrayList<>();
+			
+			while(img_list.size()>0) {
+				Elements tmp = new Elements();
+				for(int i=0; i<100 && img_list.size()>0; i++) {
+					tmp.add(img_list.get(0));
+					img_list.remove(0);
+				}
+				work_pool.add(tmp);
 			}
-			for(Thread t : threads) {
-				t.join();
+			
+			for(Elements partial_work : work_pool) {
+				for(Element e : partial_work) {
+					String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".png";
+					Runnable task = new Runnable() {					
+						@Override
+						public void run() {
+							ImageDownload(e.text(), save_path, 0);
+							item.getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									item.setText(2, String.valueOf(pbar_selection)+"/"+String.valueOf(max_selection));
+									pbar_selection++;
+								}
+							});
+						}
+					};
+					Thread download_thread = new Thread(task);
+					download_thread.start();
+					threads.add(download_thread);
+				}
+				for(Thread t : threads) {
+					t.join();
+				}
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	public boolean deleteDirectory(File path) {

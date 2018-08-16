@@ -338,6 +338,10 @@ public class HMFrame {
 		display.addFilter(SWT.KeyDown, new Listener() {	
 			@Override
 			public void handleEvent(Event e) {
+				if(shlHrm.isDisposed()) {
+					display.removeFilter(SWT.KeyDown, this);
+					return;
+				}
 				// TODO Auto-generated method stub
 				Table current_table=null;
 				switch (tabFolder.getSelectionIndex()) {
