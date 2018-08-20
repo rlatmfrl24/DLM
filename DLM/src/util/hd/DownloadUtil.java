@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -209,7 +210,8 @@ public class DownloadUtil {
 					}
 				});
 				zu.createZipFile(homepath.getPath()+"/"+gal.getPath()+"/", toPath, gal.getPath()+".zip");
-				deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
+				//deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
+				subDirList(homepath.getPath()+"/"+gal.getPath()+"/");
 				dbManager.insertDownloadLog(gal);
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -278,7 +280,6 @@ public class DownloadUtil {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public boolean deleteDirectory(File path) {
@@ -289,6 +290,26 @@ public class DownloadUtil {
 		    else file.delete();
 		}
 		return path.delete();
+	}
+	
+	public void subDirList(String source){
+		File dir = new File(source); 
+		File[] fileList = dir.listFiles();
+		
+		try{
+			for(int i = 0 ; i < fileList.length ; i++){
+				File file = fileList[i]; 
+				if(file.isFile()){
+					FileDeleteStrategy.FORCE.delete(file);
+					file.delete();
+				}else if(file.isDirectory()){
+					subDirList(file.getCanonicalPath().toString()); 
+					FileDeleteStrategy.FORCE.delete(file);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }
 

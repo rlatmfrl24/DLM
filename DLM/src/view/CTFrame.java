@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import main.ConfigLoader;
-import main.Manager;
 
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -196,9 +195,6 @@ public class CTFrame implements Observer {
 				display.sleep();
 			}
 		}
-		System.gc();
-		Manager m = new Manager();
-		m.open();
 	}
 	
 public Tree addPath(String s, File f, Tree root) {	

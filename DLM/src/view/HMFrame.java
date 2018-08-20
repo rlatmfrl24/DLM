@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import main.Manager;
 import main.dbManager;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
@@ -89,7 +88,7 @@ public class HMFrame {
 		Display display = Display.getDefault();
 		Shell shlHrm = new Shell();
 		shlHrm.setSize(786, 573);
-		shlHrm.setText("갱신");
+		shlHrm.setText("Trend Checker");
 		shlHrm.setLayout(new GridLayout(2, false));
 		
 		TabFolder tabFolder = new TabFolder(shlHrm, SWT.NONE);
@@ -157,9 +156,6 @@ public class HMFrame {
 			}
 		});
 		mntmOpenSelectedLink.setText("Open Selected link");
-		
-		
-
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
 		tbtmBattlepage.setText("Battlepage");
 		
@@ -639,11 +635,10 @@ public class HMFrame {
 				display.sleep();
 			}
 		}
-		System.gc();
-		Manager m = new Manager();
-		m.open();
 	}
+	
 	public void open_load(Shell shlHrm) {
+		
 		shlHrm.getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -666,6 +661,7 @@ public class HMFrame {
 				lblProgress.setText("Open headless webdriver..");
 				
 				popup_load.open();
+
 				Map<String, List<String>> refreshed;
 				refreshed = hu.LoadHrm();
 				for(String tag : refreshed.keySet()) {
