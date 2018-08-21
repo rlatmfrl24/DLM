@@ -301,7 +301,6 @@ public class DownloadUtil {
 				File file = fileList[i]; 
 				if(file.isFile()){
 					FileDeleteStrategy.FORCE.delete(file);
-					file.delete();
 				}else if(file.isDirectory()){
 					subDirList(file.getCanonicalPath().toString()); 
 					FileDeleteStrategy.FORCE.delete(file);
