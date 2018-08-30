@@ -63,6 +63,7 @@ public class CTFrame implements Observer {
 		composite_center.setLayout(new GridLayout(3, false));
 		
 		Tree tree_origin = new Tree(composite_center, SWT.BORDER);
+		tree_origin.setSortDirection(SWT.UP);
 		tree_origin.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		Composite composite = new Composite(composite_center, SWT.NONE);
@@ -76,7 +77,8 @@ public class CTFrame implements Observer {
 			public void widgetSelected(SelectionEvent e) {
 				tree_transform.removeAll();
 				for(TreeItem item : tree_origin.getItems()) {
-					String transform_path = ac.GetCategorizedName((File)item.getData(item.getText()));
+					System.out.println(new File(item.getText()));
+					String transform_path = ac.GetCategorizedName(new File(item.getText()));
 					tree_transform = addPath(transform_path, (File) item.getData(item.getText()), tree_transform);
 				}
 			}
@@ -177,13 +179,7 @@ public class CTFrame implements Observer {
 					config.setCurrentPath(selected);
 				}
 				File current_directory = new File(config.GetCurrentPath());
-				for(File f : current_directory.listFiles()) {
-					if(f.isFile()) {
-						TreeItem t = new TreeItem(tree_origin, 0);
-						t.setData(f.getName(), f);
-						t.setText(f.getName());
-					}
-				}
+				makeOriginTree(current_directory, tree_origin);
 			}
 		});
 		btnBrowse.setText("Browse");
@@ -196,8 +192,42 @@ public class CTFrame implements Observer {
 			}
 		}
 	}
+
+	public void makeOriginTree(File origin_path, Tree parent) {
+		try {
+			for(File f : origin_path.listFiles()) {
+				if(f.isDirectory()) {
+					TreeItem item = new TreeItem(parent, 0);
+					item.setText(f.getName());
+					makeOriginTree(f, item);
+				}else if(f.isFile()) {
+					TreeItem item = new TreeItem(parent, 0);
+					item.setText(f.getName());
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
-public Tree addPath(String s, File f, Tree root) {	
+	public void makeOriginTree(File origin_path, TreeItem parent) {		
+		try {
+			for(File f : origin_path.listFiles()) {
+				if(f.isDirectory()) {
+					TreeItem item = new TreeItem(parent, 0);
+					item.setText(f.getName());
+					makeOriginTree(f.getCanonicalFile(), item);
+				}else {
+					TreeItem item = new TreeItem(parent, 0);
+					item.setText(f.getName());
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Tree addPath(String s, File f, Tree root) {	
 		
 		TreeItem parent = null;
 		for(TreeItem item : root.getItems()) {
@@ -242,6 +272,4 @@ public Tree addPath(String s, File f, Tree root) {
 		// TODO Auto-generated method stub
 		config = (ConfigLoader) o;
 	}
-
-
 }

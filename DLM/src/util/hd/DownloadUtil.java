@@ -210,8 +210,8 @@ public class DownloadUtil {
 					}
 				});
 				zu.createZipFile(homepath.getPath()+"/"+gal.getPath()+"/", toPath, gal.getPath()+".zip");
-				//deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
-				subDirList(homepath.getPath()+"/"+gal.getPath()+"/");
+				deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
+				//subDirList(homepath.getPath()+"/"+gal.getPath()+"/");
 				dbManager.insertDownloadLog(gal);
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
