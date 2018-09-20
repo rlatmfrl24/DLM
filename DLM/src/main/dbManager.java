@@ -1,5 +1,6 @@
 package main;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -105,8 +106,13 @@ public class dbManager {
 		String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		for(String link : list) {
-			URL url = new URL(link);
-			stmt.setString(1, url.getAuthority());
+			URL url;
+			try {
+				url = new URL(link);
+				stmt.setString(1, url.getAuthority());
+			}catch(MalformedURLException mue) {
+				stmt.setString(1, "");
+			}
 			stmt.setString(2, link);
 			stmt.addBatch();
 		}
