@@ -1,15 +1,4 @@
-package main;
-
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
-import view.CTFrame;
-import view.HDFrame;
-import view.HMFrame;
-import view.RCFrame;
-
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+package deprecated;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,13 +6,25 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
+import main.ConfigLoader;
+import main.dbManager;
+import view.CTFrame;
+import view.HMFrame;
+import view.HDFrame;
+import view.RCFrame;
+
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 
-public class Manager {
+public class deprecated_Manager extends Shell {
 	private static final File TempPath = new File("./temp/");
 	private static final File HiyobiPath = new File("./hiyobi/");
 	private static final File deletedItemPath = new File("./temp/deleted/");
@@ -31,7 +32,11 @@ public class Manager {
 	private static ConfigLoader configLoader = new ConfigLoader();
 	private static dbManager dbManager = new dbManager();
 	
-	public Manager() {
+	/**
+	 * Launch the application.
+	 * @param args
+	 */
+	public static void main(String args[]) {
 		try {
 			if (!TempPath.exists()) {
 				TempPath.mkdirs();
@@ -59,42 +64,36 @@ public class Manager {
 			configLoader.loadConfig(TempPath+"/config.properties");
 			dbManager.Connect();
 			dbManager.initialize();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			Manager window = new Manager();
-			window.open();
+			Display display = Display.getDefault();
+			deprecated_Manager shell = new deprecated_Manager(display);
+			shell.open();
+			shell.layout();
+			while (!shell.isDisposed()) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Open the window.
+	 * Create the shell.
+	 * @param display
 	 */
-	public void open() {
-		Display display = Display.getDefault();
-		Shell shlManager = new Shell();
-		shlManager.setSize(273, 227);
-		shlManager.setText("Select Module");
-		shlManager.setLayout(new FillLayout(SWT.HORIZONTAL));
+	public deprecated_Manager(Display display) {
+		super(display, SWT.SHELL_TRIM);
+		setLayout(new FillLayout(SWT.HORIZONTAL));
 		
-		Composite composite = new Composite(shlManager, SWT.NONE);
+		Composite composite = new Composite(this, SWT.NONE);
 		composite.setLayout(new GridLayout(1, true));
 		
 		Button btnRandomChooser = new Button(composite, SWT.NONE);
 		btnRandomChooser.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				shlManager.dispose();
+				dispose();
 				RCFrame mainFrame = new RCFrame(configLoader);
 				mainFrame.FrameIntialize();
 			}
@@ -106,7 +105,7 @@ public class Manager {
 		btnCategorizer.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				shlManager.dispose();
+				dispose();
 				CTFrame mainFrame = new CTFrame(configLoader);
 				mainFrame.FrameInitialize();
 			}
@@ -118,7 +117,7 @@ public class Manager {
 		btnHiyobiDownloader.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				shlManager.dispose();
+				dispose();
 				HDFrame mainFrame = new HDFrame(dbManager);
 				mainFrame.open();
 			}
@@ -130,21 +129,27 @@ public class Manager {
 		btnTrendChecker.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				shlManager.dispose();
+				dispose();
 				HMFrame mainFrame = new HMFrame(dbManager);
 				mainFrame.open();
 			}
 		});
 		btnTrendChecker.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		btnTrendChecker.setText("Trend Checker");
+		createContents();
+	}
 
-		shlManager.open();
-		shlManager.layout();
-		while (!shlManager.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
+	/**
+	 * Create contents of the shell.
+	 */
+	protected void createContents() {
+		setText("Select Module");
+		setSize(273, 227);
+	}
+
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
 	}
 
 }

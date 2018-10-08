@@ -21,18 +21,18 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import main.dbManager;
 
-public class HDFrame {
+public class deprecated_HDFrame {
 	private Text cnt_searchpage;
 	private Text cnt_itemcount;
 	public Thread downloader;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private dbManager dm;
 	
-	public HDFrame() {
+	public deprecated_HDFrame() {
 		
 	}
 	
-	public HDFrame(dbManager dm) {
+	public deprecated_HDFrame(dbManager dm) {
 		this.dm = dm;
 	}
 	
@@ -86,7 +86,7 @@ public class HDFrame {
 		btnCrawl.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				downloader = new Thread(new DownlaodManager(dm, lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText())));
+				downloader = new Thread(new deprecated_DownlaodManager(dm, lblCurrenttitle, progressBar ,Integer.valueOf(cnt_searchpage.getText()), Integer.valueOf(cnt_itemcount.getText())));
 				downloader.start();
 			}
 		});

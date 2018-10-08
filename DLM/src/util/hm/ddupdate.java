@@ -27,10 +27,11 @@ public class ddupdate {
 		try {
 			for(int i=1; i<=num_search_page; i++) {
 				Document doc = Jsoup.connect("http://www.dogdrip.net/index.php?mid=dogdrip&page="+i).get();
-				Elements items = doc.getElementsByTag("tbody").get(0).getElementsByTag("a");
+				Elements items = doc.getElementsByTag("tbody").get(0).getElementsByClass("ed link-reset");
+				
 				for(Element item : items) {
-					if(!log_list.contains(item.attr("href"))) {
-						String url = item.attr("href");
+					if(!log_list.contains(item.attr("href").replaceAll("index.*=", "dogdrip/"))) {
+						String url = item.attr("href").replaceAll("index.*=", "dogdrip/");
 						String title = item.text();
 						String id = url.substring(url.lastIndexOf('/')+1);
 						List<String> entry = new ArrayList<>();
@@ -48,7 +49,9 @@ public class ddupdate {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ddupdate du = new ddupdate(new dbManager());
+		dbManager dm = new dbManager();
+		dm.Connect();
+		ddupdate du = new ddupdate(dm);
 		du.LoadDD();
 	}
 

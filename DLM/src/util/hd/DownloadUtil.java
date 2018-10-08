@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -189,6 +190,8 @@ public class DownloadUtil {
 			for(Entry<String, TableItem> entry : item_map.entrySet()) {
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
+						table.setSelection(entry.getValue());
+						table.showItem(entry.getValue());
 						entry.getValue().setText(2, "Fetch..");
 					}
 				});
@@ -208,6 +211,7 @@ public class DownloadUtil {
 				});
 				zu.createZipFile(homepath.getPath()+"/"+gal.getPath()+"/", toPath, gal.getPath()+".zip");
 				deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
+				//subDirList(homepath.getPath()+"/"+gal.getPath()+"/");
 				dbManager.insertDownloadLog(gal);
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -236,30 +240,42 @@ public class DownloadUtil {
 			}
 			pbar_selection = 1;
 			int max_selection = img_list.size();
-			
 			List<Thread> threads = new ArrayList<>();
-			for(Element e : img_list) {
-				String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".jpg";
-				Runnable task = new Runnable() {					
-					@Override
-					public void run() {
-						ImageDownload(e.text(), save_path, 0);
-						item.getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								item.setText(2, String.valueOf(pbar_selection)+"/"+String.valueOf(max_selection));
-								pbar_selection++;
-							}
-						});
-					}
-				};
-				Thread download_thread = new Thread(task);
-				download_thread.start();
-				threads.add(download_thread);
+			List<Elements> work_pool = new ArrayList<>();
+			
+			while(img_list.size()>0) {
+				Elements tmp = new Elements();
+				for(int i=0; i<100 && img_list.size()>0; i++) {
+					tmp.add(img_list.get(0));
+					img_list.remove(0);
+				}
+				work_pool.add(tmp);
 			}
-			for(Thread t : threads) {
-				t.join();
+			
+			for(Elements partial_work : work_pool) {
+				for(Element e : partial_work) {
+					String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".png";
+					Runnable task = new Runnable() {					
+						@Override
+						public void run() {
+							ImageDownload(e.text(), save_path, 0);
+							item.getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									item.setText(2, String.valueOf(pbar_selection)+"/"+String.valueOf(max_selection));
+									pbar_selection++;
+								}
+							});
+						}
+					};
+					Thread download_thread = new Thread(task);
+					download_thread.start();
+					threads.add(download_thread);
+				}
+				for(Thread t : threads) {
+					t.join();
+				}
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -267,18 +283,32 @@ public class DownloadUtil {
 	}
 	
 	public boolean deleteDirectory(File path) {
-		if (!path.exists()) {
-			return false;
-		}
+		if (!path.exists()) return false;
 		File[] files = path.listFiles();
 		for (File file : files) {
-			if (file.isDirectory()) {
-				deleteDirectory(file);
-			} else {
-				file.delete();
-			}
+			if (file.isDirectory()) deleteDirectory(file);
+		    else file.delete();
 		}
 		return path.delete();
+	}
+	
+	public void subDirList(String source){
+		File dir = new File(source); 
+		File[] fileList = dir.listFiles();
+		
+		try{
+			for(int i = 0 ; i < fileList.length ; i++){
+				File file = fileList[i]; 
+				if(file.isFile()){
+					FileDeleteStrategy.FORCE.delete(file);
+				}else if(file.isDirectory()){
+					subDirList(file.getCanonicalPath().toString()); 
+					FileDeleteStrategy.FORCE.delete(file);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }
 
