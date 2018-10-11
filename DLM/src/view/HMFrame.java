@@ -163,19 +163,19 @@ public class HMFrame {
 		mntmGoToBookmark_hrm.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				List<String> list = new ArrayList<>();
+				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
 				try {
 					for(TableItem selected : table_hrm.getSelection()) {
 						URL url = new URL(selected.getText(1));
 						TableItem bmk_item = new TableItem(table_bmk, 0);
 						bmk_item.setText(1, selected.getText(1));
 						bmk_item.setText(0, url.getAuthority());
+						list.add(selected.getText(1));
 						table_hrm.remove(table_hrm.indexOf(selected));
-						List<String> list = new ArrayList<>();
-						for(TableItem item : table_bmk.getItems()) {
-							list.add(item.getText(1));
-						}
-						dm.UpdateBookmark(list);
 					}
+					dm.insertLog(list);
+					dm.UpdateBookmark(list);
 				}catch(Exception bme) {
 					bme.printStackTrace();
 				}
@@ -258,20 +258,19 @@ public class HMFrame {
 		mntmGoToBookmark_bp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				List<String> list = new ArrayList<>();
+				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
 				try {
 					for(TableItem selected : table_bp.getSelection()) {
 						URL url = new URL(selected.getText(2));
 						TableItem bmk_item = new TableItem(table_bmk, 0);
 						bmk_item.setText(0, url.getAuthority());
 						bmk_item.setText(1, selected.getText(2));
+						list.add(selected.getText(2));
 						table_bp.remove(table_bp.indexOf(selected));
-						List<String> list = new ArrayList<>();
-						for(TableItem item : table_bmk.getItems()) {
-							list.add(item.getText(1));
-						}
-						System.out.println(list);
-						dm.UpdateBookmark(list);
 					}
+					dm.insertLog(list);
+					dm.UpdateBookmark(list);
 				}catch(Exception bme) {
 					bme.printStackTrace();
 				}
@@ -345,21 +344,22 @@ public class HMFrame {
 		mntmGoToBookmark_dd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				List<String> list = new ArrayList<>();
+				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
 				try {
 					for(TableItem selected : table_dd.getSelection()) {
 						URL url = new URL(selected.getText(1));
 						TableItem bmk_item = new TableItem(table_bmk, 0);
 						bmk_item.setText(0, url.getAuthority());
 						bmk_item.setText(1, selected.getText(1));
+						list.add(selected.getText(1));
 						table_dd.remove(table_dd.indexOf(selected));
-						List<String> list = new ArrayList<>();
-						for(TableItem item : table_bmk.getItems()) {
-							list.add(item.getText(1));
-						}
-						dm.UpdateBookmark(list);
 					}
+					dm.insertLog(list);
+					dm.UpdateBookmark(list);
 				}catch(Exception bme) {
 					bme.printStackTrace();
+					
 				}
 			}
 		});

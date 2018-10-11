@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
@@ -83,21 +84,39 @@ public class HDFrame {
 		text.setLayoutData(gd_text);
 		
 		Button btnFind = new Button(composite_input, SWT.NONE);
-		btnFind.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if(text.getText().length() > 0) {
-					table.removeAll();
-					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
-				}
-			}
-		});
 		GridData gd_btnFind = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_btnFind.widthHint = 63;
 		btnFind.setLayoutData(gd_btnFind);
 		btnFind.setText("Find");
 		
 		Button btnDownload = new Button(composite_input, SWT.NONE);
+		btnDownload.setText("Download");
+
+		btnFind.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(text.getText().length() > 0) {
+					table.removeAll();
+					Shell popup_load = new Shell(shell, 0);
+					popup_load.setText("Alert");
+					popup_load.setSize(449, 166);
+					popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
+					Composite composite = new Composite(popup_load, 0);
+					composite.setLayout(new GridLayout(1, false));
+					Label lblMsg = new Label(composite, SWT.NONE);
+					lblMsg.setAlignment(SWT.CENTER);
+					lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
+					lblMsg.setText("Load new downlist from web.. Please Wait..");
+					popup_load.open();
+					btnFind.setEnabled(false);
+					btnDownload.setEnabled(false);
+					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
+					popup_load.dispose();
+					btnFind.setEnabled(true);
+					btnDownload.setEnabled(true);
+				}
+			}
+		});
 		btnDownload.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -111,7 +130,6 @@ public class HDFrame {
 				download.start();
 			}
 		});
-		btnDownload.setText("Download");
 		
 		Composite composite_list = new Composite(shell, SWT.NONE);
 		composite_list.setLayout(new GridLayout(1, false));
