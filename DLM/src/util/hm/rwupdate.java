@@ -127,12 +127,11 @@ public class rwupdate {
 								+ img_link.toLowerCase().substring(img_link.lastIndexOf('/') + 1,
 								img_link.toLowerCase().lastIndexOf(img_validation(img_link).toLowerCase())
 								+img_validation(img_link).length());
-						System.out.println(img_path);
-						download_util.ImageDownload(img_link, img_path, 0);
+						//System.out.println(img_path);
+						//download_util.ImageDownload(img_link, img_path, 0);
 					} else {
-						String img_link = LinkData.split("\t")[2];
-						System.out.println("=====OTHER_TAG=====");
-						System.out.println(img_link);
+						String other_link = LinkData.split("\t")[2];
+						System.out.println("[OTHER_TAG]:"+other_link);
 					}
 				}
 				System.out.println("[SYSTEM]Download Done.");

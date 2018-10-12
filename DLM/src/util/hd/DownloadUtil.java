@@ -136,6 +136,7 @@ public class DownloadUtil {
 	
 	public void ImageDownload(String link, String path, int retry) {
 		try {
+			path = DuplicateCheck(path);
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			URL url = new URL(link);
@@ -279,6 +280,17 @@ public class DownloadUtil {
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public String DuplicateCheck(String path) {
+		File tempForCheck = new File(path);
+		String modifiedPath;
+		if(tempForCheck.exists()) {
+			modifiedPath = DuplicateCheck(path.substring(0, path.lastIndexOf('.'))+" (1)"+path.substring(path.lastIndexOf('.')));
+			return modifiedPath;
+		}else {
+			return path;
 		}
 	}
 	
