@@ -148,18 +148,6 @@ public class HMFrame {
 			}
 		});
 		mntmCheckAllSelected_hrm.setText("Check All Selected Item");
-		MenuItem mntmOpenSelectedLink_hrm = new MenuItem(menu_hrm, SWT.NONE);
-		mntmOpenSelectedLink_hrm.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				for(TableItem selected : table_hrm.getSelection()) {
-					su.open_browser(selected.getText(1));
-					selected.setChecked(true);
-					updateItem(table_hrm, selected);
-				}
-			}
-		});
-		mntmOpenSelectedLink_hrm.setText("Open Selected link");
 		
 		MenuItem mntmGoToBookmark_hrm = new MenuItem(menu_hrm, SWT.NONE);
 		mntmGoToBookmark_hrm.addSelectionListener(new SelectionAdapter() {
@@ -184,6 +172,24 @@ public class HMFrame {
 			}
 		});
 		mntmGoToBookmark_hrm.setText("Go to Bookmark");
+		MenuItem mntmOpenSelectedLink_hrm = new MenuItem(menu_hrm, SWT.NONE);
+		mntmOpenSelectedLink_hrm.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> open_list = new ArrayList<>();
+					for(TableItem selected : table_hrm.getSelection()) {
+						su.open_browser(selected.getText(1));
+						open_list.add(selected.getText(1));
+						table_hrm.remove(table_hrm.indexOf(selected));
+					}
+					dm.insertLog(open_list);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		mntmOpenSelectedLink_hrm.setText("Open Selected link (Enter)");
 		
 		
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
@@ -243,19 +249,6 @@ public class HMFrame {
 		});
 		mntmCheckAllSelected_bp.setText("Check All Selected Item");
 		
-		MenuItem mntmOpenSelectedLink_bp = new MenuItem(menu_bp, SWT.NONE);
-		mntmOpenSelectedLink_bp.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				for(TableItem selected : table_bp.getSelection()) {
-					su.open_browser(selected.getText(2));
-					selected.setChecked(true);
-					updateItem(table_bp, selected);
-				}
-			}
-		});
-		mntmOpenSelectedLink_bp.setText("Open Selected link");
-		
 		MenuItem mntmGoToBookmark_bp = new MenuItem(menu_bp, SWT.NONE);
 		mntmGoToBookmark_bp.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -279,6 +272,25 @@ public class HMFrame {
 			}
 		});
 		mntmGoToBookmark_bp.setText("Go to Bookmark");
+		
+		MenuItem mntmOpenSelectedLink_bp = new MenuItem(menu_bp, SWT.NONE);
+		mntmOpenSelectedLink_bp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> open_list = new ArrayList<>();
+					for(TableItem selected : table_bp.getSelection()) {
+						su.open_browser(selected.getText(2));
+						open_list.add(selected.getText(2));
+						table_bp.remove(table_bp.indexOf(selected));
+					}
+					dm.insertLog(open_list);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		mntmOpenSelectedLink_bp.setText("Open Selected link (Enter)");
 		
 		TabItem tbtmDogdrip = new TabItem(tabFolder, SWT.NONE);
 		tbtmDogdrip.setText("Dogdrip");
@@ -329,19 +341,6 @@ public class HMFrame {
 		});
 		mntmCheckAllSelected_dd.setText("Check All Selected Item");
 		
-		MenuItem mntmOpenSelectedLink_dd = new MenuItem(menu_dd, SWT.NONE);
-		mntmOpenSelectedLink_dd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				for(TableItem selected : table_dd.getSelection()) {
-					su.open_browser(selected.getText(1));
-					selected.setChecked(true);
-					updateItem(table_dd, selected);
-				}
-			}
-		});
-		mntmOpenSelectedLink_dd.setText("Open Selected link");
-		
 		MenuItem mntmGoToBookmark_dd = new MenuItem(menu_dd, SWT.NONE);
 		mntmGoToBookmark_dd.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -366,6 +365,25 @@ public class HMFrame {
 			}
 		});
 		mntmGoToBookmark_dd.setText("Go to Bookmark");
+		
+		MenuItem mntmOpenSelectedLink_dd = new MenuItem(menu_dd, SWT.NONE);
+		mntmOpenSelectedLink_dd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> open_list = new ArrayList<>();
+					for(TableItem selected : table_dd.getSelection()) {
+						su.open_browser(selected.getText(1));
+						open_list.add(selected.getText(1));
+						table_dd.remove(table_dd.indexOf(selected));
+					}
+					dm.insertLog(open_list);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		mntmOpenSelectedLink_dd.setText("Open Selected link (Enter)");
 		
 		TabItem tbtmBookmark = new TabItem(tabFolder, SWT.NONE);
 		tbtmBookmark.setText("Bookmark");
@@ -439,17 +457,6 @@ public class HMFrame {
 		TableColumn tblclmnLink_2 = new TableColumn(table_rw_other, SWT.NONE);
 		tblclmnLink_2.setWidth(100);
 		tblclmnLink_2.setText("Link");
-
-		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
-			try {
-				URL url = new URL(link);
-				TableItem item = new TableItem(table_bmk, 0);
-				item.setText(0, url.getAuthority());
-				item.setText(1, link);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
 		
 		table_bmk.addMouseListener(new MouseAdapter() {
 			@Override
@@ -462,7 +469,17 @@ public class HMFrame {
 				}
 			}
 		});
-		
+
+		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
+			try {
+				URL url = new URL(link);
+				TableItem item = new TableItem(table_bmk, 0);
+				item.setText(0, url.getAuthority());
+				item.setText(1, link);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		display.addFilter(SWT.KeyDown, new Listener() {	
 			@Override
@@ -527,18 +544,23 @@ public class HMFrame {
 				        e1.printStackTrace();
 				    }
 				}else if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
-					if(current_table.getSelectionCount() > 0) {
-						for(TableItem item : current_table.getSelection()) {
-							String link;
-							if(current_table == table_bp) {
-								link = item.getText(2);
-							}else {
-								link = item.getText(1);
+					try {
+						if(current_table.getSelectionCount() > 0) {
+							List<String> visit_list = new ArrayList<>();
+							for(TableItem item : current_table.getSelection()) {
+								String link;
+								if(current_table == table_bp) link = item.getText(2);
+								else link = item.getText(1);
+								visit_list.add(link);
+								System.out.println(link);
+								su.open_browser(link);
+								current_table.remove(current_table.indexOf(item));
+								//item.setChecked(true);
 							}
-							System.out.println(link);
-							su.open_browser(link);
-							item.setChecked(true);
+							dm.insertLog(visit_list);
 						}
+					}catch(Exception ex) {
+						ex.printStackTrace();
 					}
 				}
 			}
