@@ -58,6 +58,8 @@ public class HMFrame {
 	private dbManager dm;
 	private SystemUtility su = new SystemUtility();
 	private Table table_bmk;
+	private Table table_rw_download;
+	private Table table_rw_other;
 	
 	public HMFrame(dbManager dm) {
 		this.dm = dm;
@@ -146,42 +148,48 @@ public class HMFrame {
 			}
 		});
 		mntmCheckAllSelected_hrm.setText("Check All Selected Item");
-		MenuItem mntmOpenSelectedLink_hrm = new MenuItem(menu_hrm, SWT.NONE);
-		mntmOpenSelectedLink_hrm.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				for(TableItem selected : table_hrm.getSelection()) {
-					su.open_browser(selected.getText(1));
-					selected.setChecked(true);
-					updateItem(table_hrm, selected);
-				}
-			}
-		});
-		mntmOpenSelectedLink_hrm.setText("Open Selected link");
 		
 		MenuItem mntmGoToBookmark_hrm = new MenuItem(menu_hrm, SWT.NONE);
 		mntmGoToBookmark_hrm.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				List<String> list = new ArrayList<>();
+				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
 				try {
 					for(TableItem selected : table_hrm.getSelection()) {
 						URL url = new URL(selected.getText(1));
 						TableItem bmk_item = new TableItem(table_bmk, 0);
 						bmk_item.setText(1, selected.getText(1));
 						bmk_item.setText(0, url.getAuthority());
+						list.add(selected.getText(1));
 						table_hrm.remove(table_hrm.indexOf(selected));
-						List<String> list = new ArrayList<>();
-						for(TableItem item : table_bmk.getItems()) {
-							list.add(item.getText(1));
-						}
-						dm.UpdateBookmark(list);
 					}
+					dm.insertLog(list);
+					dm.UpdateBookmark(list);
 				}catch(Exception bme) {
 					bme.printStackTrace();
 				}
 			}
 		});
 		mntmGoToBookmark_hrm.setText("Go to Bookmark");
+		MenuItem mntmOpenSelectedLink_hrm = new MenuItem(menu_hrm, SWT.NONE);
+		mntmOpenSelectedLink_hrm.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> open_list = new ArrayList<>();
+					for(TableItem selected : table_hrm.getSelection()) {
+						su.open_browser(selected.getText(1));
+						open_list.add(selected.getText(1));
+						table_hrm.remove(table_hrm.indexOf(selected));
+					}
+					dm.insertLog(open_list);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		mntmOpenSelectedLink_hrm.setText("Open Selected link (Enter)");
 		
 		
 		TabItem tbtmBattlepage = new TabItem(tabFolder, SWT.NONE);
@@ -241,43 +249,48 @@ public class HMFrame {
 		});
 		mntmCheckAllSelected_bp.setText("Check All Selected Item");
 		
-		MenuItem mntmOpenSelectedLink_bp = new MenuItem(menu_bp, SWT.NONE);
-		mntmOpenSelectedLink_bp.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				for(TableItem selected : table_bp.getSelection()) {
-					su.open_browser(selected.getText(2));
-					selected.setChecked(true);
-					updateItem(table_bp, selected);
-				}
-			}
-		});
-		mntmOpenSelectedLink_bp.setText("Open Selected link");
-		
 		MenuItem mntmGoToBookmark_bp = new MenuItem(menu_bp, SWT.NONE);
 		mntmGoToBookmark_bp.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				List<String> list = new ArrayList<>();
+				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
 				try {
 					for(TableItem selected : table_bp.getSelection()) {
 						URL url = new URL(selected.getText(2));
 						TableItem bmk_item = new TableItem(table_bmk, 0);
 						bmk_item.setText(0, url.getAuthority());
 						bmk_item.setText(1, selected.getText(2));
+						list.add(selected.getText(2));
 						table_bp.remove(table_bp.indexOf(selected));
-						List<String> list = new ArrayList<>();
-						for(TableItem item : table_bmk.getItems()) {
-							list.add(item.getText(1));
-						}
-						System.out.println(list);
-						dm.UpdateBookmark(list);
 					}
+					dm.insertLog(list);
+					dm.UpdateBookmark(list);
 				}catch(Exception bme) {
 					bme.printStackTrace();
 				}
 			}
 		});
 		mntmGoToBookmark_bp.setText("Go to Bookmark");
+		
+		MenuItem mntmOpenSelectedLink_bp = new MenuItem(menu_bp, SWT.NONE);
+		mntmOpenSelectedLink_bp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> open_list = new ArrayList<>();
+					for(TableItem selected : table_bp.getSelection()) {
+						su.open_browser(selected.getText(2));
+						open_list.add(selected.getText(2));
+						table_bp.remove(table_bp.indexOf(selected));
+					}
+					dm.insertLog(open_list);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		mntmOpenSelectedLink_bp.setText("Open Selected link (Enter)");
 		
 		TabItem tbtmDogdrip = new TabItem(tabFolder, SWT.NONE);
 		tbtmDogdrip.setText("Dogdrip");
@@ -328,42 +341,49 @@ public class HMFrame {
 		});
 		mntmCheckAllSelected_dd.setText("Check All Selected Item");
 		
-		MenuItem mntmOpenSelectedLink_dd = new MenuItem(menu_dd, SWT.NONE);
-		mntmOpenSelectedLink_dd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				for(TableItem selected : table_dd.getSelection()) {
-					su.open_browser(selected.getText(1));
-					selected.setChecked(true);
-					updateItem(table_dd, selected);
-				}
-			}
-		});
-		mntmOpenSelectedLink_dd.setText("Open Selected link");
-		
 		MenuItem mntmGoToBookmark_dd = new MenuItem(menu_dd, SWT.NONE);
 		mntmGoToBookmark_dd.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				List<String> list = new ArrayList<>();
+				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
 				try {
 					for(TableItem selected : table_dd.getSelection()) {
 						URL url = new URL(selected.getText(1));
 						TableItem bmk_item = new TableItem(table_bmk, 0);
 						bmk_item.setText(0, url.getAuthority());
 						bmk_item.setText(1, selected.getText(1));
+						list.add(selected.getText(1));
 						table_dd.remove(table_dd.indexOf(selected));
-						List<String> list = new ArrayList<>();
-						for(TableItem item : table_bmk.getItems()) {
-							list.add(item.getText(1));
-						}
-						dm.UpdateBookmark(list);
 					}
+					dm.insertLog(list);
+					dm.UpdateBookmark(list);
 				}catch(Exception bme) {
 					bme.printStackTrace();
+					
 				}
 			}
 		});
 		mntmGoToBookmark_dd.setText("Go to Bookmark");
+		
+		MenuItem mntmOpenSelectedLink_dd = new MenuItem(menu_dd, SWT.NONE);
+		mntmOpenSelectedLink_dd.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					List<String> open_list = new ArrayList<>();
+					for(TableItem selected : table_dd.getSelection()) {
+						su.open_browser(selected.getText(1));
+						open_list.add(selected.getText(1));
+						table_dd.remove(table_dd.indexOf(selected));
+					}
+					dm.insertLog(open_list);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		mntmOpenSelectedLink_dd.setText("Open Selected link (Enter)");
 		
 		TabItem tbtmBookmark = new TabItem(tabFolder, SWT.NONE);
 		tbtmBookmark.setText("Bookmark");
@@ -387,17 +407,56 @@ public class HMFrame {
 		TableColumn tblclmnLink = tableViewerColumn_8.getColumn();
 		tblclmnLink.setWidth(100);
 		tblclmnLink.setText("Link");
-
-		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
-			try {
-				URL url = new URL(link);
-				TableItem item = new TableItem(table_bmk, 0);
-				item.setText(0, url.getAuthority());
-				item.setText(1, link);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+		
+		TabItem tbtmRearwarning = new TabItem(tabFolder, SWT.NONE);
+		tbtmRearwarning.setText("RearWarning");
+		
+		Composite composite_rw = new Composite(tabFolder, SWT.NONE);
+		tbtmRearwarning.setControl(composite_rw);
+		composite_rw.setLayout(new GridLayout(1, false));
+		
+		Label lblDownloadList = new Label(composite_rw, SWT.NONE);
+		lblDownloadList.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		lblDownloadList.setText("Download List");
+		
+		TableViewer tableViewer = new TableViewer(composite_rw, SWT.BORDER | SWT.FULL_SELECTION);
+		table_rw_download = tableViewer.getTable();
+		table_rw_download.setHeaderVisible(true);
+		table_rw_download.setLinesVisible(true);
+		table_rw_download.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
+		
+		TableColumn tblclmnDomain_1 = new TableColumn(table_rw_download, SWT.NONE);
+		tblclmnDomain_1.setWidth(100);
+		tblclmnDomain_1.setText("Domain");
+		
+		TableColumn tblclmnTitle_1 = new TableColumn(table_rw_download, SWT.NONE);
+		tblclmnTitle_1.setWidth(100);
+		tblclmnTitle_1.setText("Title");
+		
+		TableColumn tblclmnLink_1 = new TableColumn(table_rw_download, SWT.NONE);
+		tblclmnLink_1.setWidth(100);
+		tblclmnLink_1.setText("Link");
+		
+		Label lblNonimageLinkList = new Label(composite_rw, SWT.NONE);
+		lblNonimageLinkList.setText("Non-Image Link List");
+		
+		TableViewer tableViewer_1 = new TableViewer(composite_rw, SWT.BORDER | SWT.FULL_SELECTION);
+		table_rw_other = tableViewer_1.getTable();
+		table_rw_other.setHeaderVisible(true);
+		table_rw_other.setLinesVisible(true);
+		table_rw_other.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
+		
+		TableColumn tblclmnDomain_2 = new TableColumn(table_rw_other, SWT.NONE);
+		tblclmnDomain_2.setWidth(100);
+		tblclmnDomain_2.setText("Domain");
+		
+		TableColumn tblclmnTitle_2 = new TableColumn(table_rw_other, SWT.NONE);
+		tblclmnTitle_2.setWidth(100);
+		tblclmnTitle_2.setText("Title");
+		
+		TableColumn tblclmnLink_2 = new TableColumn(table_rw_other, SWT.NONE);
+		tblclmnLink_2.setWidth(100);
+		tblclmnLink_2.setText("Link");
 		
 		table_bmk.addMouseListener(new MouseAdapter() {
 			@Override
@@ -410,7 +469,17 @@ public class HMFrame {
 				}
 			}
 		});
-		
+
+		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
+			try {
+				URL url = new URL(link);
+				TableItem item = new TableItem(table_bmk, 0);
+				item.setText(0, url.getAuthority());
+				item.setText(1, link);
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		display.addFilter(SWT.KeyDown, new Listener() {	
 			@Override
@@ -475,18 +544,23 @@ public class HMFrame {
 				        e1.printStackTrace();
 				    }
 				}else if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
-					if(current_table.getSelectionCount() > 0) {
-						for(TableItem item : current_table.getSelection()) {
-							String link;
-							if(current_table == table_bp) {
-								link = item.getText(2);
-							}else {
-								link = item.getText(1);
+					try {
+						if(current_table.getSelectionCount() > 0) {
+							List<String> visit_list = new ArrayList<>();
+							for(TableItem item : current_table.getSelection()) {
+								String link;
+								if(current_table == table_bp) link = item.getText(2);
+								else link = item.getText(1);
+								visit_list.add(link);
+								System.out.println(link);
+								su.open_browser(link);
+								current_table.remove(current_table.indexOf(item));
+								//item.setChecked(true);
 							}
-							System.out.println(link);
-							su.open_browser(link);
-							item.setChecked(true);
+							dm.insertLog(visit_list);
 						}
+					}catch(Exception ex) {
+						ex.printStackTrace();
 					}
 				}
 			}
@@ -593,7 +667,7 @@ public class HMFrame {
 			}
 		});
 		lblReady.setAlignment(SWT.RIGHT);
-		GridData gd_lblReady = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		GridData gd_lblReady = new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1);
 		gd_lblReady.widthHint = 640;
 		lblReady.setLayoutData(gd_lblReady);
 		lblReady.setText("Ready..");
