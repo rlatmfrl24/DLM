@@ -26,8 +26,8 @@ public class bpupdate {
 		}
 	}
 	
-	public Map<String, List<String>> LoadBP() {
-		Map<String, List<String>> data_map = new TreeMap<>();
+	public Map<String, String> LoadBP() {
+		Map<String, String> data_map = new TreeMap<>();
 		try {
 			log_list = dm.getLogs("v12.battlepage.com");
 			for(int i=1; i<=num_search_page; i++) {
@@ -37,12 +37,7 @@ public class bpupdate {
 					String url = e.attr("href").replace("&page="+i, "");
 					if(!log_list.contains(url) && url.contains("no=")) {
 						String title = e.getElementsByClass("search_title").get(0).text();
-						String id = url.substring(url.indexOf("no=")).replace("no=", "");
-						List<String> entry = new ArrayList<>();
-						entry.add("유머게시판");
-						entry.add(title);
-						entry.add(url);
-						data_map.put(id, entry);
+						data_map.put(url, title);
 					}
 				}
 			}
@@ -53,12 +48,7 @@ public class bpupdate {
 					String url = e.attr("href").replace("&page="+i, "");
 					if(!log_list.contains(url) && url.contains("no=")) {
 						String title = e.getElementsByClass("search_title").get(0).text();
-						String id = url.substring(url.indexOf("no=")).replace("no=", "");
-						List<String> entry = new ArrayList<>();
-						entry.add("기타게시판");
-						entry.add(title);
-						entry.add(url);
-						data_map.put(id, entry);
+						data_map.put(url, title);
 					}
 				}
 			}
