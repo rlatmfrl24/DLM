@@ -20,6 +20,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -39,7 +44,6 @@ import util.rc.SystemUtility;
 
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -61,9 +65,28 @@ public class HMFrame {
 	private Table table_bmk;
 	private Table table_rw_download;
 	private Table table_rw_other;
+	private Map<String, String> refreshed_hrm;
+	private Map<String, String> refreshed_bp;
+	private Map<String, String> refreshed_dd;
+	private IRunnableWithProgress loadTask;
 	
 	public HMFrame(dbManager dm) {
 		this.dm = dm;
+		loadTask = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				// TODO Auto-generated method stub
+				monitor.beginTask("Loading HRM pages..", 3);
+				refreshed_hrm = hu.LoadHrm();
+				monitor.worked(2);
+				monitor.setTaskName("Loading BP pages..");
+				refreshed_bp = bp.LoadBP();
+				monitor.worked(1);
+				monitor.setTaskName("Loading DD pages..");
+				refreshed_dd = du.LoadDD();
+				monitor.done();
+			}
+		};
 	}
 	
 	/**
@@ -227,6 +250,7 @@ public class HMFrame {
 		tblclmnLink.setWidth(100);
 		tblclmnLink.setText("Link");
 		
+		/*
 		TabItem tbtmRearwarning = new TabItem(tabFolder, SWT.NONE);
 		tbtmRearwarning.setText("RearWarning");
 		
@@ -276,6 +300,7 @@ public class HMFrame {
 		TableColumn tblclmnLink_2 = new TableColumn(table_rw_other, SWT.NONE);
 		tblclmnLink_2.setWidth(100);
 		tblclmnLink_2.setText("Link");
+		*/
 
 		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
 			try {
@@ -311,6 +336,7 @@ public class HMFrame {
 		lblReady.setLayoutData(gd_lblReady);
 		lblReady.setText("Ready..");
 
+		
 		// Listener Part
 		MouseAdapter doubleclickAdapter = new MouseAdapter() {
 			@Override
@@ -558,28 +584,9 @@ public class HMFrame {
 		btnRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				btnRefresh.setEnabled(false);
-				btnUpdate.setEnabled(false);
-				Map<String, String> refreshed = null;
-				Table current_table = getCurrentTable(tabFolder);
-				current_table.removeAll();
-				lblReady.setText("Refreshing Pages..");
-				
-				if(current_table == table_hrm) {
-					refreshed = hu.LoadHrm();
-				}else if(current_table == table_bp) {
-					refreshed = bp.LoadBP();
-				}else if(current_table == table_dd) {
-					refreshed = du.LoadDD();
+				if(MessageDialog.openQuestion(shlHrm, "목록 초기화", "전체 목록을 삭제하고 다시 로드합니다. 괜찮습니까?")) {
+					open_load(shlHrm);
 				}
-				for(Entry<String, String> entry : refreshed.entrySet()) {
-					TableItem ti = new TableItem(current_table, 0);
-					ti.setText(0, entry.getValue());
-					ti.setText(1, entry.getKey());
-				}
-				btnRefresh.setEnabled(true);
-				btnUpdate.setEnabled(true);
-				lblReady.setText("Done!");
 			}
 		});
 		
@@ -662,40 +669,23 @@ public class HMFrame {
 		return current_table;
 	}
 	
+
+	
 	public void open_load(Shell shlHrm) {
+		
 		shlHrm.getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-
-				Shell popup_load = new Shell(shlHrm, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-				popup_load.setText("Alert");
-				popup_load.setSize(449, 166);
-				popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
-				Composite composite = new Composite(popup_load, 0);
-				composite.setLayout(new GridLayout(1, false));
-				
-				
-				Label lblMsg = new Label(composite, SWT.NONE);
-				lblMsg.setAlignment(SWT.CENTER);
-				lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1));
-				lblMsg.setText("Load new pages.. Please Wait..");
-				
-				Label lblProgress = new Label(composite, SWT.NONE);
-				lblProgress.setAlignment(SWT.CENTER);
-				lblProgress.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
-				lblProgress.setText("Load Hrm Pages..");
-				popup_load.open();
-						
-				Map<String, String> refreshed_hrm;
-				Map<String, String> refreshed_bp;
-				Map<String, String> refreshed_dd;
-
-				refreshed_hrm = hu.LoadHrm();
-				lblProgress.setText("Load Battlepage Pages..");
-				refreshed_bp = bp.LoadBP();
-				lblProgress.setText("Load Dogdrip Pages..");
-				refreshed_dd = du.LoadDD();
+				try {
+					new ProgressMonitorDialog(shlHrm).run(true, false, loadTask);
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					MessageDialog.openError(shlHrm, "Error", e.getMessage());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					MessageDialog.openInformation(shlHrm, "Cancelled", e.getMessage());
+				}
 				
 				for(Entry<String, String> entry : refreshed_bp.entrySet()) {
 					TableItem ti = new TableItem(table_bp, 0);
@@ -712,8 +702,6 @@ public class HMFrame {
 					ti.setText(0, entry.getValue());
 					ti.setText(1, entry.getKey());
 				}
-				popup_load.dispose();
-				
 			}
 		});
 	}

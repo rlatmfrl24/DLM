@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-public class test extends ApplicationWindow {
-	public test() {
+public class refProgressbar extends ApplicationWindow {
+	public refProgressbar() {
 		super(null);
 	}
 
@@ -62,7 +62,7 @@ public class test extends ApplicationWindow {
 	}
 
 	public static void main(String[] args) {
-		new test().run();
+		new refProgressbar().run();
 	}
 }
 
