@@ -35,7 +35,7 @@ public class HDFrame {
 	private Text text;
 	private Table table;
 	private DownloadUtil downloadUtil;
-	private Thread download;
+	private Thread download=null;
 	
 	public HDFrame() {
 		
@@ -94,45 +94,7 @@ public class HDFrame {
 		Button btnDownload = new Button(composite_input, SWT.NONE);
 		btnDownload.setText("Download");
 
-		btnFind.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if(text.getText().length() > 0) {
-					table.removeAll();
-					Shell popup_load = new Shell(shell, 0);
-					popup_load.setText("Alert");
-					popup_load.setSize(449, 166);
-					popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
-					Composite composite = new Composite(popup_load, 0);
-					composite.setLayout(new GridLayout(1, false));
-					Label lblMsg = new Label(composite, SWT.NONE);
-					lblMsg.setAlignment(SWT.CENTER);
-					lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
-					lblMsg.setText("Load new downlist from web.. Please Wait..");
-					popup_load.open();
-					btnFind.setEnabled(false);
-					btnDownload.setEnabled(false);
-					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
-					popup_load.dispose();
-					btnFind.setEnabled(true);
-					btnDownload.setEnabled(true);
-				}
-			}
-		});
-		btnDownload.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				download = new Thread(new Runnable() {					
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						downloadUtil.getDownloadByTable(table);
-					}
-				});
-				download.start();
-			}
-		});
-		
+
 		Composite composite_list = new Composite(shell, SWT.NONE);
 		composite_list.setLayout(new GridLayout(1, false));
 		composite_list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -196,35 +158,62 @@ public class HDFrame {
 				
 			}
 		});
+
+		btnFind.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					if(text.getText().length() > 0) {
+						btnFind.setEnabled(false);
+						btnDownload.setEnabled(false);
+						table.removeAll();
+						Shell popup_load = getAlertDialog(shell);
+						popup_load.open();
+						downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
+						popup_load.dispose();
+						btnFind.setEnabled(true);
+						btnDownload.setEnabled(true);
+					}
+				}catch(Exception ec) {
+					ec.printStackTrace();
+				}
+			}
+		});
+		btnDownload.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				download = new Thread(new Runnable() {					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						downloadUtil.getDownloadByTable(table);
+					}
+				});
+				download.start();
+			}
+		});
 		
 		display.addFilter(SWT.KeyDown, new Listener() {
 			
 			@Override
-			public void handleEvent(Event event) {
+			public void handleEvent(Event e) {
 				// TODO Auto-generated method stub
 				if(shell.isDisposed()) {
 					display.removeFilter(SWT.KeyDown, this);
 					return;
 				}
-				if(text.getText().length() > 0) {
-					table.removeAll();
-					Shell popup_load = new Shell(shell, 0);
-					popup_load.setText("Alert");
-					popup_load.setSize(449, 166);
-					popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
-					Composite composite = new Composite(popup_load, 0);
-					composite.setLayout(new GridLayout(1, false));
-					Label lblMsg = new Label(composite, SWT.NONE);
-					lblMsg.setAlignment(SWT.CENTER);
-					lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
-					lblMsg.setText("Load new downlist from web.. Please Wait..");
-					popup_load.open();
-					btnFind.setEnabled(false);
-					btnDownload.setEnabled(false);
-					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
-					popup_load.dispose();
-					btnFind.setEnabled(true);
-					btnDownload.setEnabled(true);
+				if(text.getText().length() > 0) {					
+					if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
+						btnFind.setEnabled(false);
+						btnDownload.setEnabled(false);
+						table.removeAll();
+						Shell popup_load = getAlertDialog(shell);
+						popup_load.open();
+						downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
+						popup_load.dispose();
+						btnFind.setEnabled(true);
+						btnDownload.setEnabled(true);
+					}
 				}
 			}
 		});
@@ -252,5 +241,24 @@ public class HDFrame {
 				display.sleep();
 			}
 		}
+	}
+	
+	public Shell getAlertDialog(Shell shell) {
+		Shell popup_load = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		popup_load.setText("Alert");
+		popup_load.setSize(449, 166);
+		popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
+		Composite composite = new Composite(popup_load, 0);
+		composite.setLayout(new GridLayout(1, false));
+		Label lblMsg = new Label(composite, SWT.NONE);
+		lblMsg.setAlignment(SWT.CENTER);
+		lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
+		lblMsg.setText("Load new downlist from web.. Please Wait..");
+		
+		return popup_load;
+	}
+	
+	public void test() {
+		
 	}
 }

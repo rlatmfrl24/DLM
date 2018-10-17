@@ -337,6 +337,8 @@ public class HMFrame {
 		SelectionAdapter GotoBookmarkAdapter = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				btnRefresh.setEnabled(false);
+				btnUpdate.setEnabled(false);
 				Table current_table = getCurrentTable(tabFolder);
 				List<String> list = new ArrayList<>();
 				for(TableItem ti : table_bmk.getItems()) list.add(ti.getText(1));
@@ -351,6 +353,8 @@ public class HMFrame {
 					}
 					dm.insertLog(list);
 					dm.UpdateBookmark(list);
+					btnRefresh.setEnabled(true);
+					btnUpdate.setEnabled(true);
 				}catch(Exception bme) {
 					bme.printStackTrace();
 				}
@@ -360,6 +364,8 @@ public class HMFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					btnRefresh.setEnabled(false);
+					btnUpdate.setEnabled(false);
 					Table current_table = getCurrentTable(tabFolder);
 					List<String> open_list = new ArrayList<>();
 					for(TableItem selected : current_table.getSelection()) {
@@ -368,6 +374,8 @@ public class HMFrame {
 						current_table.remove(current_table.indexOf(selected));
 					}
 					dm.insertLog(open_list);
+					btnRefresh.setEnabled(true);
+					btnUpdate.setEnabled(true);
 				}catch(Exception ex) {
 					ex.printStackTrace();
 				}
@@ -440,6 +448,8 @@ public class HMFrame {
 				    }
 				}else if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
 					try {
+						btnRefresh.setEnabled(false);
+						btnUpdate.setEnabled(false);
 						if(current_table.getSelectionCount() > 0) {
 							List<String> visit_list = new ArrayList<>();
 							for(TableItem item : current_table.getSelection()) {
@@ -452,6 +462,8 @@ public class HMFrame {
 							}
 							dm.insertLog(visit_list);
 						}
+						btnRefresh.setEnabled(true);
+						btnUpdate.setEnabled(true);
 					}catch(Exception ex) {
 						ex.printStackTrace();
 					}
@@ -546,8 +558,9 @@ public class HMFrame {
 		btnRefresh.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Map<String, String> refreshed = null;
 				btnRefresh.setEnabled(false);
+				btnUpdate.setEnabled(false);
+				Map<String, String> refreshed = null;
 				Table current_table = getCurrentTable(tabFolder);
 				current_table.removeAll();
 				lblReady.setText("Refreshing Pages..");
@@ -565,6 +578,7 @@ public class HMFrame {
 					ti.setText(1, entry.getKey());
 				}
 				btnRefresh.setEnabled(true);
+				btnUpdate.setEnabled(true);
 				lblReady.setText("Done!");
 			}
 		});
@@ -574,6 +588,8 @@ public class HMFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					btnRefresh.setEnabled(false);
+					btnUpdate.setEnabled(false);
 					List<String> visited = new ArrayList<>();
 					List<Integer> selected_idx = new ArrayList<>();
 					int[] remove_idx;
@@ -589,7 +605,8 @@ public class HMFrame {
 					for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
 					current_table.remove(remove_idx);
 					dm.insertLog(visited);
-					
+					btnRefresh.setEnabled(true);
+					btnUpdate.setEnabled(true);
 					lblReady.setText("Log Updated.");
 				}catch(Exception e1) {
 					e1.printStackTrace();
@@ -650,46 +667,53 @@ public class HMFrame {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				Shell popup_load = new Shell(shlHrm, 0);
+
+				Shell popup_load = new Shell(shlHrm, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 				popup_load.setText("Alert");
 				popup_load.setSize(449, 166);
 				popup_load.setLayout(new FillLayout(SWT.HORIZONTAL));
 				Composite composite = new Composite(popup_load, 0);
 				composite.setLayout(new GridLayout(1, false));
 				
+				
 				Label lblMsg = new Label(composite, SWT.NONE);
 				lblMsg.setAlignment(SWT.CENTER);
-				lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
+				lblMsg.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 1, 1));
 				lblMsg.setText("Load new pages.. Please Wait..");
 				
 				Label lblProgress = new Label(composite, SWT.NONE);
 				lblProgress.setAlignment(SWT.CENTER);
 				lblProgress.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, true, 1, 1));
-				lblProgress.setText("Open headless webdriver..");
-				
+				lblProgress.setText("Load Hrm Pages..");
 				popup_load.open();
+						
+				Map<String, String> refreshed_hrm;
+				Map<String, String> refreshed_bp;
+				Map<String, String> refreshed_dd;
 
-				Map<String, String> refreshed;
-				refreshed = hu.LoadHrm();
-				for(Entry<String, String> entry : refreshed.entrySet()) {
-					TableItem ti = new TableItem(table_hrm, 0);
-					ti.setText(0, entry.getValue());
-					ti.setText(1, entry.getKey());
-				}
-				refreshed = bp.LoadBP();
-				for(Entry<String, String> entry : refreshed.entrySet()) {
+				refreshed_hrm = hu.LoadHrm();
+				lblProgress.setText("Load Battlepage Pages..");
+				refreshed_bp = bp.LoadBP();
+				lblProgress.setText("Load Dogdrip Pages..");
+				refreshed_dd = du.LoadDD();
+				
+				for(Entry<String, String> entry : refreshed_bp.entrySet()) {
 					TableItem ti = new TableItem(table_bp, 0);
 					ti.setText(0, entry.getValue());
 					ti.setText(1, entry.getKey());
 				}
-				refreshed = du.LoadDD();
-				for(Entry<String, String> entry : refreshed.entrySet()) {
+				for(Entry<String, String> entry : refreshed_hrm.entrySet()) {
+					TableItem ti = new TableItem(table_hrm, 0);
+					ti.setText(0, entry.getValue());
+					ti.setText(1, entry.getKey());
+				}
+				for(Entry<String, String> entry : refreshed_dd.entrySet()) {
 					TableItem ti = new TableItem(table_dd, 0);
 					ti.setText(0, entry.getValue());
 					ti.setText(1, entry.getKey());
 				}
-				
 				popup_load.dispose();
+				
 			}
 		});
 	}
