@@ -1,6 +1,7 @@
 package util.hm;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,11 +10,17 @@ import java.util.concurrent.TimeUnit;
 
 import org.ahocorasick.trie.Trie;
 import org.ahocorasick.trie.Trie.TrieBuilder;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Shell;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
+import com.google.common.util.concurrent.Monitor;
 
 import main.dbManager;
 import util.hd.DownloadUtil;
@@ -28,9 +35,11 @@ public class rwupdate {
 	private static int pageNum = 1;
 	private static Trie expansion_check_trie;
 	private static DownloadUtil download_util;
+	private static dbManager dm;
 	Expansion exp = new Expansion();
 
 	public rwupdate(dbManager dm) {
+		this.dm = dm;
 		download_util = new DownloadUtil(dm);
 		
 		//이미지 확장자 로드
@@ -60,8 +69,34 @@ public class rwupdate {
 		driver.quit();
 		
 	}
+	
+	public void getData(Shell shell)  {
+		try {
+			new ProgressMonitorDialog(shell).run(true, false, new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					// TODO Auto-generated method stub	
+					rwupdate r = new rwupdate(dm);
+					r.BP_Login();
+					List<String> vilsit = r.BP_getList();
+					monitor.beginTask("Load DB Manager", vilsit.size());
 
-	private void BP_Login() {
+					dbManager dm = new dbManager();
+					dm.Connect();
+					dm.initialize();
+					for(String link : r.BP_getList()) {
+						r.BP_getContent(link);
+					}
+					driver.close();
+					driver.quit();
+				}
+			});
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void BP_Login() {
 		System.setProperty("webdriver.chrome.driver", "./driver/chromedriver/chromedriver.exe");
 		ChromeOptions options = new ChromeOptions();
 		
@@ -79,12 +114,21 @@ public class rwupdate {
 	
 	public List<String> BP_getList() {
 		List<String> bp_visit_list = new ArrayList<>();
-		for(int i=1; i <= pageNum; i++) {
-			driver.get(board_rearwarning+"&page="+i);
-			WebElement listable = driver.findElement(By.cssSelector("#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable"));
-			for(WebElement we : listable.findElements(By.tagName("a"))) {
-				bp_visit_list.add(we.getAttribute("href"));
+		try {
+			for(int i=1; i <= pageNum; i++) {
+				driver.get(board_rearwarning+"&page="+i);
+				WebElement listable = driver.findElement(By.cssSelector("#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable"));
+				List<String> log_list = dm.getLogs("v12.battlepage.com");
+				for(WebElement we : listable.findElements(By.tagName("a"))) {
+					String url = we.getAttribute("href");
+					if(!log_list.contains(url)) {
+						bp_visit_list.add(we.getAttribute("href"));
+					}
+				}
+				dm.insertLog(bp_visit_list);
 			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
 		return bp_visit_list;
 	}
@@ -127,8 +171,8 @@ public class rwupdate {
 								+ img_link.toLowerCase().substring(img_link.lastIndexOf('/') + 1,
 								img_link.toLowerCase().lastIndexOf(img_validation(img_link).toLowerCase())
 								+img_validation(img_link).length());
-						//System.out.println(img_path);
-						//download_util.ImageDownload(img_link, img_path, 0);
+						System.out.println(img_path);
+						download_util.ImageDownload(img_link, img_path, 0);
 					} else {
 						String other_link = LinkData.split("\t")[2];
 						System.out.println("[OTHER_TAG]:"+other_link);

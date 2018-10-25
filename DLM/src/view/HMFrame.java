@@ -63,8 +63,6 @@ public class HMFrame {
 	private dbManager dm;
 	private SystemUtility su = new SystemUtility();
 	private Table table_bmk;
-	private Table table_rw_download;
-	private Table table_rw_other;
 	private Map<String, String> refreshed_hrm;
 	private Map<String, String> refreshed_bp;
 	private Map<String, String> refreshed_dd;
@@ -249,59 +247,7 @@ public class HMFrame {
 		TableColumn tblclmnLink = tableViewerColumn_8.getColumn();
 		tblclmnLink.setWidth(100);
 		tblclmnLink.setText("Link");
-		
-		/*
-		TabItem tbtmRearwarning = new TabItem(tabFolder, SWT.NONE);
-		tbtmRearwarning.setText("RearWarning");
-		
-		Composite composite_rw = new Composite(tabFolder, SWT.NONE);
-		tbtmRearwarning.setControl(composite_rw);
-		composite_rw.setLayout(new GridLayout(1, false));
-		
-		Label lblDownloadList = new Label(composite_rw, SWT.NONE);
-		lblDownloadList.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		lblDownloadList.setText("Download List");
-		
-		TableViewer tableViewer = new TableViewer(composite_rw, SWT.BORDER | SWT.FULL_SELECTION);
-		table_rw_download = tableViewer.getTable();
-		table_rw_download.setHeaderVisible(true);
-		table_rw_download.setLinesVisible(true);
-		table_rw_download.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
-		
-		TableColumn tblclmnDomain_1 = new TableColumn(table_rw_download, SWT.NONE);
-		tblclmnDomain_1.setWidth(100);
-		tblclmnDomain_1.setText("Domain");
-		
-		TableColumn tblclmnTitle_1 = new TableColumn(table_rw_download, SWT.NONE);
-		tblclmnTitle_1.setWidth(100);
-		tblclmnTitle_1.setText("Title");
-		
-		TableColumn tblclmnLink_1 = new TableColumn(table_rw_download, SWT.NONE);
-		tblclmnLink_1.setWidth(100);
-		tblclmnLink_1.setText("Link");
-		
-		Label lblNonimageLinkList = new Label(composite_rw, SWT.NONE);
-		lblNonimageLinkList.setText("Non-Image Link List");
-		
-		TableViewer tableViewer_1 = new TableViewer(composite_rw, SWT.BORDER | SWT.FULL_SELECTION);
-		table_rw_other = tableViewer_1.getTable();
-		table_rw_other.setHeaderVisible(true);
-		table_rw_other.setLinesVisible(true);
-		table_rw_other.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
-		
-		TableColumn tblclmnDomain_2 = new TableColumn(table_rw_other, SWT.NONE);
-		tblclmnDomain_2.setWidth(100);
-		tblclmnDomain_2.setText("Domain");
-		
-		TableColumn tblclmnTitle_2 = new TableColumn(table_rw_other, SWT.NONE);
-		tblclmnTitle_2.setWidth(100);
-		tblclmnTitle_2.setText("Title");
-		
-		TableColumn tblclmnLink_2 = new TableColumn(table_rw_other, SWT.NONE);
-		tblclmnLink_2.setWidth(100);
-		tblclmnLink_2.setText("Link");
-		*/
-
+			
 		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
 			try {
 				URL url = new URL(link);
@@ -315,13 +261,25 @@ public class HMFrame {
 
 		Composite composite_1 = new Composite(shlHrm, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		composite_1.setLayout(new GridLayout(3, false));
+		composite_1.setLayout(new GridLayout(4, false));
 
 		Button btnUpdate = new Button(composite_1, SWT.NONE);
 		btnUpdate.setText("Update");
 		
 		Button btnRefresh = new Button(composite_1, SWT.NONE);
 		btnRefresh.setText("Refresh");
+		
+		Button btnRear = new Button(composite_1, SWT.NONE);
+		btnRear.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+			}
+		});
+		GridData gd_btnRear = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+		gd_btnRear.widthHint = 56;
+		btnRear.setLayoutData(gd_btnRear);
+		btnRear.setText("Rear");
 		
 		Label lblReady = new Label(composite_1, SWT.NONE);
 		lblReady.addMouseListener(new MouseAdapter() {
@@ -661,8 +619,6 @@ public class HMFrame {
 		case 3:
 			current_table = table_bmk;
 			break;
-		case 4:
-			current_table = table_rw_download;
 		default:
 			break;
 		}
