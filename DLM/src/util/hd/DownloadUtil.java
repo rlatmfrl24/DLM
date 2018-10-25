@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,6 +19,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.jsoup.Jsoup;
@@ -56,31 +60,39 @@ public class DownloadUtil {
 		return download_list;
 	}
 	
-	public void GetDownloadList(Table table, int pages) {
-		try {
-			getWebDriver();
-			download_list.clear();
-			List<String> skip_list = dbManager.getDataFromDB("code", "tb_hiyobi_info");
-			for(int i = 1; i<pages+1; i++) {
-				Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
-				download_list = getGalleryDataFromPage(doc, skip_list);
-			}
-			table.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					for(Gallery g : download_list.values()) {
-						TableItem item = new TableItem(table, 0);
-						item.setText(0, g.getCode());
-						item.setText(1, g.getTitle());
-						item.setText(2, "Ready..");
+	public void GetDownloadList(Table table, int pages) throws Exception {	
+		new ProgressMonitorDialog(table.getShell()).run(true, false, new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				// TODO Auto-generated method stub
+				try {
+					monitor.beginTask("Getting List from Hiyobi..", pages+1);
+					getWebDriver();
+					download_list.clear();
+					List<String> skip_list = dbManager.getDataFromDB("code", "tb_hiyobi_info");
+					for(int i = 1; i<pages+1; i++) {
+						Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
+						download_list = getGalleryDataFromPage(doc, skip_list);
+						monitor.worked(1);
 					}
+					table.getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							for(Gallery g : download_list.values()) {
+								TableItem item = new TableItem(table, 0);
+								item.setText(0, g.getCode());
+								item.setText(1, g.getTitle());
+								item.setText(2, "Ready..");
+							}
+						}
+					});	
+					closeWebDriver();
+				}catch(Exception e) {
+					e.printStackTrace();
 				}
-			});
-			closeWebDriver();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+			}
+		});
 	}
 	
 	public Map<String, Gallery> getGalleryDataFromPage(Document doc, List<String> skip_list) {
@@ -136,6 +148,7 @@ public class DownloadUtil {
 	
 	public void ImageDownload(String link, String path, int retry) {
 		try {
+			path = DuplicateCheck(path);
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			URL url = new URL(link);
@@ -279,6 +292,17 @@ public class DownloadUtil {
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public String DuplicateCheck(String path) {
+		File tempForCheck = new File(path);
+		String modifiedPath;
+		if(tempForCheck.exists()) {
+			modifiedPath = DuplicateCheck(path.substring(0, path.lastIndexOf('.'))+" (1)"+path.substring(path.lastIndexOf('.')));
+			return modifiedPath;
+		}else {
+			return path;
 		}
 	}
 	

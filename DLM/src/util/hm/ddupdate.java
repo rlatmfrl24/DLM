@@ -21,8 +21,8 @@ public class ddupdate {
 		this.dm = dm;
 	}
 	
-	public Map<String, List<String>> LoadDD() {
-		Map<String, List<String>> data_map = new TreeMap<>();
+	public Map<String, String> LoadDD() {
+		Map<String, String> data_map = new TreeMap<>();
 		log_list = dm.getLogs("www.dogdrip.net");
 		try {
 			for(int i=1; i<=num_search_page; i++) {
@@ -33,11 +33,7 @@ public class ddupdate {
 					if(!log_list.contains(item.attr("href").replaceAll("index.*=", "dogdrip/"))) {
 						String url = item.attr("href").replaceAll("index.*=", "dogdrip/");
 						String title = item.text();
-						String id = url.substring(url.lastIndexOf('/')+1);
-						List<String> entry = new ArrayList<>();
-						entry.add(title);
-						entry.add(url);
-						data_map.put(id, entry);
+						data_map.put(url, title);
 					}
 				}
 			}

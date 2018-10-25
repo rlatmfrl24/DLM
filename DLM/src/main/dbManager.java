@@ -106,11 +106,11 @@ public class dbManager {
 		String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		for(String link : list) {
-			URL url;
 			try {
-				url = new URL(link);
+				URL url = new URL(link);
 				stmt.setString(1, url.getAuthority());
 			}catch(MalformedURLException mue) {
+				System.err.println("URL 분석 오류 : 올바른 URL이 아닙니다.");
 				stmt.setString(1, "");
 			}
 			stmt.setString(2, link);
@@ -119,6 +119,22 @@ public class dbManager {
 		stmt.executeBatch();
 		stmt.close();
 	}
+	
+	public void insertLog(String str_url) throws Exception {
+		String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
+		PreparedStatement stmt = connection.prepareStatement(sql);
+		try {
+			URL url = new URL(str_url);
+			stmt.setString(1, url.getAuthority());
+		}catch(MalformedURLException mue) {
+			System.err.println("URL 분석 오류 : 올바른 URL이 아닙니다.");
+			stmt.setString(1, "");
+		}
+		stmt.setString(2, str_url);
+		stmt.addBatch();
+		stmt.executeBatch();
+		stmt.close();
+	} 
 	
 	public void UpdateBookmark(List<String> list) throws Exception {
 		String sql = "DELETE FROM tb_bookmark_info";

@@ -11,19 +11,19 @@ public class Expansion {
 	
 	public Type TYPE;
 	
-	ArrayList<String> expansion_image = new ArrayList<>(
+	public ArrayList<String> expansion_image = new ArrayList<>(
 			Arrays.asList(".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".php", ".png", ".raw", ".pcx", ".ico")
 	);
-	ArrayList<String> expansion_movie = new ArrayList<>(
+	public ArrayList<String> expansion_movie = new ArrayList<>(
 			Arrays.asList(".avi", ".wmv", ".mp4", ".mpg", ".mpe", ".asf", ".asx", ".flv", ".mov", ".dat", ".rm", ".mkv", ".mpeg")
 	);
-	ArrayList<String> expansion_music = new ArrayList<>(
+	public ArrayList<String> expansion_music = new ArrayList<>(
 			Arrays.asList(".mp3", ".flac", ".wma", "wav")
 	);
-	ArrayList<String> expansion_subtitle = new ArrayList<>(
+	public ArrayList<String> expansion_subtitle = new ArrayList<>(
 			Arrays.asList(".smi", ".srt")
 	);
-	ArrayList<String> expansion_compressed = new ArrayList<>(
+	public ArrayList<String> expansion_compressed = new ArrayList<>(
 			Arrays.asList(".zip", ".7z", ".rar", ".gz", ".bz2", ".alz", ".egg", ".lua")
 	);
 	

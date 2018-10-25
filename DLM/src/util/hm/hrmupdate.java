@@ -3,9 +3,12 @@ package util.hm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.ahocorasick.trie.*;
 import org.jsoup.Jsoup;
@@ -21,7 +24,8 @@ public class hrmupdate {
 
 	private static WebDriver driver;
 	private Map<String, String> Filter_Map = new HashMap<>();
-	private Map<String, List<String>> res_map = new HashMap<>();
+	private Map<String, String> res_map = new TreeMap<>();
+	
 	private Trie linkTrie;
 	private List<String> log_list = new ArrayList<>();
 	private dbManager dm;
@@ -42,50 +46,21 @@ public class hrmupdate {
 	
 	public void classify(String url) {
 		String tag="ETC";
-		List<String> list;
-		
 		Collection<Emit> Emits= linkTrie.parseText(url);
 		if(!Emits.isEmpty()) {
 			for(Emit e : Emits) {
 				tag = Filter_Map.get(e.getKeyword());
 			}
 		}
+		if(!tag.equals("dostream"))
+			res_map.put(url, tag);
+	}
 		
-		if(!res_map.containsKey(tag)) list = new ArrayList<>();
-		else list = res_map.get(tag);
-
-		list.add(url);
-		res_map.put(tag, list);
-	}
-
-	public void SaveLog(List<String> list_visited) throws Exception {
-		dm.insertLog(list_visited);
-	}
-	
-	public void printResMap() {
-		for(String key : res_map.keySet()) {
-			System.out.println("Tag: "+key);
-			for(String url : res_map.get(key)) {
-				System.out.println("ㄴ"+url);
-			}
-		}
-	}
-	
-	public Map<String, List<String>> LoadHrm() {
+	public Map<String, String> LoadHrm() {
 		try {
 			res_map.clear();
 			log_list.clear();
 			log_list = dm.getDataFromDB("link", "tb_link_info");
-			
-			//파폭 드라이버
-			/*
-			System.setProperty("webdriver.gecko.driver", "./driver/geckodriver/geckodriver.exe");
-			driver = new FirefoxDriver();
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-			driver.get("http://insagirl-toto.appspot.com/hrm/?where=2");
-			driver.findElement(By.cssSelector("#hrmbodyexpand")).click();
-			Thread.sleep(1000);
-			*/
 			
 			System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
 			driver = new PhantomJSDriver();
@@ -105,11 +80,12 @@ public class hrmupdate {
 					log_list.add(url);
 				}
 			}
-			res_map.remove("dostream");
-			//printResMap();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
+		res_map = res_map.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 		return res_map;
 	}
 }

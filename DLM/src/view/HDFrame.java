@@ -1,13 +1,14 @@
 package view;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import main.dbManager;
@@ -24,6 +25,7 @@ import org.eclipse.swt.widgets.Table;
 
 import java.lang.Thread.State;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -32,11 +34,7 @@ public class HDFrame {
 	private Text text;
 	private Table table;
 	private DownloadUtil downloadUtil;
-	private Thread download;
-	
-	public HDFrame() {
-		
-	}
+	private Thread download=null;
 	
 	public HDFrame(dbManager dbManager) {
 		downloadUtil = new DownloadUtil(dbManager);
@@ -83,36 +81,15 @@ public class HDFrame {
 		text.setLayoutData(gd_text);
 		
 		Button btnFind = new Button(composite_input, SWT.NONE);
-		btnFind.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if(text.getText().length() > 0) {
-					table.removeAll();
-					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
-				}
-			}
-		});
 		GridData gd_btnFind = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 		gd_btnFind.widthHint = 63;
 		btnFind.setLayoutData(gd_btnFind);
 		btnFind.setText("Find");
 		
 		Button btnDownload = new Button(composite_input, SWT.NONE);
-		btnDownload.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				download = new Thread(new Runnable() {					
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						downloadUtil.getDownloadByTable(table);
-					}
-				});
-				download.start();
-			}
-		});
 		btnDownload.setText("Download");
-		
+
+
 		Composite composite_list = new Composite(shell, SWT.NONE);
 		composite_list.setLayout(new GridLayout(1, false));
 		composite_list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -177,6 +154,52 @@ public class HDFrame {
 			}
 		});
 
+		btnFind.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
+				}catch(Exception ec) {
+					ec.printStackTrace();
+				}
+			}
+		});
+		
+		btnDownload.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				download = new Thread(new Runnable() {					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						downloadUtil.getDownloadByTable(table);
+					}
+				});
+				download.start();
+			}
+		});
+		
+		display.addFilter(SWT.KeyDown, new Listener() {
+			
+			@Override
+			public void handleEvent(Event e) {
+				// TODO Auto-generated method stub
+				if(shell.isDisposed()) {
+					display.removeFilter(SWT.KeyDown, this);
+					return;
+				}
+				try {
+					if(!text.getText().isEmpty()) {
+						if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
+							downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
+						}
+					}
+				}catch(Exception ec) {
+					ec.printStackTrace();
+				}
+			}
+		});
+
 		shell.open();
 		shell.layout();
 		State before_state = State.TERMINATED;
@@ -189,10 +212,7 @@ public class HDFrame {
 					btnDownload.setEnabled(true);
 				}
 				if(before_state!=download.getState() && download.getState() == State.TERMINATED) {
-					MessageBox msg = new MessageBox(shell);
-					msg.setText("Alert");
-					msg.setMessage("Download Complete.");
-					msg.open();
+					MessageDialog.openConfirm(shell, "Alert", "Download Complete.");
 				}
 				before_state=download.getState();
 			}
