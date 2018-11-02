@@ -11,6 +11,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import main.ConfigLoader;
+import main.Dapina;
 import main.dbManager;
 import util.hd.DownloadUtil;
 
@@ -46,7 +48,8 @@ public class HDFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			dbManager dm = new dbManager();
+			ConfigLoader config = new ConfigLoader("./temp/config.properties");
+			dbManager dm = new dbManager(config);
 			dm.Connect();
 			HDFrame window = new HDFrame(dm);
 			window.open();

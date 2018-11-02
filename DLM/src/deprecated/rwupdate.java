@@ -22,6 +22,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.google.common.util.concurrent.Monitor;
 
+import main.ConfigLoader;
 import main.dbManager;
 import util.hd.DownloadUtil;
 import util.rc.Expansion;
@@ -36,6 +37,7 @@ public class rwupdate {
 	private static Trie expansion_check_trie;
 	private static DownloadUtil download_util;
 	private static dbManager dm;
+	private static ConfigLoader config = new ConfigLoader("./temp/config.properties");
 	Expansion exp = new Expansion();
 
 	public rwupdate(dbManager dm) {
@@ -56,8 +58,7 @@ public class rwupdate {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		
-		dbManager dm = new dbManager();
+		dbManager dm = new dbManager(config);
 		dm.Connect();
 		dm.initialize();
 		rwupdate r = new rwupdate(dm);
@@ -81,7 +82,7 @@ public class rwupdate {
 					List<String> vilsit = r.BP_getList();
 					monitor.beginTask("Load DB Manager", vilsit.size());
 
-					dbManager dm = new dbManager();
+					dbManager dm = new dbManager(config);
 					dm.Connect();
 					dm.initialize();
 					for(String link : r.BP_getList()) {

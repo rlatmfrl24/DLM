@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -13,13 +14,18 @@ import util.hd.Gallery;
 
 public class dbManager {
 
-	private static final String dbPath = "./temp/sample.db";
+	private static String dbPath;
 	private static Connection connection;
+	
+	public dbManager(ConfigLoader config) {
+		dbPath = config.GetLocalDBPath();
+	}
 	
 	public void Connect() {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:"+dbPath);
+			if(!new File(dbPath).exists()) initialize();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}		
@@ -175,14 +181,6 @@ public class dbManager {
 	}
 	
 	public void ConnectionClose() throws Exception {
-		connection.close();
-	}
-	
-	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
-		dbManager t = new dbManager();
-		t.Connect();
-		t.initialize();
 		connection.close();
 	}
 }

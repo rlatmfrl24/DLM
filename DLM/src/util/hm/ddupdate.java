@@ -42,13 +42,4 @@ public class ddupdate {
 		}
 		return data_map;
 	}
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		dbManager dm = new dbManager();
-		dm.Connect();
-		ddupdate du = new ddupdate(dm);
-		du.LoadDD();
-	}
-
 }

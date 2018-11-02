@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import main.ConfigLoader;
 import main.dbManager;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
@@ -93,7 +94,8 @@ public class HMFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			dbManager dm = new dbManager();
+			ConfigLoader config = new ConfigLoader("./temp/config.properties");
+			dbManager dm = new dbManager(config);
 			dm.Connect();
 			dm.initialize();
 			HMFrame window = new HMFrame(dm);
@@ -261,25 +263,13 @@ public class HMFrame {
 
 		Composite composite_1 = new Composite(shlHrm, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		composite_1.setLayout(new GridLayout(4, false));
+		composite_1.setLayout(new GridLayout(3, false));
 
 		Button btnUpdate = new Button(composite_1, SWT.NONE);
 		btnUpdate.setText("Update");
 		
 		Button btnRefresh = new Button(composite_1, SWT.NONE);
 		btnRefresh.setText("Refresh");
-		
-		Button btnRear = new Button(composite_1, SWT.NONE);
-		btnRear.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				
-			}
-		});
-		GridData gd_btnRear = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_btnRear.widthHint = 56;
-		btnRear.setLayoutData(gd_btnRear);
-		btnRear.setText("Rear");
 		
 		Label lblReady = new Label(composite_1, SWT.NONE);
 		lblReady.addMouseListener(new MouseAdapter() {
@@ -624,9 +614,7 @@ public class HMFrame {
 		}
 		return current_table;
 	}
-	
 
-	
 	public void open_load(Shell shlHrm) {
 		
 		shlHrm.getDisplay().asyncExec(new Runnable() {

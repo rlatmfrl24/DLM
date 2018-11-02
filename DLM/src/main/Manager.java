@@ -11,11 +11,6 @@ import view.RCFrame;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -24,41 +19,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
 public class Manager {
-	private static final File TempPath = new File("./temp/");
-	private static final File HiyobiPath = new File("./hiyobi/");
-	private static final File deletedItemPath = new File("./temp/deleted/");
-	private static final File moveItemPath = new File("./temp/moved/");
-	private static ConfigLoader configLoader = new ConfigLoader();
-	private static dbManager dbManager = new dbManager();
+	private static final String config_filepath = "./temp/config.properties";
+	private static ConfigLoader configLoader;
+	private static dbManager dbManager;
 	
 	public Manager() {
 		try {
-			if (!TempPath.exists()) {
-				TempPath.mkdirs();
-				File configFile = new File(TempPath + "/config.properties");
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile)));
-				bw.write("TargetPath=C:/");
-				bw.newLine();
-				bw.write("ImageViewerPath=DEFAULT");
-				bw.newLine();
-				bw.write("VideoViewerPath=DEFAULT");
-				bw.flush();
-				bw.close();
-			}
-			
-			if(!deletedItemPath.exists()) {
-				deletedItemPath.mkdirs();
-			}
-			if(!moveItemPath.exists()) {
-				moveItemPath.mkdirs();
-			}
-			if(!HiyobiPath.exists()) {
-				HiyobiPath.mkdirs();
-			}
-			
-			configLoader.loadConfig(TempPath+"/config.properties");
+			configLoader = new ConfigLoader(config_filepath);
+			Dapina dapina = new Dapina(configLoader);
+			dapina.DownloadDB();
+			dbManager = new dbManager(configLoader);
 			dbManager.Connect();
-			dbManager.initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
