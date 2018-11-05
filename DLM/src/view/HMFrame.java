@@ -36,8 +36,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import main.ConfigLoader;
-import main.dbManager;
+import main.dbManager_remote;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
 import util.hm.hrmupdate;
@@ -61,7 +60,7 @@ public class HMFrame {
 	private hrmupdate hu;
 	private bpupdate bp;
 	private ddupdate du;
-	private dbManager dm;
+	private dbManager_remote dm;
 	private SystemUtility su = new SystemUtility();
 	private Table table_bmk;
 	private Map<String, String> refreshed_hrm;
@@ -69,7 +68,7 @@ public class HMFrame {
 	private Map<String, String> refreshed_dd;
 	private IRunnableWithProgress loadTask;
 	
-	public HMFrame(dbManager dm) {
+	public HMFrame(dbManager_remote dm) {
 		this.dm = dm;
 		loadTask = new IRunnableWithProgress() {
 			@Override
@@ -94,10 +93,8 @@ public class HMFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			ConfigLoader config = new ConfigLoader("./temp/config.properties");
-			dbManager dm = new dbManager(config);
-			dm.Connect();
-			dm.initialize();
+			dbManager_remote dm = new dbManager_remote();
+			dm.Connect("db_trends");
 			HMFrame window = new HMFrame(dm);
 			window.open();
 		} catch (Exception e) {

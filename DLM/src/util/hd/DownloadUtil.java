@@ -28,26 +28,23 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-import main.dbManager;
+import main.Webdriver;
+import main.dbManager_remote;
 
 public class DownloadUtil {
 
-	private dbManager dbManager;
-	private static WebDriver driver;
+	private dbManager_remote dbManager;
 	private static Map<String, Gallery> download_list = new HashMap<>();;
 	private static File homepath = new File("./hiyobi/");
 	private int pbar_selection = 1;
-
-	public DownloadUtil(dbManager dbManager) {
+	private static ChromeDriver driver;
+	
+	public DownloadUtil(dbManager_remote dbManager) {
 		this.dbManager = dbManager;
-	}
-
-	public void getWebDriver() {
-		System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
-		driver = new PhantomJSDriver();
+		Webdriver wd = new Webdriver();
+		driver = wd.getWebDriver();
 		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 	}
 	
@@ -67,7 +64,6 @@ public class DownloadUtil {
 				// TODO Auto-generated method stub
 				try {
 					monitor.beginTask("Getting List from Hiyobi..", pages+1);
-					getWebDriver();
 					download_list.clear();
 					List<String> skip_list = dbManager.getDataFromDB("code", "tb_hiyobi_info");
 					for(int i = 1; i<pages+1; i++) {
@@ -176,7 +172,6 @@ public class DownloadUtil {
 	public void getDownloadByTable(Table table) {
 		// TODO Auto-generated method stub
 		try {
-			getWebDriver();
 			ziputil zu = new ziputil();
 			final HashMap<String, TableItem> item_map = new HashMap<>();
 			Runnable getItemData = new Runnable() {

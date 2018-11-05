@@ -20,10 +20,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import com.google.common.util.concurrent.Monitor;
-
 import main.ConfigLoader;
-import main.dbManager;
+import main.dbManager_remote;
 import util.hd.DownloadUtil;
 import util.rc.Expansion;
 
@@ -36,11 +34,11 @@ public class rwupdate {
 	private static int pageNum = 1;
 	private static Trie expansion_check_trie;
 	private static DownloadUtil download_util;
-	private static dbManager dm;
+	private static dbManager_remote dm;
 	private static ConfigLoader config = new ConfigLoader("./temp/config.properties");
 	Expansion exp = new Expansion();
 
-	public rwupdate(dbManager dm) {
+	public rwupdate(dbManager_remote dm) {
 		this.dm = dm;
 		download_util = new DownloadUtil(dm);
 		
@@ -58,9 +56,8 @@ public class rwupdate {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		dbManager dm = new dbManager(config);
-		dm.Connect();
-		dm.initialize();
+		dbManager_remote dm = new dbManager_remote();
+		dm.Connect("db_trends");
 		rwupdate r = new rwupdate(dm);
 		r.BP_Login();
 		for(String link : r.BP_getList()) {

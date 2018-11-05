@@ -21,15 +21,15 @@ import org.eclipse.swt.layout.GridLayout;
 public class Manager {
 	private static final String config_filepath = "./temp/config.properties";
 	private static ConfigLoader configLoader;
-	private static dbManager dbManager;
+	private static dbManager_remote dbManager;
 	
 	public Manager() {
 		try {
 			configLoader = new ConfigLoader(config_filepath);
-			Dapina dapina = new Dapina(configLoader);
-			dapina.DownloadDB();
-			dbManager = new dbManager(configLoader);
-			dbManager.Connect();
+			dbManager = new dbManager_remote();
+			dbManager.Connect("db_trends");
+			//dbManager = new dbManager(configLoader);
+			//dbManager.Connect();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

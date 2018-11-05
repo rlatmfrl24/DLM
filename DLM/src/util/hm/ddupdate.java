@@ -10,14 +10,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import main.dbManager;
+import main.dbManager_remote;
 
 public class ddupdate {
-	private dbManager dm;
+	private dbManager_remote dm;
 	private static final int num_search_page = 6;
 	private List<String> log_list = new ArrayList<>();
 
-	public ddupdate(dbManager dm) {
+	public ddupdate(dbManager_remote dm) {
 		this.dm = dm;
 	}
 	
