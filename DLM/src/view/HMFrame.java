@@ -448,6 +448,7 @@ public class HMFrame {
 			public void controlResized(ControlEvent arg0) {
 				// TODO Auto-generated method stub
 				Rectangle area = tabFolder.getClientArea();
+				//Rectangle area = composite_hrm.getClientArea();
 
 				Point preferredSize = table_hrm.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				int width = area.width - 2 * table_hrm.getBorderWidth();

@@ -158,6 +158,7 @@ public class HDFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					table.removeAll();
 					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
 				}catch(Exception ec) {
 					ec.printStackTrace();
@@ -191,6 +192,7 @@ public class HDFrame {
 				try {
 					if(!text.getText().isEmpty()) {
 						if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
+							table.removeAll();
 							downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
 						}
 					}

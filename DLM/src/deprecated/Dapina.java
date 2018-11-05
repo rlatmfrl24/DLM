@@ -25,6 +25,16 @@ public class Dapina {
 			e.printStackTrace();
 		}
 	}
+	
+	public void UploadData(String local_path, String Dbx_path) {
+		try(InputStream io_localdb = new FileInputStream(local_path)){
+			client.files().uploadBuilder(Dbx_path).uploadAndFinish(io_localdb);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
 	/*
 	public void DownloadDB() {
 		try {

@@ -27,7 +27,7 @@ public class Manager {
 		try {
 			configLoader = new ConfigLoader(config_filepath);
 			dbManager = new dbManager();
-			dbManager.Connect("test_trends");
+			dbManager.Connect("db_trends");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
