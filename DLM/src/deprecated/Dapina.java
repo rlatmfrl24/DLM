@@ -25,7 +25,7 @@ public class Dapina {
 			e.printStackTrace();
 		}
 	}
-	
+	/*
 	public void DownloadDB() {
 		try {
 			OutputStream os_localdb = new FileOutputStream(config.GetLocalDBPath());
@@ -43,4 +43,5 @@ public class Dapina {
 			e.printStackTrace();
 		}
 	}
+	*/
 }

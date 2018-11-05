@@ -31,21 +31,18 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import main.Webdriver;
-import main.dbManager_remote;
+import main.dbManager;
 
 public class DownloadUtil {
 
-	private dbManager_remote dbManager;
+	private dbManager dbManager;
 	private static Map<String, Gallery> download_list = new HashMap<>();;
 	private static File homepath = new File("./hiyobi/");
 	private int pbar_selection = 1;
 	private static ChromeDriver driver;
 	
-	public DownloadUtil(dbManager_remote dbManager) {
+	public DownloadUtil(dbManager dbManager) {
 		this.dbManager = dbManager;
-		Webdriver wd = new Webdriver();
-		driver = wd.getWebDriver();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 	}
 	
 	public void closeWebDriver() {
@@ -63,9 +60,11 @@ public class DownloadUtil {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				// TODO Auto-generated method stub
 				try {
+					Webdriver wd = new Webdriver();
+					driver = wd.getWebDriver();
 					monitor.beginTask("Getting List from Hiyobi..", pages+1);
 					download_list.clear();
-					List<String> skip_list = dbManager.getDataFromDB("code", "tb_hiyobi_info");
+					List<String> skip_list = dbManager.getDataFromDB("h_code", "tb_hiyobi_info");
 					for(int i = 1; i<pages+1; i++) {
 						Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
 						download_list = getGalleryDataFromPage(doc, skip_list);
@@ -195,6 +194,8 @@ public class DownloadUtil {
 					e.printStackTrace();
 				}
 			}
+			Webdriver wd = new Webdriver();
+			driver = wd.getWebDriver();
 			for(Entry<String, TableItem> entry : item_map.entrySet()) {
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {

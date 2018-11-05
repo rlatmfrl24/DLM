@@ -21,7 +21,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import main.ConfigLoader;
-import main.dbManager_remote;
+import main.dbManager;
 import util.hd.DownloadUtil;
 import util.rc.Expansion;
 
@@ -34,11 +34,11 @@ public class rwupdate {
 	private static int pageNum = 1;
 	private static Trie expansion_check_trie;
 	private static DownloadUtil download_util;
-	private static dbManager_remote dm;
+	private static dbManager dm;
 	private static ConfigLoader config = new ConfigLoader("./temp/config.properties");
 	Expansion exp = new Expansion();
 
-	public rwupdate(dbManager_remote dm) {
+	public rwupdate(dbManager dm) {
 		this.dm = dm;
 		download_util = new DownloadUtil(dm);
 		
@@ -56,7 +56,7 @@ public class rwupdate {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		dbManager_remote dm = new dbManager_remote();
+		dbManager dm = new dbManager();
 		dm.Connect("db_trends");
 		rwupdate r = new rwupdate(dm);
 		r.BP_Login();
@@ -79,7 +79,7 @@ public class rwupdate {
 					List<String> vilsit = r.BP_getList();
 					monitor.beginTask("Load DB Manager", vilsit.size());
 
-					dbManager dm = new dbManager(config);
+					dbManager_old dm = new dbManager_old();
 					dm.Connect();
 					dm.initialize();
 					for(String link : r.BP_getList()) {

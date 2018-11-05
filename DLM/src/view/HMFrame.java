@@ -36,7 +36,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import main.dbManager_remote;
+import main.dbManager;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
 import util.hm.hrmupdate;
@@ -60,7 +60,7 @@ public class HMFrame {
 	private hrmupdate hu;
 	private bpupdate bp;
 	private ddupdate du;
-	private dbManager_remote dm;
+	private dbManager dm;
 	private SystemUtility su = new SystemUtility();
 	private Table table_bmk;
 	private Map<String, String> refreshed_hrm;
@@ -68,7 +68,7 @@ public class HMFrame {
 	private Map<String, String> refreshed_dd;
 	private IRunnableWithProgress loadTask;
 	
-	public HMFrame(dbManager_remote dm) {
+	public HMFrame(dbManager dm) {
 		this.dm = dm;
 		loadTask = new IRunnableWithProgress() {
 			@Override
@@ -93,7 +93,7 @@ public class HMFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			dbManager_remote dm = new dbManager_remote();
+			dbManager dm = new dbManager();
 			dm.Connect("db_trends");
 			HMFrame window = new HMFrame(dm);
 			window.open();
@@ -584,8 +584,7 @@ public class HMFrame {
 	
 	public void updateItem(Table table, TableItem item) {
 		try {
-			if(table.equals(table_bp)) dm.insertLog(item.getText(2));
-			else dm.insertLog(item.getText(1));
+			dm.insertLog(item.getText(1));
 			table.remove(table.indexOf(item));
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -627,6 +626,9 @@ public class HMFrame {
 					// TODO Auto-generated catch block
 					MessageDialog.openInformation(shlHrm, "Cancelled", e.getMessage());
 				}
+				table_hrm.removeAll();
+				table_bp.removeAll();
+				table_dd.removeAll();
 				
 				for(Entry<String, String> entry : refreshed_bp.entrySet()) {
 					TableItem ti = new TableItem(table_bp, 0);

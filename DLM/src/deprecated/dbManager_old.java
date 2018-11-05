@@ -14,14 +14,11 @@ import java.util.List;
 import main.ConfigLoader;
 import util.hd.Gallery;
 
-public class dbManager {
+public class dbManager_old {
 
 	private static String dbPath;
 	private static Connection connection;
 	
-	public dbManager(ConfigLoader config) {
-		dbPath = config.GetLocalDBPath();
-	}
 	
 	public void Connect() {
 		try {

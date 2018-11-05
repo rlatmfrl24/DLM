@@ -17,8 +17,6 @@ public class ConfigLoader extends Observable {
 	private static final String Default_deletedItemPath = "./temp/deleted/";
 	private static final String Default_movedItemPath = "./temp/moved/";
 	private static final String Default_DbxAccessToken = "FMwnuyPWJdsAAAAAAABzAyZ1u1lAOczChSN0XSXJNfHmmUKUPrk-gS49cfTtSdg0";
-	private static final String Default_DbxDBPath = "/dlm/temp/sample.db";
-	private static final String Default_LocalDBPath = "./temp/sample.db";
 
 	public ConfigLoader(String path) {
 		// TODO Auto-generated constructor stub
@@ -50,10 +48,6 @@ public class ConfigLoader extends Observable {
 		bw.write("MovedPath=" + Default_movedItemPath);
 		bw.newLine();
 		bw.write("HiyobiPath=" + Default_HiyobiPath);
-		bw.newLine();
-		bw.write("DbxDBPath=" + Default_DbxDBPath);
-		bw.newLine();
-		bw.write("LocalDBPath=" + Default_LocalDBPath);
 		bw.newLine();
 		bw.write("ImageViewerPath=DEFAULT");
 		bw.newLine();
@@ -105,18 +99,6 @@ public class ConfigLoader extends Observable {
 		notifyObservers();
 	}
 
-	public void setLocalDBPath(String path) {
-		properties.setProperty("LocalDBPath", path);
-		setChanged();
-		notifyObservers();
-	}
-
-	public void setDbxDBPath(String path) {
-		properties.setProperty("DbxDBPath", path);
-		setChanged();
-		notifyObservers();
-	}
-
 	//Getter Method
 	public String GetCurrentPath() {
 		return properties.getProperty("TargetPath");
@@ -132,13 +114,5 @@ public class ConfigLoader extends Observable {
 
 	public String GetDbxToken() {
 		return properties.getProperty("DbxAccessToken");
-	}
-
-	public String GetLocalDBPath() {
-		return properties.getProperty("LocalDBPath");
-	}
-
-	public String GetDbxDBPath() {
-		return properties.getProperty("DbxDBPath");
 	}
 }

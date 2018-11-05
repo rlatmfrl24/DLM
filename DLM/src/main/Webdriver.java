@@ -1,5 +1,7 @@
 package main;
 
+import java.util.concurrent.TimeUnit;
+
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -16,6 +18,7 @@ public class Webdriver {
 		options.addArguments("window-size=1920x1080");
 		options.addArguments("disable-gpu");
 		driver = new ChromeDriver(options);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 	}
 	
 	public ChromeDriver getWebDriver() {

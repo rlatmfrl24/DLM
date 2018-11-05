@@ -18,7 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import main.Webdriver;
-import main.dbManager_remote;
+import main.dbManager;
 
 public class hrmupdate {
 
@@ -28,9 +28,9 @@ public class hrmupdate {
 	
 	private Trie linkTrie;
 	private List<String> log_list = new ArrayList<>();
-	private dbManager_remote dm;
+	private dbManager dm;
 	
-	public hrmupdate(dbManager_remote dm) {
+	public hrmupdate(dbManager dm) {
 		Filter_Map.put("http://www.dostream.com/", "dostream");
 		Filter_Map.put("imgur.com", "imgur");
 		Filter_Map.put("youtube.com", "Youtube");
@@ -42,8 +42,6 @@ public class hrmupdate {
 		Filter_Map.put("bbs.ruliweb.com", "ruliweb");
 		linkTrie = Trie.builder().addKeywords(Filter_Map.keySet()).build();
 		this.dm = dm;
-		Webdriver wd = new Webdriver();
-		driver = wd.getWebDriver();
 	}
 	
 	public void classify(String url) {
@@ -63,9 +61,8 @@ public class hrmupdate {
 			res_map.clear();
 			log_list.clear();
 			log_list = dm.getDataFromDB("link", "tb_link_info");
-			
-			System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+			Webdriver wd = new Webdriver();
+			driver = wd.getWebDriver();
 			driver.get("http://insagirl-toto.appspot.com/hrm/?where=2");
 			driver.findElement(By.cssSelector("#hrmbodyexpand")).click();
 			Thread.sleep(1000);

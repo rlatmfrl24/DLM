@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import util.hd.Gallery;
 
-public class dbManager_remote {
+public class dbManager {
 	private static Connection connection;
 	private static String DriverName = "com.mysql.cj.jdbc.Driver";
 	private static String dbURL = "jdbc:mysql://35.233.230.219:3306/";
@@ -20,7 +20,7 @@ public class dbManager_remote {
 	private static String db_pwd = "Love397!@";
 	private static String dbName;
 	
-	public dbManager_remote() {
+	public dbManager() {
 	}
 	
 	public void Connect(String name) {

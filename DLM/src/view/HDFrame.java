@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import main.dbManager_remote;
+import main.dbManager;
 import util.hd.DownloadUtil;
 
 import org.eclipse.swt.widgets.Button;
@@ -36,7 +36,7 @@ public class HDFrame {
 	private DownloadUtil downloadUtil;
 	private Thread download=null;
 	
-	public HDFrame(dbManager_remote dbManager) {
+	public HDFrame(dbManager dbManager) {
 		downloadUtil = new DownloadUtil(dbManager);
 	}
 	
@@ -46,7 +46,7 @@ public class HDFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			dbManager_remote dm = new dbManager_remote();
+			dbManager dm = new dbManager();
 			dm.Connect("db_trends");
 			HDFrame window = new HDFrame(dm);
 			window.open();

@@ -9,16 +9,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import main.dbManager_remote;
+import main.dbManager;
 
 public class bpupdate {
 	private static final int num_search_page = 3;
 	private static final String board_humor = "http://v12.battlepage.com/??=Board.Humor.Table";
 	private static final String board_etc = "http://v12.battlepage.com/??=Board.ETC.Table";
 	private List<String> log_list = new ArrayList<>();
-	private dbManager_remote dm;
+	private dbManager dm;
 	
-	public bpupdate(dbManager_remote dm) {
+	public bpupdate(dbManager dm) {
 		try {
 			this.dm = dm;
 		}catch(Exception e) {
