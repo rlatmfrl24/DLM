@@ -13,18 +13,18 @@ connection.connect(function(err){
 });
 
 /* GET users listing. */
-router.get('/', function(res) {
+router.get('/', function(req, res) {
   res.send('DB RESTful API Page');
 });
 
-router.get('/hiyobi/all', function(res){
+router.get('/hiyobi/all', function(req, res){
   connection.query('SELECT * from tb_hiyobi_info', function(err, rows){
     if(!err) res.send(rows);
     else console.error(err);
   });
 });
 
-router.get('/link', function(res){
+router.get('/link', function(req, res){
   res.send('Request Format for tb_link_info')
 });
 
@@ -36,7 +36,7 @@ router.post('/link', function(req, res){
   });
 });
 
-router.get('/link/all', function(res){
+router.get('/link/all', function(req, res){
   connection.query('SELECT * from tb_link_info', function(err, rows, fields){
     if(!err) res.send(rows);
     else console.error(err);
