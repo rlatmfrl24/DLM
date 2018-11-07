@@ -2,6 +2,7 @@ package main;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -63,22 +64,29 @@ public class dbManager {
 		return loglist;
 	}
 
-	public void insertLog(List<String> list) throws Exception {
-		String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
-		PreparedStatement stmt = connection.prepareStatement(sql);
-		for(String link : list) {
-			try {
-				URL url = new URL(link);
-				stmt.setString(1, url.getAuthority());
-			}catch(MalformedURLException mue) {
-				System.err.println("URL 분석 오류 : 올바른 URL이 아닙니다.");
-				stmt.setString(1, "");
+	public void insertLog(List<String> list) {
+		try {
+			String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
+			PreparedStatement stmt = connection.prepareStatement(sql);
+			for(String link : list) {
+				try {
+					URL url = new URL(link);
+					stmt.setString(1, url.getAuthority());
+				}catch(MalformedURLException mue) {
+					System.err.println("URL 분석 오류 : 올바른 URL이 아닙니다.");
+					stmt.setString(1, "");
+				}
+				stmt.setString(2, link);
+				stmt.addBatch();
 			}
-			stmt.setString(2, link);
-			stmt.addBatch();
+			stmt.executeBatch();
+			stmt.close();
+		}catch(BatchUpdateException ec_batch) {
+			if(ec_batch.getMessage().contains("Duplicate entry")) return;
+			else ec_batch.printStackTrace();
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
-		stmt.executeBatch();
-		stmt.close();
 	}
 	
 	public void insertLog(String str_url) throws Exception {

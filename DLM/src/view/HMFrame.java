@@ -548,16 +548,23 @@ public class HMFrame {
 					int[] remove_idx;
 					
 					Table current_table = getCurrentTable(tabFolder);
-					for(TableItem item : current_table.getItems()) {
-						if(item.getChecked()) {
+					if(current_table == table_bmk) {
+						for(TableItem item : current_table.getItems())
 							visited.add(item.getText(1));
-							selected_idx.add(current_table.indexOf(item));
+						dm.UpdateBookmark(visited);
+					}else {
+						for(TableItem item : current_table.getItems()) {
+							if(item.getChecked()) {
+								visited.add(item.getText(1));
+								selected_idx.add(current_table.indexOf(item));
+							}
 						}
+						remove_idx = new int[selected_idx.size()];
+						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
+						current_table.remove(remove_idx);
+						dm.insertLog(visited);
 					}
-					remove_idx = new int[selected_idx.size()];
-					for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
-					current_table.remove(remove_idx);
-					dm.insertLog(visited);
+					
 					btnRefresh.setEnabled(true);
 					btnUpdate.setEnabled(true);
 					lblReady.setText("Log Updated.");
