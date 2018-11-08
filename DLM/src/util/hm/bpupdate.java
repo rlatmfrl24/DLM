@@ -9,27 +9,23 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import main.dbManager;
+import main.RestClient;
 
 public class bpupdate {
 	private static final int num_search_page = 3;
 	private static final String board_humor = "http://v12.battlepage.com/??=Board.Humor.Table";
 	private static final String board_etc = "http://v12.battlepage.com/??=Board.ETC.Table";
 	private List<String> log_list = new ArrayList<>();
-	private dbManager dm;
+	private RestClient restClient;
 	
-	public bpupdate(dbManager dm) {
-		try {
-			this.dm = dm;
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+	public bpupdate() {
+		restClient = new RestClient();
 	}
 	
 	public Map<String, String> LoadBP() {
 		Map<String, String> data_map = new TreeMap<>();
 		try {
-			log_list = dm.getLogs("v12.battlepage.com");
+			log_list = restClient.getListByColumn("tb_link_info", "link", "domain like 'v12.battlepage.com'");
 			for(int i=1; i<=num_search_page; i++) {
 				Document doc = Jsoup.connect(board_humor+"&page="+i).get();
 				Element table = doc.select("#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable").get(0);

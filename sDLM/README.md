@@ -1,15 +1,19 @@
 
 
-# test
+# Server DLM
 
 
 
-## Usage
+## RESTful API for DLM
 
+
+### Test Page
+
+
+http://35.233.230.219:3000
 
 
 ## Developing
-
 
 
 ### Tools

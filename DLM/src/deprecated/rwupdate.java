@@ -21,7 +21,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import main.ConfigLoader;
-import main.dbManager;
 import util.hd.DownloadUtil;
 import util.rc.Expansion;
 
@@ -40,7 +39,7 @@ public class rwupdate {
 
 	public rwupdate(dbManager dm) {
 		this.dm = dm;
-		download_util = new DownloadUtil(dm);
+		download_util = new DownloadUtil();
 		
 		//이미지 확장자 로드
 		TrieBuilder tb = Trie.builder();
@@ -79,9 +78,11 @@ public class rwupdate {
 					List<String> vilsit = r.BP_getList();
 					monitor.beginTask("Load DB Manager", vilsit.size());
 
+					/*
 					dbManager_old dm = new dbManager_old();
 					dm.Connect();
 					dm.initialize();
+					*/
 					for(String link : r.BP_getList()) {
 						r.BP_getContent(link);
 					}

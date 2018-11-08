@@ -21,13 +21,10 @@ import org.eclipse.swt.layout.GridLayout;
 public class Manager {
 	private static final String config_filepath = "./temp/config.properties";
 	private static ConfigLoader configLoader;
-	private static dbManager dbManager;
 	
 	public Manager() {
 		try {
 			configLoader = new ConfigLoader(config_filepath);
-			dbManager = new dbManager();
-			dbManager.Connect("db_trends");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -88,7 +85,7 @@ public class Manager {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shlManager.dispose();
-				HDFrame mainFrame = new HDFrame(dbManager);
+				HDFrame mainFrame = new HDFrame();
 				mainFrame.open();
 			}
 		});
@@ -100,7 +97,7 @@ public class Manager {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shlManager.dispose();
-				HMFrame mainFrame = new HMFrame(dbManager);
+				HMFrame mainFrame = new HMFrame();
 				mainFrame.open();
 			}
 		});

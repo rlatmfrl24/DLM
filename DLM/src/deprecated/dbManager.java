@@ -1,8 +1,8 @@
 package deprecated;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,68 +10,25 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import main.ConfigLoader;
 import util.hd.Gallery;
 
-public class dbManager_old {
-
-	private static String dbPath;
+public class dbManager {
 	private static Connection connection;
+	private static String DriverName = "com.mysql.cj.jdbc.Driver";
+	private static String dbURL = "jdbc:mysql://35.233.230.219:3306/";
+	private static String db_option = "?useUnicode=yes&characterEncoding=UTF-8";
+	private static String db_id = "root";
+	private static String db_pwd = "Love397!@";
+	private static String dbName;
 	
-	
-	public void Connect() {
-		try {
-			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:"+dbPath);
-			if(!new File(dbPath).exists()) initialize();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}		
+	public dbManager() {
 	}
 	
-	public boolean isTableExists(String tbname) throws Exception {
-		String sql = "SELECT COUNT(*) FROM sqlite_master WHERE name='"+tbname+"';";
-		Statement stmt = connection.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		return rs.getBoolean(1);
-	}
-	
-	public void initialize() {
+	public void Connect(String name) {
+		dbName = name;
 		try {
-			Statement stmt = connection.createStatement();
-			if(!isTableExists("tb_link_info")) {
-				String sql = "CREATE TABLE tb_link_info (" + 
-						"idx    INTEGER PRIMARY KEY ASC AUTOINCREMENT, " + 
-						"domain VARCHAR, " + 
-						"link   TEXT" + 
-						");";
-				stmt.executeUpdate(sql);
-			}
-			if(!isTableExists("tb_hiyobi_info")) {
-				String sql = "CREATE TABLE tb_hiyobi_info (" + 
-						"idx      INTEGER PRIMARY KEY ASC AUTOINCREMENT," + 
-						"code     VARCHAR UNIQUE NOT NULL," + 
-						"title    TEXT," + 
-						"url      TEXT," + 
-						"artist   VARCHAR," + 
-						"[group]  VARCHAR," + 
-						"original VARCHAR," + 
-						"type     VARCHAR," + 
-						"keyword  TEXT," + 
-						"path     TEXT" + 
-						");";
-				stmt.executeUpdate(sql);
-			}
-			if(!isTableExists("tb_bookmark_info")) {
-				String sql = "CREATE TABLE tb_bookmark_info (" + 
-						"idx    INTEGER PRIMARY KEY ASC AUTOINCREMENT, " + 
-						"domain VARCHAR, " + 
-						"link   TEXT" + 
-						");";
-				stmt.executeUpdate(sql);
-			}
-			stmt.close();
+			Class.forName(DriverName).newInstance();
+			connection = DriverManager.getConnection(dbURL+dbName+db_option, db_id, db_pwd);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -107,22 +64,29 @@ public class dbManager_old {
 		return loglist;
 	}
 
-	public void insertLog(List<String> list) throws Exception {
-		String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
-		PreparedStatement stmt = connection.prepareStatement(sql);
-		for(String link : list) {
-			try {
-				URL url = new URL(link);
-				stmt.setString(1, url.getAuthority());
-			}catch(MalformedURLException mue) {
-				System.err.println("URL 분석 오류 : 올바른 URL이 아닙니다.");
-				stmt.setString(1, "");
+	public void insertLog(List<String> list) {
+		try {
+			String sql = "INSERT INTO tb_link_info (domain, link) VALUES (?, ?)";
+			PreparedStatement stmt = connection.prepareStatement(sql);
+			for(String link : list) {
+				try {
+					URL url = new URL(link);
+					stmt.setString(1, url.getAuthority());
+				}catch(MalformedURLException mue) {
+					System.err.println("URL 분석 오류 : 올바른 URL이 아닙니다.");
+					stmt.setString(1, "");
+				}
+				stmt.setString(2, link);
+				stmt.addBatch();
 			}
-			stmt.setString(2, link);
-			stmt.addBatch();
+			stmt.executeBatch();
+			stmt.close();
+		}catch(BatchUpdateException ec_batch) {
+			if(ec_batch.getMessage().contains("Duplicate entry")) return;
+			else ec_batch.printStackTrace();
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
-		stmt.executeBatch();
-		stmt.close();
 	}
 	
 	public void insertLog(String str_url) throws Exception {
@@ -159,7 +123,7 @@ public class dbManager_old {
 	}
 	
 	public void insertDownloadLog(Gallery gal) throws Exception {
-		String sql = "INSERT INTO tb_hiyobi_info (code, title, url, artist, [group], original, type, keyword, path) "
+		String sql = "INSERT INTO tb_hiyobi_info (h_code, h_title, h_url, h_artist, h_group, h_original, h_type, h_keyword, h_path) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		PreparedStatement stmt = connection.prepareStatement(sql);
 		stmt.setString(1, gal.getCode());

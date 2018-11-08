@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,19 +29,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import main.RestClient;
 import main.Webdriver;
-import main.dbManager;
 
 public class DownloadUtil {
 
-	private dbManager dbManager;
+	private RestClient restClient;
 	private static Map<String, Gallery> download_list = new HashMap<>();;
 	private static File homepath = new File("./hiyobi/");
 	private int pbar_selection = 1;
 	private static ChromeDriver driver;
 	
-	public DownloadUtil(dbManager dbManager) {
-		this.dbManager = dbManager;
+	public DownloadUtil() {
+		this.restClient = new RestClient();
 	}
 	
 	public void closeWebDriver() {
@@ -64,7 +63,7 @@ public class DownloadUtil {
 					driver = wd.getWebDriver();
 					monitor.beginTask("Getting List from Hiyobi..", pages+1);
 					download_list.clear();
-					List<String> skip_list = dbManager.getDataFromDB("h_code", "tb_hiyobi_info");
+					List<String> skip_list = restClient.getListByColumn("tb_hiyobi_info", "h_code");
 					for(int i = 1; i<pages+1; i++) {
 						Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
 						download_list = getGalleryDataFromPage(doc, skip_list);
@@ -220,8 +219,7 @@ public class DownloadUtil {
 				});
 				zu.createZipFile(homepath.getPath()+"/"+gal.getPath()+"/", toPath, gal.getPath()+".zip");
 				deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
-				//subDirList(homepath.getPath()+"/"+gal.getPath()+"/");
-				dbManager.insertDownloadLog(gal);
+				restClient.post_json(restClient.makeInsertGalleryJSON(gal));
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						entry.getValue().setText(2, "Done");

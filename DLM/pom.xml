@@ -23,13 +23,6 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.11.3</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-server -->
-		<!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.23.1</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.eclipse.ui/forms -->
 		<dependency>
 			<groupId>org.eclipse.ui</groupId>

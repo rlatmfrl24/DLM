@@ -17,30 +17,42 @@ router.get('/', function(req, res) {
   res.send('DB RESTful API Page');
 });
 
-router.get('/hiyobi/all', function(req, res){
-  connection.query('SELECT * from tb_hiyobi_info', function(err, rows){
-    if(!err) res.send(rows);
-    else console.error(err);
-  });
-});
-
-router.get('/link', function(req, res){
-  res.send('Request Format for tb_link_info')
-});
-
-router.post('/link', function(req, res){
-  var sql = "SELECT * from tb_link_info info where "+req.body.column+" like '"+req.body.value+"';";
-  connection.query(sql, function(err, rows){
-    if(!err) res.send(rows);
-    else res.send(err);
-  });
-});
-
-router.get('/link/all', function(req, res){
-  connection.query('SELECT * from tb_link_info', function(err, rows, fields){
-    if(!err) res.send(rows);
-    else console.error(err);
-  });
+router.post('/', function(req, res){
+  var sql = "";
+  console.log(req.body);
+  if(req.body.query_type == 'SELECT'){
+    sql += "SELECT "+req.body.column+" FROM "+req.body.table_name;
+    if(!req.body.where_value == ''){
+      sql += " WHERE "+req.body.where_value+";"
+    }
+    console.log(sql);
+    connection.query(sql, function(err, rows){
+      if(!err) res.send(rows);
+      else res.send(err);
+    });
+  }else if(req.body.query_type == 'INSERT'){
+    sql += "INSERT INTO "+req.body.table_name+" "+req.body.column+" VALUES ?";
+    var values = req.body.values;
+    connection.query(sql, [values], function(err, result){
+      if(!err){
+        console.log(result);
+        res.send(result);
+      } 
+      else {
+        console.log(err);
+        res.send(err);
+      };
+    });
+  }else if(req.body.query_type == 'DELETE'){
+    sql += "DELETE FROM "+req.body.table_name;
+    connection.query(sql, function(err, result){
+      if(!err) res.send(result);
+      else res.send(err);
+    });
+  }else{
+    console.log("QUERY ERROR!");
+    res.send("Query Type Error");
+  }
 });
 
 module.exports = router;
