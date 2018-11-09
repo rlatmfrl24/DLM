@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
 import deprecated.dbManager;
@@ -214,7 +215,10 @@ public class HDFrame {
 					btnDownload.setEnabled(true);
 				}
 				if(before_state!=download.getState() && download.getState() == State.TERMINATED) {
-					MessageDialog.openConfirm(shell, "Alert", "Download Complete.");
+					MessageBox msg = new MessageBox(shell);
+					msg.setText("Alert");
+					msg.setMessage("Download Complete.");
+					msg.open();
 				}
 				before_state=download.getState();
 			}
