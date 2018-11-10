@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,27 +27,21 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-import main.dbManager;
+import main.RestClient;
+import main.Webdriver;
 
 public class DownloadUtil {
 
-	private dbManager dbManager;
-	private static WebDriver driver;
+	private RestClient restClient;
 	private static Map<String, Gallery> download_list = new HashMap<>();;
 	private static File homepath = new File("./hiyobi/");
 	private int pbar_selection = 1;
-
-	public DownloadUtil(dbManager dbManager) {
-		this.dbManager = dbManager;
-	}
-
-	public void getWebDriver() {
-		System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
-		driver = new PhantomJSDriver();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+	private static ChromeDriver driver;
+	
+	public DownloadUtil() {
+		this.restClient = new RestClient();
 	}
 	
 	public void closeWebDriver() {
@@ -66,10 +59,11 @@ public class DownloadUtil {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				// TODO Auto-generated method stub
 				try {
+					Webdriver wd = new Webdriver();
+					driver = wd.getWebDriver();
 					monitor.beginTask("Getting List from Hiyobi..", pages+1);
-					getWebDriver();
 					download_list.clear();
-					List<String> skip_list = dbManager.getDataFromDB("code", "tb_hiyobi_info");
+					List<String> skip_list = restClient.getListByColumn("tb_hiyobi_info", "h_code");
 					for(int i = 1; i<pages+1; i++) {
 						Document doc = Jsoup.connect("https://hiyobi.me/list/"+i).get();
 						download_list = getGalleryDataFromPage(doc, skip_list);
@@ -176,7 +170,6 @@ public class DownloadUtil {
 	public void getDownloadByTable(Table table) {
 		// TODO Auto-generated method stub
 		try {
-			getWebDriver();
 			ziputil zu = new ziputil();
 			final HashMap<String, TableItem> item_map = new HashMap<>();
 			Runnable getItemData = new Runnable() {
@@ -200,6 +193,8 @@ public class DownloadUtil {
 					e.printStackTrace();
 				}
 			}
+			Webdriver wd = new Webdriver();
+			driver = wd.getWebDriver();
 			for(Entry<String, TableItem> entry : item_map.entrySet()) {
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -224,8 +219,7 @@ public class DownloadUtil {
 				});
 				zu.createZipFile(homepath.getPath()+"/"+gal.getPath()+"/", toPath, gal.getPath()+".zip");
 				deleteDirectory(new File(homepath.getPath()+"/"+gal.getPath()+"/"));
-				//subDirList(homepath.getPath()+"/"+gal.getPath()+"/");
-				dbManager.insertDownloadLog(gal);
+				restClient.post_json(restClient.makeInsertGalleryJSON(gal));
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
 						entry.getValue().setText(2, "Done");

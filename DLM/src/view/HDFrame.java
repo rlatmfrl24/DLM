@@ -9,9 +9,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
-import main.dbManager;
+import deprecated.dbManager;
 import util.hd.DownloadUtil;
 
 import org.eclipse.swt.widgets.Button;
@@ -36,8 +37,8 @@ public class HDFrame {
 	private DownloadUtil downloadUtil;
 	private Thread download=null;
 	
-	public HDFrame(dbManager dbManager) {
-		downloadUtil = new DownloadUtil(dbManager);
+	public HDFrame() {
+		downloadUtil = new DownloadUtil();
 	}
 	
 	/**
@@ -47,8 +48,8 @@ public class HDFrame {
 	public static void main(String[] args) {
 		try {
 			dbManager dm = new dbManager();
-			dm.Connect();
-			HDFrame window = new HDFrame(dm);
+			dm.Connect("db_trends");
+			HDFrame window = new HDFrame();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,6 +159,7 @@ public class HDFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					table.removeAll();
 					downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
 				}catch(Exception ec) {
 					ec.printStackTrace();
@@ -191,6 +193,7 @@ public class HDFrame {
 				try {
 					if(!text.getText().isEmpty()) {
 						if(e.keyCode==SWT.CR || e.keyCode==SWT.KEYPAD_CR) {
+							table.removeAll();
 							downloadUtil.GetDownloadList(table, Integer.parseInt(text.getText()));
 						}
 					}
@@ -212,7 +215,10 @@ public class HDFrame {
 					btnDownload.setEnabled(true);
 				}
 				if(before_state!=download.getState() && download.getState() == State.TERMINATED) {
-					MessageDialog.openConfirm(shell, "Alert", "Download Complete.");
+					MessageBox msg = new MessageBox(shell);
+					msg.setText("Alert");
+					msg.setMessage("Download Complete.");
+					msg.open();
 				}
 				before_state=download.getState();
 			}

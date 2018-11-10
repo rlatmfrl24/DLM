@@ -36,7 +36,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import main.dbManager;
+import main.RestClient;
 import util.hm.bpupdate;
 import util.hm.ddupdate;
 import util.hm.hrmupdate;
@@ -60,16 +60,16 @@ public class HMFrame {
 	private hrmupdate hu;
 	private bpupdate bp;
 	private ddupdate du;
-	private dbManager dm;
 	private SystemUtility su = new SystemUtility();
 	private Table table_bmk;
 	private Map<String, String> refreshed_hrm;
 	private Map<String, String> refreshed_bp;
 	private Map<String, String> refreshed_dd;
 	private IRunnableWithProgress loadTask;
+	private RestClient restClient;
 	
-	public HMFrame(dbManager dm) {
-		this.dm = dm;
+	public HMFrame() {
+		restClient = new RestClient();
 		loadTask = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -93,10 +93,7 @@ public class HMFrame {
 	 */
 	public static void main(String[] args) {
 		try {
-			dbManager dm = new dbManager();
-			dm.Connect();
-			dm.initialize();
-			HMFrame window = new HMFrame(dm);
+			HMFrame window = new HMFrame();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -106,9 +103,9 @@ public class HMFrame {
 	 * Open the window.
 	 */
 	public void open() {
-		hu = new hrmupdate(dm);
-		bp = new bpupdate(dm);
-		du = new ddupdate(dm);
+		hu = new hrmupdate();
+		bp = new bpupdate();
+		du = new ddupdate();
 		Display display = Display.getDefault();
 		Shell shlHrm = new Shell();
 		shlHrm.setSize(786, 573);
@@ -248,7 +245,7 @@ public class HMFrame {
 		tblclmnLink.setWidth(100);
 		tblclmnLink.setText("Link");
 			
-		for(String link : dm.getDataFromDB("link", "tb_bookmark_info")) {
+		for(String link : restClient.getListByColumn("tb_bookmark_info", "link")) {
 			try {
 				URL url = new URL(link);
 				TableItem item = new TableItem(table_bmk, 0);
@@ -261,25 +258,13 @@ public class HMFrame {
 
 		Composite composite_1 = new Composite(shlHrm, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-		composite_1.setLayout(new GridLayout(4, false));
+		composite_1.setLayout(new GridLayout(3, false));
 
 		Button btnUpdate = new Button(composite_1, SWT.NONE);
 		btnUpdate.setText("Update");
 		
 		Button btnRefresh = new Button(composite_1, SWT.NONE);
 		btnRefresh.setText("Refresh");
-		
-		Button btnRear = new Button(composite_1, SWT.NONE);
-		btnRear.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				
-			}
-		});
-		GridData gd_btnRear = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_btnRear.widthHint = 56;
-		btnRear.setLayoutData(gd_btnRear);
-		btnRear.setText("Rear");
 		
 		Label lblReady = new Label(composite_1, SWT.NONE);
 		lblReady.addMouseListener(new MouseAdapter() {
@@ -335,8 +320,8 @@ public class HMFrame {
 						list.add(selected.getText(1));
 						current_table.remove(current_table.indexOf(selected));
 					}
-					dm.insertLog(list);
-					dm.UpdateBookmark(list);
+					restClient.post_json(restClient.makeInsertLinkJSON(list));
+					restClient.UpdateBMK("tb_bookmark_info", list);
 					btnRefresh.setEnabled(true);
 					btnUpdate.setEnabled(true);
 				}catch(Exception bme) {
@@ -357,7 +342,7 @@ public class HMFrame {
 						open_list.add(selected.getText(1));
 						current_table.remove(current_table.indexOf(selected));
 					}
-					dm.insertLog(open_list);
+					restClient.post_json(restClient.makeInsertLinkJSON(open_list));
 					btnRefresh.setEnabled(true);
 					btnUpdate.setEnabled(true);
 				}catch(Exception ex) {
@@ -444,7 +429,7 @@ public class HMFrame {
 								current_table.remove(current_table.indexOf(item));
 								//item.setChecked(true);
 							}
-							dm.insertLog(visit_list);
+							restClient.post_json(restClient.makeInsertLinkJSON(visit_list));
 						}
 						btnRefresh.setEnabled(true);
 						btnUpdate.setEnabled(true);
@@ -461,6 +446,7 @@ public class HMFrame {
 			public void controlResized(ControlEvent arg0) {
 				// TODO Auto-generated method stub
 				Rectangle area = tabFolder.getClientArea();
+				//Rectangle area = composite_hrm.getClientArea();
 
 				Point preferredSize = table_hrm.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				int width = area.width - 2 * table_hrm.getBorderWidth();
@@ -560,16 +546,23 @@ public class HMFrame {
 					int[] remove_idx;
 					
 					Table current_table = getCurrentTable(tabFolder);
-					for(TableItem item : current_table.getItems()) {
-						if(item.getChecked()) {
+					if(current_table == table_bmk) {
+						for(TableItem item : current_table.getItems())
 							visited.add(item.getText(1));
-							selected_idx.add(current_table.indexOf(item));
+						restClient.UpdateBMK("tb_bookmark_info", visited);
+					}else {
+						for(TableItem item : current_table.getItems()) {
+							if(item.getChecked()) {
+								visited.add(item.getText(1));
+								selected_idx.add(current_table.indexOf(item));
+							}
 						}
+						remove_idx = new int[selected_idx.size()];
+						for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
+						current_table.remove(remove_idx);
+						restClient.post_json(restClient.makeInsertLinkJSON(visited));
 					}
-					remove_idx = new int[selected_idx.size()];
-					for(int i = 0; i < selected_idx.size(); i++) remove_idx[i] = selected_idx.get(i);
-					current_table.remove(remove_idx);
-					dm.insertLog(visited);
+					
 					btnRefresh.setEnabled(true);
 					btnUpdate.setEnabled(true);
 					lblReady.setText("Log Updated.");
@@ -597,8 +590,9 @@ public class HMFrame {
 	
 	public void updateItem(Table table, TableItem item) {
 		try {
-			if(table.equals(table_bp)) dm.insertLog(item.getText(2));
-			else dm.insertLog(item.getText(1));
+			List<String> list = new ArrayList<>();
+			list.add(item.getText(1));
+			restClient.post_json(restClient.makeInsertLinkJSON(list));
 			table.remove(table.indexOf(item));
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -624,9 +618,7 @@ public class HMFrame {
 		}
 		return current_table;
 	}
-	
 
-	
 	public void open_load(Shell shlHrm) {
 		
 		shlHrm.getDisplay().asyncExec(new Runnable() {
@@ -642,6 +634,9 @@ public class HMFrame {
 					// TODO Auto-generated catch block
 					MessageDialog.openInformation(shlHrm, "Cancelled", e.getMessage());
 				}
+				table_hrm.removeAll();
+				table_bp.removeAll();
+				table_dd.removeAll();
 				
 				for(Entry<String, String> entry : refreshed_bp.entrySet()) {
 					TableItem ti = new TableItem(table_bp, 0);

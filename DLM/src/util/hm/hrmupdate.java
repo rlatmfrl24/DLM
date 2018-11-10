@@ -7,30 +7,29 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.ahocorasick.trie.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.phantomjs.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-import main.dbManager;
+import main.RestClient;
+import main.Webdriver;
 
 public class hrmupdate {
 
-	private static WebDriver driver;
+	private RestClient restClient;
+	private static ChromeDriver driver;
 	private Map<String, String> Filter_Map = new HashMap<>();
 	private Map<String, String> res_map = new TreeMap<>();
 	
 	private Trie linkTrie;
 	private List<String> log_list = new ArrayList<>();
-	private dbManager dm;
 	
-	public hrmupdate(dbManager dm) {
+	public hrmupdate() {
 		Filter_Map.put("http://www.dostream.com/", "dostream");
 		Filter_Map.put("imgur.com", "imgur");
 		Filter_Map.put("youtube.com", "Youtube");
@@ -41,7 +40,7 @@ public class hrmupdate {
 		Filter_Map.put("gall.dcinside.com", "dcinside");
 		Filter_Map.put("bbs.ruliweb.com", "ruliweb");
 		linkTrie = Trie.builder().addKeywords(Filter_Map.keySet()).build();
-		this.dm = dm;
+		restClient = new RestClient();
 	}
 	
 	public void classify(String url) {
@@ -60,11 +59,9 @@ public class hrmupdate {
 		try {
 			res_map.clear();
 			log_list.clear();
-			log_list = dm.getDataFromDB("link", "tb_link_info");
-			
-			System.setProperty("phantomjs.binary.path", "./driver/phantomjs/phantomjs.exe");
-			driver = new PhantomJSDriver();
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+			log_list = restClient.getListByColumn("tb_link_info", "link");
+			Webdriver wd = new Webdriver();
+			driver = wd.getWebDriver();
 			driver.get("http://insagirl-toto.appspot.com/hrm/?where=2");
 			driver.findElement(By.cssSelector("#hrmbodyexpand")).click();
 			Thread.sleep(1000);
