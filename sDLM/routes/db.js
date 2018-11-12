@@ -53,7 +53,7 @@ router.post('/', function (req, res) {
       }
     });
   } else if (req.body.query_type == 'INSERT') {
-    sql += "INSERT INTO " + req.body.table_name + " " + req.body.column + " VALUES ?";
+    sql += "INSERT IGNORE INTO " + req.body.table_name + " " + req.body.column + " VALUES ?";
     var values = req.body.values;
     connection.query(sql, [values], function (err, result) {
       if (!err) {

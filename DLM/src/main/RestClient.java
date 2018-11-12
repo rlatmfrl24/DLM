@@ -173,7 +173,9 @@ public class RestClient {
 	
 	public void UpdateBMK(String table_name, List<String> list) {
 		post_json(makeDeleteJSON(table_name));
-		post_json(makeInsertBMKJSON(list));
+		if(list.size() != 0) {
+			post_json(makeInsertBMKJSON(list));
+		}
 	}
 	
 	public static void main(String[] args) {
