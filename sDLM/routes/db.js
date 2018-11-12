@@ -8,8 +8,9 @@ var db_config = {
   prot: 3306,
   database: 'db_trends'
 }
-var connection = mysql.createConnection(db_config);
 
+var pool = mysql.createPool(db_config);
+var connection = mysql.createConnection(db_config);
 function handleDisconnect() {
   console.log('handleDisconnect()');
   connection.destroy();
@@ -46,7 +47,10 @@ router.post('/', function (req, res) {
     console.log(sql);
     connection.query(sql, function (err, rows) {
       if (!err) res.send(rows);
-      else res.send(err);
+      else {
+        console.log(err);
+        res.send(err);
+      }
     });
   } else if (req.body.query_type == 'INSERT') {
     sql += "INSERT INTO " + req.body.table_name + " " + req.body.column + " VALUES ?";
