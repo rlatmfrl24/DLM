@@ -9,7 +9,6 @@ var db_config = {
   database: 'db_trends'
 }
 
-var pool = mysql.createPool(db_config);
 var connection = mysql.createConnection(db_config);
 function handleDisconnect() {
   console.log('handleDisconnect()');
