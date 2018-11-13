@@ -181,9 +181,12 @@ public class RestClient {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		RestClient con = new RestClient();
-		System.out.println(con.getListByColumn("tb_hiyobi_info", "h_code"));
-		System.out.println(con.getListByColumn("tb_link_info", "link", "domain like 'www.dogdrip.net'"));
 		
+		for(String code : con.getListByColumn("tb_hiyobi_info", "h_code")) {
+			System.out.println(code);
+		}
+		//System.out.println(con.getListByColumn("tb_hiyobi_info", "h_code"));
+		//System.out.println(con.getListByColumn("tb_link_info", "link", "domain like 'www.dogdrip.net'"));
 	}
 
 }

@@ -9,6 +9,18 @@ var db_config = {
   database: 'db_trends'
 }
 
+function handleDisconnect() {
+  console.log('handleDisconnect()');
+  connection.destroy();
+  connection = mysql.createConnection(db_config);
+  connection.connect(function (err) {
+    if (err) {
+      console.log(' Error when connecting to db  (DBERR001):', err);
+      setTimeout(handleDisconnect, 1000);
+    }
+  });
+}
+
 /* GET users listing. */
 router.get('/', function (req, res) {
   res.send('DB RESTful API Page');
@@ -16,18 +28,6 @@ router.get('/', function (req, res) {
 
 router.post('/', function (req, res) {
   var connection = mysql.createConnection(db_config);
-  function handleDisconnect() {
-    console.log('handleDisconnect()');
-    connection.destroy();
-    connection = mysql.createConnection(db_config);
-    connection.connect(function (err) {
-      if (err) {
-        console.log(' Error when connecting to db  (DBERR001):', err);
-        setTimeout(handleDisconnect, 1000);
-      }
-    });
-  }
-
   connection.connect(function (err) {
     if (err) {
       console.log('Connection is asleep (time to wake it up): ', err);
