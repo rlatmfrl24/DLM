@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Table;
 
 import java.lang.Thread.State;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.jface.viewers.TableViewerColumn;

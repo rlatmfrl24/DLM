@@ -248,17 +248,6 @@ public class HMFrame {
 		TableColumn tblclmnLink = tableViewerColumn_8.getColumn();
 		tblclmnLink.setWidth(100);
 		tblclmnLink.setText("Link");
-			
-		for(String link : restClient.getListByColumn("tb_bookmark_info", "link")) {
-			try {
-				URL url = new URL(link);
-				TableItem item = new TableItem(table_bmk, 0);
-				item.setText(0, url.getAuthority());
-				item.setText(1, link);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
 
 		Composite composite_1 = new Composite(shlHrm, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));

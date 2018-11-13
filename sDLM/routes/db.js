@@ -9,33 +9,32 @@ var db_config = {
   database: 'db_trends'
 }
 
-var connection = mysql.createConnection(db_config);
-function handleDisconnect() {
-  console.log('handleDisconnect()');
-  connection.destroy();
-  connection = mysql.createConnection(db_config);
-  connection.connect(function (err) {
-    if (err) {
-      console.log(' Error when connecting to db  (DBERR001):', err);
-      setTimeout(handleDisconnect, 1000);
-    }
-  });
-}
-
-connection.connect(function (err) {
-  if (err) {
-    console.log('Connection is asleep (time to wake it up): ', err);
-    setTimeout(handleDisconnect, 1000);
-    handleDisconnect();
-  }
-});
-
 /* GET users listing. */
 router.get('/', function (req, res) {
   res.send('DB RESTful API Page');
 });
 
 router.post('/', function (req, res) {
+  var connection = mysql.createConnection(db_config);
+  function handleDisconnect() {
+    console.log('handleDisconnect()');
+    connection.destroy();
+    connection = mysql.createConnection(db_config);
+    connection.connect(function (err) {
+      if (err) {
+        console.log(' Error when connecting to db  (DBERR001):', err);
+        setTimeout(handleDisconnect, 1000);
+      }
+    });
+  }
+
+  connection.connect(function (err) {
+    if (err) {
+      console.log('Connection is asleep (time to wake it up): ', err);
+      setTimeout(handleDisconnect, 1000);
+      handleDisconnect();
+    }
+  });
   var sql = "";
   console.log(req.body);
   if (req.body.query_type == 'SELECT') {
