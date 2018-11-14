@@ -130,8 +130,15 @@ router.get('/dd', function (req, res) {
 router.get('/hrm', function (req, res) {
 
     require('chromedriver')
+    var chrome = require('selenium-webdriver/chrome')
+    var screen = {
+        width: 640,
+        height: 480
+    }
     var webdriver = require('selenium-webdriver');
-    var driver = new webdriver.Builder().forBrowser('chrome').build();
+    var driver = new webdriver.Builder()
+        .setChromeOptions(new chrome.Options().headless().windowSize(screen))
+        .forBrowser('chrome').build();
     var By = webdriver.By;
 
     var hrm_list = []
