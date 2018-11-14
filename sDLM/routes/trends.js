@@ -47,6 +47,7 @@ router.get('/bp', function (req, res) {
     Promises.each(url_list, function (url) {
         return reqpromise(url)
             .then(function (body) {
+                console.log("GET:bp/[Promise] Get Data from request..")
                 var $ = cheerio.load(body);
                 var $table_data = $('#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable');
                 return $table_data.find('a');
@@ -57,6 +58,7 @@ router.get('/bp', function (req, res) {
             })
     }).then(function () {
         return new Promise(function (resolve, reject) {
+            console.log("GET:bp/[Promise] Connect DB..")
             var connection = mysql.createConnection(db_config);
             connection.connect(function (err) {
                 if (err) {
@@ -76,6 +78,7 @@ router.get('/bp', function (req, res) {
                 resolve(bp_list)
             })
         }).then(function (row_data) {
+            console.log("GET:bp/[Promise] Send to Client..")
             //console.log(row_data)
             res.send(JSON.stringify(row_data))
         })
@@ -92,6 +95,7 @@ router.get('/dd', function (req, res) {
     Promises.each(url_list, function (url) {
         return reqpromise(url)
             .then(function (body) {
+                console.log("GET:dd/[Promise] Get Data from request")
                 var $ = cheerio.load(body);
                 var $table_data = $('#main > div > div.eq.section.secontent.background-color-content > div > div.ed.board-list > table > tbody');
                 return $table_data.find('.ed.link-reset');
@@ -104,6 +108,7 @@ router.get('/dd', function (req, res) {
             })
     }).then(function () {
         return new Promise(function (resolve, reject) {
+            console.log("GET:dd/[Promise] Connect with DB..")
             var connection = mysql.createConnection(db_config);
             connection.connect(function (err) {
                 if (err) {
@@ -123,6 +128,7 @@ router.get('/dd', function (req, res) {
                 resolve(dd_list)
             })
         }).then(function (row_data) {
+            console.log("GET:dd/[Promise] Send to client..")
             //console.log(row_data)
             res.send(JSON.stringify(row_data))
         })
@@ -149,6 +155,8 @@ router.get('/hrm', function (req, res) {
         .then(function () {
             driver.findElement(By.css("#hrmbodyexpand")).click()
             sleep(1000).then(function () {
+                console.log("GET:hrm/[Promise] Get Data from driver..")
+
                 return driver.findElement(By.id('hrmbody'))
                     .getAttribute('innerHTML').then(function (body) {
                         var $ = cheerio.load(body)
@@ -159,6 +167,8 @@ router.get('/hrm', function (req, res) {
                     hrm_list.push(this.attribs.href)
                 })
             }).then(function () {
+                console.log("GET:hrm/[Promise] Connect with DB..")
+
                 return new Promise(function (resolve, reject) {
                     var connection = mysql.createConnection(db_config);
                     connection.connect(function (err) {
@@ -181,6 +191,7 @@ router.get('/hrm', function (req, res) {
                 })
             }).then(function (result) {
                 //console.log(result)
+                console.log("GET:hrm/[Promise] Driver Close..")
                 driver.close()
                 res.send(JSON.stringify(result))
             })
