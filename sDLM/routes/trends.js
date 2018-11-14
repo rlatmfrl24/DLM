@@ -29,16 +29,7 @@ function handleDisconnect() {
     });
 }
 
-require('chromedriver')
-var chrome = require('selenium-webdriver/chrome')
-var screen = {
-    width: 640,
-    height: 480
-}
-var webdriver = require('selenium-webdriver');
-var driver = new webdriver.Builder()
-    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
-    .forBrowser('chrome').build();
+
 
 router.get('/', function (req, res) {
     res.send('Trends Check API Page')
@@ -139,8 +130,16 @@ router.get('/dd', function (req, res) {
 })
 
 router.get('/hrm', function (req, res) {
-
-
+    require('chromedriver')
+    var chrome = require('selenium-webdriver/chrome')
+    var screen = {
+        width: 640,
+        height: 480
+    }
+    var webdriver = require('selenium-webdriver');
+    var driver = new webdriver.Builder()
+        .setChromeOptions(new chrome.Options().headless().windowSize(screen))
+        .forBrowser('chrome').build();
     var By = webdriver.By;
 
     var hrm_list = []
@@ -182,6 +181,7 @@ router.get('/hrm', function (req, res) {
                 })
             }).then(function (result) {
                 //console.log(result)
+                driver.close()
                 res.send(JSON.stringify(result))
             })
         })
