@@ -10,7 +10,7 @@ var bp_board_humor = 'http://v12.battlepage.com/??=Board.Humor.Table';
 var bp_board_etc = 'http://v12.battlepage.com/??=Board.ETC.Table';
 var dd_board = 'http://www.dogdrip.net/index.php?mid=dogdrip&page=';
 var db_config = {
-    host: '35.233.230.219',
+    host: '35.233.250.217',
     user: 'root',
     password: 'Love397!@',
     prot: 3306,
@@ -86,7 +86,7 @@ router.get('/bp', function (req, res) {
             })
         }).then(function (row_data) {
             //console.log(row_data)
-            res.send(row_data)
+            res.send(JSON.stringify(row_data))
         })
     })
 })
@@ -133,7 +133,7 @@ router.get('/dd', function (req, res) {
             })
         }).then(function (row_data) {
             //console.log(row_data)
-            res.send(row_data)
+            res.send(JSON.stringify(row_data))
         })
     })
 })
@@ -182,7 +182,7 @@ router.get('/hrm', function (req, res) {
                 })
             }).then(function (result) {
                 //console.log(result)
-                res.send(result)
+                res.send(JSON.stringify(result))
             })
         })
 })

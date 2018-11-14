@@ -2,7 +2,7 @@ var express = require('express');
 var mysql = require('mysql');
 var router = express.Router();
 var db_config = {
-  host: '35.233.230.219',
+  host: '35.233.250.217',
   user: 'root',
   password: 'Love397!@',
   prot: 3306,
