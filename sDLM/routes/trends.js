@@ -1,8 +1,9 @@
 var express = require('express');
-var reqpromise = require('request-promise');
+var reqpromise = require('request-promise')
 var mysql = require('mysql')
-var cheerio = require('cheerio');
+var cheerio = require('cheerio')
 var Promises = require('bluebird')
+var sleep = require('sleep-promise')
 var router = express.Router();
 var num_search_page = 5
 var bp_board_humor = 'http://v12.battlepage.com/??=Board.Humor.Table';
@@ -125,4 +126,57 @@ router.get('/dd', function (req, res) {
         })
     })
 })
+
+router.get('/hrm', function (req, res) {
+
+    require('chromedriver')
+    var webdriver = require('selenium-webdriver');
+    var driver = new webdriver.Builder().forBrowser('chrome').build();
+    var By = webdriver.By;
+
+    var hrm_list = []
+
+    var url = 'http://insagirl-toto.appspot.com/hrm/?where=2'
+    driver.get(url)
+        .then(function () {
+            driver.findElement(By.css("#hrmbodyexpand")).click()
+            sleep(1000).then(function () {
+                return driver.findElement(By.id('hrmbody'))
+                    .getAttribute('innerHTML').then(function (body) {
+                        var $ = cheerio.load(body)
+                        return $('a[href]')
+                    })
+            }).then(function (data) {
+                data.each(function () {
+                    hrm_list.push(this.attribs.href)
+                })
+            }).then(function () {
+                return new Promise(function (resolve, reject) {
+                    var connection = mysql.createConnection(db_config);
+                    connection.connect(function (err) {
+                        if (err) {
+                            console.log('Connection is asleep (time to wake it up): ', err);
+                            setTimeout(handleDisconnect, 1000);
+                            handleDisconnect();
+                        }
+                    });
+                    var sql = "SELECT link FROM tb_link_info;"
+                    connection.query(sql, function (err, rows) {
+                        for (var i = 0; i < rows.length; i++) {
+                            var find_data = rows[i].link
+                            if (hrm_list.includes(find_data)) {
+                                hrm_list.splice(hrm_list.indexOf(find_data), 1)
+                            }
+                        }
+                        resolve(hrm_list)
+                    })
+                })
+            }).then(function (result) {
+                //console.log(result)
+                driver.close()
+                res.send(result)
+            })
+        })
+})
+
 module.exports = router;
