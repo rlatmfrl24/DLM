@@ -147,7 +147,6 @@ router.get('/dd', function (req, res) {
 
 router.get('/hrm', function (req, res) {
 
-
     var hrm_list = []
 
     var url = 'http://insagirl-toto.appspot.com/hrm/?where=2'
@@ -192,7 +191,6 @@ router.get('/hrm', function (req, res) {
             }).then(function (result) {
                 //console.log(result)
                 console.log("GET:hrm/[Promise] Driver Close..")
-                driver.quit()
                 res.send(JSON.stringify(result))
             })
         })
