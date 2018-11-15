@@ -5,6 +5,9 @@ var cheerio = require('cheerio')
 var Promises = require('bluebird')
 var sleep = require('sleep-promise')
 var router = express.Router();
+var chrome = require('selenium-webdriver/chrome')
+var webdriver = require('selenium-webdriver')
+var By = webdriver.By;
 var num_search_page = 5
 var bp_board_humor = 'http://v12.battlepage.com/??=Board.Humor.Table';
 var bp_board_etc = 'http://v12.battlepage.com/??=Board.ETC.Table';
@@ -16,30 +19,13 @@ var db_config = {
     prot: 3306,
     database: 'db_trends'
 }
-
-function handleDisconnect() {
-    console.log('handleDisconnect()');
-    connection.destroy();
-    connection = mysql.createConnection(db_config);
-    connection.connect(function (err) {
-        if (err) {
-            console.log(' Error when connecting to db  (DBERR001):', err);
-            setTimeout(handleDisconnect, 1000);
-        }
-    });
-}
-
-require('chromedriver')
-var chrome = require('selenium-webdriver/chrome')
-var webdriver = require('selenium-webdriver')
-var By = webdriver.By;
 var screen = {
     width: 640,
     height: 480
 }
-var driver = new webdriver.Builder()
-    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
-    .forBrowser('chrome').build();
+require('chromedriver')
+
+
 
 router.get('/', function (req, res) {
     res.send('Trends Check API Page')
@@ -147,6 +133,9 @@ router.get('/dd', function (req, res) {
 
 router.get('/hrm', function (req, res) {
 
+    var driver = new webdriver.Builder()
+    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
+    .forBrowser('chrome').build();
     var hrm_list = []
 
     var url = 'http://insagirl-toto.appspot.com/hrm/?where=2'
@@ -191,9 +180,22 @@ router.get('/hrm', function (req, res) {
             }).then(function (result) {
                 //console.log(result)
                 console.log("GET:hrm/[Promise] Driver Close..")
+                driver.quit()
                 res.send(JSON.stringify(result))
             })
         })
 })
+
+function handleDisconnect() {
+    console.log('handleDisconnect()');
+    connection.destroy();
+    connection = mysql.createConnection(db_config);
+    connection.connect(function (err) {
+        if (err) {
+            console.log(' Error when connecting to db  (DBERR001):', err);
+            setTimeout(handleDisconnect, 1000);
+        }
+    });
+}
 
 module.exports = router;
