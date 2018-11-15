@@ -134,8 +134,8 @@ router.get('/dd', function (req, res) {
 router.get('/hrm', function (req, res) {
 
     var driver = new webdriver.Builder()
-    .setChromeOptions(new chrome.Options().headless().windowSize(screen))
-    .forBrowser('chrome').build();
+        .setChromeOptions(new chrome.Options().headless().windowSize(screen))
+        .forBrowser('chrome').build();
     var hrm_list = []
 
     var url = 'http://insagirl-toto.appspot.com/hrm/?where=2'
@@ -148,6 +148,7 @@ router.get('/hrm', function (req, res) {
                 return driver.findElement(By.id('hrmbody'))
                     .getAttribute('innerHTML').then(function (body) {
                         var $ = cheerio.load(body)
+                        driver.quit()
                         return $('a[href]')
                     })
             }).then(function (data) {
@@ -180,7 +181,6 @@ router.get('/hrm', function (req, res) {
             }).then(function (result) {
                 //console.log(result)
                 console.log("GET:hrm/[Promise] Driver Close..")
-                driver.quit()
                 res.send(JSON.stringify(result))
             })
         })
