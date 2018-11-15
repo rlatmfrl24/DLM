@@ -144,14 +144,13 @@ router.get('/hrm', function (req, res) {
             driver.findElement(By.css("#hrmbodyexpand")).click()
             sleep(1000).then(function () {
                 console.log("GET:hrm/[Promise] Get Data from driver..")
-
                 return driver.findElement(By.id('hrmbody'))
                     .getAttribute('innerHTML').then(function (body) {
                         var $ = cheerio.load(body)
-                        driver.quit()
                         return $('a[href]')
                     })
             }).then(function (data) {
+                driver.quit()
                 data.each(function () {
                     hrm_list.push(this.attribs.href)
                 })
