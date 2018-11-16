@@ -3,11 +3,8 @@ var reqpromise = require('request-promise')
 var mysql = require('mysql')
 var cheerio = require('cheerio')
 var Promises = require('bluebird')
-var sleep = require('sleep-promise')
+var puppeteer = require('puppeteer')
 var router = express.Router();
-var chrome = require('selenium-webdriver/chrome')
-var webdriver = require('selenium-webdriver')
-var By = webdriver.By;
 var num_search_page = 5
 var bp_board_humor = 'http://v12.battlepage.com/??=Board.Humor.Table';
 var bp_board_etc = 'http://v12.battlepage.com/??=Board.ETC.Table';
@@ -19,13 +16,6 @@ var db_config = {
     prot: 3306,
     database: 'db_trends'
 }
-var screen = {
-    width: 640,
-    height: 480
-}
-require('chromedriver')
-
-
 
 router.get('/', function (req, res) {
     res.send('Trends Check API Page')
@@ -132,32 +122,25 @@ router.get('/dd', function (req, res) {
 })
 
 router.get('/hrm', function (req, res) {
-
-    var driver = new webdriver.Builder()
-        .setChromeOptions(new chrome.Options().headless().windowSize(screen))
-        .forBrowser('chrome').build();
-    var hrm_list = []
-
-    var url = 'http://insagirl-toto.appspot.com/hrm/?where=2'
-    driver.get(url)
-        .then(function () {
-            driver.findElement(By.css("#hrmbodyexpand")).click()
-            sleep(1000).then(function () {
-                console.log("GET:hrm/[Promise] Get Data from driver..")
-                return driver.findElement(By.id('hrmbody'))
-                    .getAttribute('innerHTML').then(function (body) {
-                        var $ = cheerio.load(body)
-                        return $('a[href]')
-                    })
-            }).then(function (data) {
-                driver.quit()
-                data.each(function () {
-                    hrm_list.push(this.attribs.href)
-                })
-            }).then(function () {
-                console.log("GET:hrm/[Promise] Connect with DB..")
-
+    puppeteer.launch()
+    .then((browser) => {
+        return browser.newPage()
+        .then((page) => {
+            return page.goto('http://insagirl-toto.appspot.com/hrm/?where=2', {waitUntil:'networkidle2'})
+            .then(() => page.$('#hrmbodyexpand'))
+            .then((expand) => expand.click())
+            .then(() => page.waitFor(1000))
+            .then(() => page.$eval('#hrmbody', (element)=>{
+                var links = Array.from(element.querySelectorAll('a'))
+                return links.map(link=>link.href)
+            }))
+            .then((data) => {
                 return new Promise(function (resolve, reject) {
+                    console.log("GET:dd/[Promise] Connect with DB..")
+                    data = data.filter(function(item, pos){
+                        return data.indexOf(item) == pos;
+                    })
+                    console.log(data.length)
                     var connection = mysql.createConnection(db_config);
                     connection.connect(function (err) {
                         if (err) {
@@ -170,19 +153,22 @@ router.get('/hrm', function (req, res) {
                     connection.query(sql, function (err, rows) {
                         for (var i = 0; i < rows.length; i++) {
                             var find_data = rows[i].link
-                            if (hrm_list.includes(find_data)) {
-                                hrm_list.splice(hrm_list.indexOf(find_data), 1)
+                            if (data.includes(find_data)) {
+                                data.splice(data.indexOf(find_data), 1)
                             }
                         }
-                        resolve(hrm_list)
+                        resolve(data)
                     })
+                }).then(function (row_data) {
+                    console.log("GET:dd/[Promise] Send to client..")
+                    //console.log(row_data)
+                    console.log(row_data.length)
+                    res.send(JSON.stringify(row_data))
                 })
-            }).then(function (result) {
-                //console.log(result)
-                console.log("GET:hrm/[Promise] Driver Close..")
-                res.send(JSON.stringify(result))
             })
         })
+        .then(() => browser.close())
+    }).then(()=>console.log('done!'))
 })
 
 function handleDisconnect() {
