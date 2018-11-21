@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">mDLM</string>
+    <string name="tab_HRM">HRM</string>
+    <string name="tab_BP">BP</string>
+    <string name="tab_DD">DD</string>
+    <string name="action_settings">Settings</string>
+    <string name="floating_item_bmk">Go to Bookmark</string>
+    <string name="floating_item_close">Update to DB</string>
+    <string name="floating_item_check">Close &amp; Not update</string>
+</resources>

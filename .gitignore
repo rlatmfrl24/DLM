@@ -1,1 +1,18 @@
+#sDLM ignore
 sDLM/node_modules/
+
+#mDLM ignore
+mDLM/*.apk
+mDLM/*.ap_
+mDLM/*.dex
+mDLM/*.class
+mDLM/bin/
+mDLM/gen/
+mDLM/local.properties
+mDLM/.classpath
+mDLM/.project
+mDLM/proguard/
+mDLM/*.iml
+mDLM/*.ipr
+mDLM/*.iws
+mDLM/.idea/
