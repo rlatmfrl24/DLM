@@ -25,6 +25,8 @@ router.get('/bp', function (req, res) {
     var url_list = []
     var bp_list = []
 
+    console.log("GET:bp/Request for BP Data")
+
     for (var i = 1; i <= num_search_page; i++) {
         url_list.push(bp_board_humor + "&page=" + i)
         url_list.push(bp_board_etc + "&page=" + i)
@@ -74,6 +76,8 @@ router.get('/dd', function (req, res) {
     var url_list = []
     var dd_list = []
 
+    console.log("GET:dd/Request for DD Data")
+
     for (var i = 1; i <= num_search_page; i++) {
         url_list.push(dd_board + i)
     }
@@ -122,8 +126,11 @@ router.get('/dd', function (req, res) {
 })
 
 router.get('/hrm', function (req, res) {
+    console.log("GET:hrm/Request for HRM Data")
+
     puppeteer.launch()
     .then((browser) => {
+        console.log("GET:hrm/Launch Puppeteer")
         return browser.newPage()
         .then((page) => {
             return page.goto('http://insagirl-toto.appspot.com/hrm/?where=2', {waitUntil:'networkidle2'})
@@ -131,6 +138,7 @@ router.get('/hrm', function (req, res) {
             .then((expand) => expand.click())
             .then(() => page.waitFor(1000))
             .then(() => page.$eval('#hrmbody', (element)=>{
+                console.log("GET:hrm/Getting Data from hrmbody..")
                 var links = Array.from(element.querySelectorAll('a'))
                 return links.map(link=>link.href)
             }))
@@ -140,7 +148,6 @@ router.get('/hrm', function (req, res) {
                     data = data.filter(function(item, pos){
                         return data.indexOf(item) == pos;
                     })
-                    console.log(data.length)
                     var connection = mysql.createConnection(db_config);
                     connection.connect(function (err) {
                         if (err) {
@@ -162,7 +169,6 @@ router.get('/hrm', function (req, res) {
                 }).then(function (row_data) {
                     console.log("GET:dd/[Promise] Send to client..")
                     //console.log(row_data)
-                    console.log(row_data.length)
                     res.send(JSON.stringify(row_data))
                 })
             })

@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 Call<JsonElement> callback_Data = null;
                 switch (mViewPager.getCurrentItem()){
                     case 0:
-                        //callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
                         break;
                     case 1:
                         callback_Data = NetRetrofit.getInstance().getService().CallData_BP();
