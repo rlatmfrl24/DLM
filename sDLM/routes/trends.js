@@ -1,6 +1,6 @@
 var express = require('express');
 var reqpromise = require('request-promise')
-var mysql = require('mysql')
+var mysql = require('promise-mysql')
 var cheerio = require('cheerio')
 var Promises = require('bluebird')
 var puppeteer = require('puppeteer')
@@ -23,7 +23,7 @@ router.get('/', function (req, res) {
 
 router.get('/bp', function (req, res) {
     var url_list = []
-    var bp_list = []
+    var bp_list = new Array();
 
     console.log("GET:bp/Request for BP Data")
 
@@ -32,49 +32,40 @@ router.get('/bp', function (req, res) {
         url_list.push(bp_board_etc + "&page=" + i)
     }
 
-    Promises.each(url_list, function (url) {
-        return reqpromise(url)
-            .then(function (body) {
-                console.log("GET:bp/[Promise] Get Data from request..")
-                var $ = cheerio.load(body);
-                var $table_data = $('#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable');
-                return $table_data.find('a');
-            }).then(function (data) {
-                data.each(function () {
-                    bp_list.push(this.attribs.href.replace(/&page=[0-9]/gi, ""))
+    mysql.createConnection(db_config)
+    .then(conn=>{
+        var sql = "SELECT link FROM tb_link_info WHERE domain like 'v12.battlepage.com';"
+        rows = conn.query(sql)
+        return rows
+    }).then((rows)=>{
+        var except_list = []
+        for(var i = 0; i < rows.length; i++){
+            except_list.push(rows[i].link)
+        }
+        Promises.each(url_list, (url)=>{
+            return reqpromise(url)
+            .then((body)=>{
+                console.log("GET:bp/[Promise] Get Data from "+url)
+                var $ = cheerio.load(body)
+                var $table_data = $('#div_content_containter > div:nth-child(2) > div.detail_container > div.ListTable')
+                $table_data.find('td.bp_subject').each(function(){
+                    var bp_subject = new Object();
+                    bp_subject.title = this.attribs.title
+                    bp_subject.link = $(this).find('a').attr('href').replace(/&page=[0-9]/gi, "")
+                    if(!except_list.includes(bp_subject.link)){
+                        bp_list.push(bp_subject)
+                    }
                 })
             })
-    }).then(function () {
-        return new Promise(function (resolve, reject) {
-            console.log("GET:bp/[Promise] Connect DB..")
-            var connection = mysql.createConnection(db_config);
-            connection.connect(function (err) {
-                if (err) {
-                    console.log('Connection is asleep (time to wake it up): ', err);
-                    setTimeout(handleDisconnect, 1000);
-                    handleDisconnect();
-                }
-            });
-            var sql = "SELECT link FROM tb_link_info WHERE domain like 'v12.battlepage.com';"
-            connection.query(sql, function (err, rows) {
-                for (var i = 0; i < rows.length; i++) {
-                    var find_data = rows[i].link
-                    if (bp_list.includes(find_data)) {
-                        bp_list.splice(bp_list.indexOf(find_data), 1)
-                    }
-                }
-                resolve(bp_list)
-            })
-        }).then(function (row_data) {
-            console.log("GET:bp/[Promise] Send to Client..")
-            //console.log(row_data)
-            res.send(JSON.stringify(row_data))
+        }).then(()=>{
+            console.log(bp_list)
+            res.send(JSON.stringify(bp_list))
         })
     })
 })
 router.get('/dd', function (req, res) {
     var url_list = []
-    var dd_list = []
+    var dd_list = new Array();
 
     console.log("GET:dd/Request for DD Data")
 
@@ -82,118 +73,80 @@ router.get('/dd', function (req, res) {
         url_list.push(dd_board + i)
     }
 
-    Promises.each(url_list, function (url) {
-        return reqpromise(url)
-            .then(function (body) {
-                console.log("GET:dd/[Promise] Get Data from request")
-                var $ = cheerio.load(body);
-                var $table_data = $('#main > div > div.eq.section.secontent.background-color-content > div > div.ed.board-list > table > tbody');
-                return $table_data.find('.ed.link-reset');
-            }).then(function (data) {
-                data.each(function () {
-                    if (this.attribs.href != '#popup_menu_area') {
-                        dd_list.push(this.attribs.href)
+    mysql.createConnection(db_config)
+    .then(conn=>{
+        var sql = "SELECT link FROM tb_link_info WHERE domain like 'www.dogdrip.net';"
+        rows = conn.query(sql)
+        return rows
+    }).then((rows)=>{
+        var except_list = []
+        for(var i = 0; i < rows.length; i++){
+            except_list.push(rows[i].link)
+        }
+        Promises.each(url_list, (url)=>{
+            return reqpromise(url)
+            .then((body)=>{
+                console.log("GET:dd/[Promise] Get Data from "+url)
+                var $ = cheerio.load(body)
+                var $table_data = $('#main > div > div.eq.section.secontent.background-color-content > div > div.ed.board-list > table > tbody')
+                $table_data.find('.ed.link-reset').each(function(){
+                    var dd_subject = new Object();
+                    dd_subject.title = $(this).find('.ed.title-link').text()
+                    dd_subject.link = this.attribs.href
+                    if(!except_list.includes(dd_subject.link) && dd_subject.link != '#popup_menu_area'){
+                        dd_list.push(dd_subject)
                     }
                 })
             })
-    }).then(function () {
-        return new Promise(function (resolve, reject) {
-            console.log("GET:dd/[Promise] Connect with DB..")
-            var connection = mysql.createConnection(db_config);
-            connection.connect(function (err) {
-                if (err) {
-                    console.log('Connection is asleep (time to wake it up): ', err);
-                    setTimeout(handleDisconnect, 1000);
-                    handleDisconnect();
-                }
-            });
-            var sql = "SELECT link FROM tb_link_info WHERE domain like 'www.dogdrip.net';"
-            connection.query(sql, function (err, rows) {
-                for (var i = 0; i < rows.length; i++) {
-                    var find_data = rows[i].link
-                    if (dd_list.includes(find_data)) {
-                        dd_list.splice(dd_list.indexOf(find_data), 1)
-                    }
-                }
-                resolve(dd_list)
-            })
-        }).then(function (row_data) {
-            console.log("GET:dd/[Promise] Send to client..")
-            //console.log(row_data)
-            res.send(JSON.stringify(row_data))
+        }).then(()=>{
+            console.log(dd_list)
+            res.send(JSON.stringify(dd_list))
         })
     })
 })
 
 router.get('/hrm', function (req, res) {
+
+    var except_list = []
+    var hrm_list = []
+
     console.log("GET:hrm/Request for HRM Data")
-
-    puppeteer.launch()
-    .then((browser) => {
-        console.log("GET:hrm/Launch Puppeteer")
-        return browser.newPage()
-        .then((page) => {
-            console.log("GET:hrm/Access to hrm page..")
-            return page.goto('http://insagirl-toto.appspot.com/hrm/?where=2', {waitUntil:'networkidle2'})
-            .then(() => page.$('#hrmbodyexpand'))
-            .then((expand) => expand.click())
-            .then(() => page.waitFor(1000))
-            .then(() => page.$eval('#hrmbody', (element)=>{
-                console.log("GET:hrm/Getting Data from hrmbody..")
-                var links = Array.from(element.querySelectorAll('a'))
-                return links.map(link=>link.href)
-            }))
-            .then((data) => {
-                return new Promise(function (resolve, reject) {
-                    console.log("GET:hrm/[Promise] Connect with DB..")
-                    data = data.filter(function(item, pos){
-                        return data.indexOf(item) == pos;
-                    })
-                    var connection = mysql.createConnection(db_config);
-                    connection.connect(function (err) {
-                        if (err) {
-                            console.log('Connection is asleep (time to wake it up): ', err);
-                            setTimeout(handleDisconnect, 1000);
-                            handleDisconnect();
-                        }
-                    });
-                    var sql = "SELECT link FROM tb_link_info;"
-                    var result_list = []
-
-                    connection.query(sql, function (err, rows) {
-                        for (var i = 0; i < rows.length; i++) {
-                            var find_data = rows[i].link
-                            if (data.includes(find_data)) {
-                                data.splice(data.indexOf(find_data), 1)
-                            }
-                        }
-                        for (var i=0; i < data.length; i++){
-                            if(!data[i].match("dostream")){
-                                result_list.push(data[i])
-                            }
-                        }
-                        resolve(result_list)
-                    })
-                }).then(function (row_data) {
-                    console.log("GET:hrm/[Promise] Send to client..")
-                    res.send(JSON.stringify(row_data))
-                })
-            })
-        })
-        .then(() => browser.close())
-    }).then(()=>console.log('done!'))
-})
-
-function handleDisconnect() {
-    console.log('handleDisconnect()');
-    connection.destroy();
-    connection = mysql.createConnection(db_config);
-    connection.connect(function (err) {
-        if (err) {
-            console.log(' Error when connecting to db  (DBERR001):', err);
-            setTimeout(handleDisconnect, 1000);
+    mysql.createConnection(db_config)
+    .then(conn=>{
+        var sql = "SELECT link FROM tb_link_info;"
+        rows = conn.query(sql)
+        return rows
+    }).then(rows=>{
+        for(var i = 0; i < rows.length; i++){
+            except_list.push(rows[i].link)
         }
-    });
-}
+        puppeteer.launch()
+        .then(browser=>{
+            console.log("GET:hrm/Launch Puppeteer")
+            return browser.newPage()
+            .then(page=>{
+                return page.goto('http://insagirl-toto.appspot.com/hrm/?where=2', {waitUntil:'networkidle2'})
+                .then(() => page.$('#hrmbodyexpand'))
+                .then((expand) => expand.click())
+                .then(() => page.waitFor(1000))
+                .then(() => page.$eval('#hrmbody', (element)=>{
+                    console.log("GET:hrm/Getting Data from hrmbody..")
+                    var links = Array.from(element.querySelectorAll('a'))
+                    return links.map(link=>link.href)
+                }))
+                .then((data)=>{
+                    for(var i = 0; i<data.length; i++){
+                        if(!except_list.includes(data[i]) && !data[i].includes('dostream')){
+                            hrm_list.push(data[i])
+                        }
+                    }
+                })
+            }).then(()=>browser.close())
+        }).then(()=>{
+            console.log(hrm_list)
+            res.send(JSON.stringify(hrm_list))
+        })
+    })
+})
 
 module.exports = router;

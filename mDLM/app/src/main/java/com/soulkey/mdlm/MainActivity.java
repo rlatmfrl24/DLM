@@ -1,7 +1,7 @@
 package com.soulkey.mdlm;
 
-import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -49,12 +49,14 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 final Snackbar notice = Snackbar.make(view, "Loading Item from Sever..", Snackbar.LENGTH_INDEFINITE);
                 mViewPager.beginFakeDrag();
-                view.setVisibility(View.GONE);
+                //view.setVisibility(View.GONE);
+                fab.hide();
                 notice.show();
                 Log.d("muta", "Retrofit called on Fragment "+String.valueOf(mViewPager.getCurrentItem()));
                 final PlaceholderFragment current = (PlaceholderFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 Call<JsonElement> callback_Data = null;
                 switch (mViewPager.getCurrentItem()){
                     case 0:
-                        callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        //callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
                         break;
                     case 1:
                         callback_Data = NetRetrofit.getInstance().getService().CallData_BP();
@@ -83,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
                             current.UpdateList(list);
                             current.hideLoading();
                             mViewPager.endFakeDrag();
-                            view.setVisibility(View.VISIBLE);
+                            //view.setVisibility(View.VISIBLE);
+                            fab.show();
                             notice.dismiss();
                         }
                         @Override
@@ -91,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                             notice.dismiss();
                             current.hideLoading();
                             mViewPager.endFakeDrag();
-                            view.setVisibility(View.VISIBLE);
+                            //view.setVisibility(View.VISIBLE);
+                            fab.show();
                             Snackbar.make(view, "Fail to Connect Server!", Snackbar.LENGTH_SHORT);
                             Log.e("muta", t.getMessage());
                         }
@@ -99,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     current.hideLoading();
                     mViewPager.endFakeDrag();
-                    view.setVisibility(View.VISIBLE);
+                    //view.setVisibility(View.VISIBLE);
+                    fab.show();
                     notice.dismiss();
                 }
             }
