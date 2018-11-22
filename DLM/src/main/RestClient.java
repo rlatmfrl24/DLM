@@ -22,7 +22,7 @@ import util.hd.Gallery;
 
 public class RestClient {
 	
-	//private static String sdlm_url = "http://localhost:3000/db/";
+	//private static String sdlm_url = "http://localhost:3000/db/test";
 	private static String sdlm_url = "http://35.233.250.217:3000/db/";
 	
 	public JsonObject makeSelectJSON(String tbname, String column, String where_value){

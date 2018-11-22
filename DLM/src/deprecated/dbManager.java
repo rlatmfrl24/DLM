@@ -15,7 +15,7 @@ import util.hd.Gallery;
 public class dbManager {
 	private static Connection connection;
 	private static String DriverName = "com.mysql.cj.jdbc.Driver";
-	private static String dbURL = "jdbc:mysql://35.233.230.219:3306/";
+	private static String dbURL = "jdbc:mysql://35.233.250.217:3306/";
 	private static String db_option = "?useUnicode=yes&characterEncoding=UTF-8";
 	private static String db_id = "root";
 	private static String db_pwd = "Love397!@";
