@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -65,6 +66,7 @@ public class HMFrame {
 	private Map<String, String> refreshed_hrm;
 	private Map<String, String> refreshed_bp;
 	private Map<String, String> refreshed_dd;
+	private Map<String, String> refreshed_bmk;
 	private IRunnableWithProgress loadTask;
 	private RestClient restClient;
 	
@@ -74,7 +76,7 @@ public class HMFrame {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				// TODO Auto-generated method stub
-				monitor.beginTask("Loading HRM pages..", 3);
+				monitor.beginTask("Loading HRM pages..", 4);
 				refreshed_hrm = hu.LoadHrm();
 				monitor.worked(2);
 				monitor.setTaskName("Loading BP pages..");
@@ -82,6 +84,8 @@ public class HMFrame {
 				monitor.worked(1);
 				monitor.setTaskName("Loading DD pages..");
 				refreshed_dd = du.LoadDD();
+				monitor.setTaskName("Loading BMK Pages..");
+				refreshed_bmk = LoadBMK();
 				monitor.done();
 			}
 		};
@@ -244,17 +248,6 @@ public class HMFrame {
 		TableColumn tblclmnLink = tableViewerColumn_8.getColumn();
 		tblclmnLink.setWidth(100);
 		tblclmnLink.setText("Link");
-			
-		for(String link : restClient.getListByColumn("tb_bookmark_info", "link")) {
-			try {
-				URL url = new URL(link);
-				TableItem item = new TableItem(table_bmk, 0);
-				item.setText(0, url.getAuthority());
-				item.setText(1, link);
-			}catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
 
 		Composite composite_1 = new Composite(shlHrm, SWT.NONE);
 		composite_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -598,6 +591,21 @@ public class HMFrame {
 			e.printStackTrace();
 		}
 	}
+	
+	public Map<String, String> LoadBMK(){
+		Map<String, String> res_map = new TreeMap<>();
+		List<String> bmk_list = restClient.getListByColumn("tb_bookmark_info", "link");
+		for(String link : bmk_list) {
+			try{
+				URL url = new URL(link);
+				res_map.put(link, url.getAuthority());
+			}catch(MalformedURLException mue) {
+				res_map.put(link, "Unknown");
+			}
+		}
+		return res_map;
+	}
+	
 	public Table getCurrentTable(TabFolder tabFolder) {
 		Table current_table=null;
 		switch (tabFolder.getSelectionIndex()) {
@@ -637,6 +645,7 @@ public class HMFrame {
 				table_hrm.removeAll();
 				table_bp.removeAll();
 				table_dd.removeAll();
+				table_bmk.removeAll();
 				
 				for(Entry<String, String> entry : refreshed_bp.entrySet()) {
 					TableItem ti = new TableItem(table_bp, 0);
@@ -650,6 +659,11 @@ public class HMFrame {
 				}
 				for(Entry<String, String> entry : refreshed_dd.entrySet()) {
 					TableItem ti = new TableItem(table_dd, 0);
+					ti.setText(0, entry.getValue());
+					ti.setText(1, entry.getKey());
+				}
+				for(Entry<String, String> entry : refreshed_bmk.entrySet()) {
+					TableItem ti = new TableItem(table_bmk, 0);
 					ti.setText(0, entry.getValue());
 					ti.setText(1, entry.getKey());
 				}

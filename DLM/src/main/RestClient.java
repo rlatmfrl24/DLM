@@ -23,7 +23,7 @@ import util.hd.Gallery;
 public class RestClient {
 	
 	//private static String sdlm_url = "http://localhost:3000/db/";
-	private static String sdlm_url = "http://35.233.230.219:3000/db/";
+	private static String sdlm_url = "http://35.233.250.217:3000/db/";
 	
 	public JsonObject makeSelectJSON(String tbname, String column, String where_value){
 		JsonObject json_query = new JsonObject();
@@ -173,15 +173,20 @@ public class RestClient {
 	
 	public void UpdateBMK(String table_name, List<String> list) {
 		post_json(makeDeleteJSON(table_name));
-		post_json(makeInsertBMKJSON(list));
+		if(list.size() != 0) {
+			post_json(makeInsertBMKJSON(list));
+		}
 	}
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		RestClient con = new RestClient();
-		System.out.println(con.getListByColumn("tb_hiyobi_info", "h_code"));
-		System.out.println(con.getListByColumn("tb_link_info", "link", "domain like 'www.dogdrip.net'"));
 		
+		for(String code : con.getListByColumn("tb_hiyobi_info", "h_code")) {
+			System.out.println(code);
+		}
+		//System.out.println(con.getListByColumn("tb_hiyobi_info", "h_code"));
+		//System.out.println(con.getListByColumn("tb_link_info", "link", "domain like 'www.dogdrip.net'"));
 	}
 
 }
