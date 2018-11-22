@@ -133,6 +133,7 @@ router.get('/hrm', function (req, res) {
         console.log("GET:hrm/Launch Puppeteer")
         return browser.newPage()
         .then((page) => {
+            console.log("GET:hrm/Access to hrm page..")
             return page.goto('http://insagirl-toto.appspot.com/hrm/?where=2', {waitUntil:'networkidle2'})
             .then(() => page.$('#hrmbodyexpand'))
             .then((expand) => expand.click())
@@ -144,7 +145,7 @@ router.get('/hrm', function (req, res) {
             }))
             .then((data) => {
                 return new Promise(function (resolve, reject) {
-                    console.log("GET:dd/[Promise] Connect with DB..")
+                    console.log("GET:hrm/[Promise] Connect with DB..")
                     data = data.filter(function(item, pos){
                         return data.indexOf(item) == pos;
                     })
@@ -157,6 +158,8 @@ router.get('/hrm', function (req, res) {
                         }
                     });
                     var sql = "SELECT link FROM tb_link_info;"
+                    var result_list = []
+
                     connection.query(sql, function (err, rows) {
                         for (var i = 0; i < rows.length; i++) {
                             var find_data = rows[i].link
@@ -164,11 +167,15 @@ router.get('/hrm', function (req, res) {
                                 data.splice(data.indexOf(find_data), 1)
                             }
                         }
-                        resolve(data)
+                        for (var i=0; i < data.length; i++){
+                            if(!data[i].match("dostream")){
+                                result_list.push(data[i])
+                            }
+                        }
+                        resolve(result_list)
                     })
                 }).then(function (row_data) {
-                    console.log("GET:dd/[Promise] Send to client..")
-                    //console.log(row_data)
+                    console.log("GET:hrm/[Promise] Send to client..")
                     res.send(JSON.stringify(row_data))
                 })
             })
