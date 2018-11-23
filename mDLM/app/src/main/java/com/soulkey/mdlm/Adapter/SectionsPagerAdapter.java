@@ -1,9 +1,11 @@
-package com.soulkey.mdlm.View;
+package com.soulkey.mdlm.Adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
+
+import com.soulkey.mdlm.Fragment.PlaceholderFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 

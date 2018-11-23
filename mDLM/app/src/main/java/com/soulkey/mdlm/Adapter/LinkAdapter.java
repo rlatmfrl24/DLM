@@ -1,4 +1,4 @@
-package com.soulkey.mdlm.Presenter;
+package com.soulkey.mdlm.Adapter;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,16 +13,21 @@ import android.widget.TextView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.soulkey.mdlm.WebActivity;
+import com.soulkey.mdlm.Activity.WebActivity;
 import com.soulkey.mdlm.R;
-
-import java.util.List;
 
 public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder> {
     private JsonArray item_array;
+    private boolean isReversed = false;
 
     public LinkAdapter(JsonArray dataset){
         item_array = dataset;
+        notifyDataSetChanged();
+    }
+
+    public LinkAdapter(JsonArray dataset, boolean flag){
+        item_array = dataset;
+        isReversed = true;
         notifyDataSetChanged();
     }
 
@@ -37,9 +42,15 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
     @Override
     public void onBindViewHolder(@NonNull LinkViewHolder linkViewHolder, int i) {
         JsonObject item_data = item_array.get(i).getAsJsonObject();
-        linkViewHolder.mTextView_title.setText(item_data.get("title").getAsString());
-        linkViewHolder.mTextView_link.setText(item_data.get("link").getAsString());
-        //linkViewHolder.mTextView.setText(List_data.get(i));
+
+        if(!isReversed){
+            linkViewHolder.mTextView_title.setText(item_data.get("title").getAsString());
+            linkViewHolder.mTextView_link.setText(item_data.get("link").getAsString());
+        }else{
+            linkViewHolder.mTextView_title.setText(item_data.get("link").getAsString());
+            linkViewHolder.mTextView_link.setText(item_data.get("title").getAsString());
+        }
+
     }
 
     @Override

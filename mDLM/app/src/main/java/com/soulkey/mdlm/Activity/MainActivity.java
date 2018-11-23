@@ -1,5 +1,6 @@
-package com.soulkey.mdlm;
+package com.soulkey.mdlm.Activity;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
@@ -14,12 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.gson.JsonElement;
-import com.soulkey.mdlm.Model.NetRetrofit;
-import com.soulkey.mdlm.View.PlaceholderFragment;
-import com.soulkey.mdlm.View.SectionsPagerAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.soulkey.mdlm.APICall.NetRetrofit;
+import com.soulkey.mdlm.Fragment.PlaceholderFragment;
+import com.soulkey.mdlm.Adapter.SectionsPagerAdapter;
+import com.soulkey.mdlm.R;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,7 +27,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    private List<String> list = new ArrayList<>();
     private FloatingActionButton fab;
     private Snackbar snk;
 
@@ -103,7 +101,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Intent intent =  new Intent(this, ActionActivity.class);
         if (id == R.id.action_settings) {
+            intent.putExtra("action", "setting");
+            startActivity(intent);
+            return true;
+        }else if(id == R.id.action_bookmark){
+            intent.putExtra("action", "bookmark");
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

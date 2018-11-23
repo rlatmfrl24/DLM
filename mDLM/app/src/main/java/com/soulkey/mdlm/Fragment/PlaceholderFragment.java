@@ -1,4 +1,4 @@
-package com.soulkey.mdlm.View;
+package com.soulkey.mdlm.Fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,11 +12,8 @@ import android.view.ViewGroup;
 
 import com.google.gson.JsonArray;
 import com.pnikosis.materialishprogress.ProgressWheel;
-import com.soulkey.mdlm.Presenter.LinkAdapter;
+import com.soulkey.mdlm.Adapter.LinkAdapter;
 import com.soulkey.mdlm.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PlaceholderFragment extends Fragment {
 

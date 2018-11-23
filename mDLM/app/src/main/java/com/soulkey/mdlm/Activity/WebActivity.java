@@ -1,4 +1,4 @@
-package com.soulkey.mdlm;
+package com.soulkey.mdlm.Activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,8 +12,10 @@ import android.webkit.WebViewClient;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.gson.JsonElement;
-import com.soulkey.mdlm.Model.JsonGenerator;
-import com.soulkey.mdlm.Model.NetRetrofit;
+import com.soulkey.mdlm.APICall.JsonGenerator;
+import com.soulkey.mdlm.APICall.NetRetrofit;
+import com.soulkey.mdlm.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
