@@ -58,7 +58,6 @@ router.get('/bp', function (req, res) {
                 })
             })
         }).then(()=>{
-            console.log(bp_list)
             res.send(JSON.stringify(bp_list))
         })
     })
@@ -99,7 +98,6 @@ router.get('/dd', function (req, res) {
                 })
             })
         }).then(()=>{
-            console.log(dd_list)
             res.send(JSON.stringify(dd_list))
         })
     })
@@ -108,7 +106,7 @@ router.get('/dd', function (req, res) {
 router.get('/hrm', function (req, res) {
 
     var except_list = []
-    var hrm_list = []
+    var hrm_list = new Array();
 
     console.log("GET:hrm/Request for HRM Data")
     mysql.createConnection(db_config)
@@ -137,13 +135,15 @@ router.get('/hrm', function (req, res) {
                 .then((data)=>{
                     for(var i = 0; i<data.length; i++){
                         if(!except_list.includes(data[i]) && !data[i].includes('dostream')){
-                            hrm_list.push(data[i])
+                            var hrm_subject = new Object();
+                            hrm_subject.title = new URL(data[i]).hostname
+                            hrm_subject.link = data[i]
+                            hrm_list.push(hrm_subject)
                         }
                     }
                 })
             }).then(()=>browser.close())
         }).then(()=>{
-            console.log(hrm_list)
             res.send(JSON.stringify(hrm_list))
         })
     })

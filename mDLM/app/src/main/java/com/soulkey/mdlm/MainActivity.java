@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private List<String> list = new ArrayList<>();
     private FloatingActionButton fab;
+    private Snackbar snk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +50,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        snk = Snackbar.make(fab, "Loading Item from Sever..", Snackbar.LENGTH_INDEFINITE);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                final Snackbar notice = Snackbar.make(view, "Loading Item from Sever..", Snackbar.LENGTH_INDEFINITE);
-                mViewPager.beginFakeDrag();
-                //view.setVisibility(View.GONE);
-                fab.hide();
-                notice.show();
                 Log.d("muta", "Retrofit called on Fragment "+String.valueOf(mViewPager.getCurrentItem()));
                 final PlaceholderFragment current = (PlaceholderFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
-                current.showLoading();
                 Call<JsonElement> callback_Data = null;
                 switch (mViewPager.getCurrentItem()){
                     case 0:
@@ -74,38 +70,25 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 if(callback_Data!=null){
+                    current.showLoading();
+                    ShowLoadingMsg();
                     callback_Data.enqueue(new Callback<JsonElement>() {
                         @Override
                         public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                            list.clear();
-                            JsonElement body = response.body();
-                            for(JsonElement je : body.getAsJsonArray()){
-                                list.add(je.getAsString());
-                            }
-                            current.UpdateList(list);
+                            current.UpdateList(response.body().getAsJsonArray());
                             current.hideLoading();
-                            mViewPager.endFakeDrag();
-                            //view.setVisibility(View.VISIBLE);
-                            fab.show();
-                            notice.dismiss();
+                            HideLoadingMsg();
                         }
                         @Override
                         public void onFailure(Call<JsonElement> call, Throwable t) {
-                            notice.dismiss();
                             current.hideLoading();
-                            mViewPager.endFakeDrag();
-                            //view.setVisibility(View.VISIBLE);
-                            fab.show();
-                            Snackbar.make(view, "Fail to Connect Server!", Snackbar.LENGTH_SHORT);
+                            HideLoadingMsg();
+                            Snackbar.make(view, "Fail to Connect Server!", Snackbar.LENGTH_LONG).show();
                             Log.e("muta", t.getMessage());
                         }
                     });
                 }else{
-                    current.hideLoading();
-                    mViewPager.endFakeDrag();
-                    //view.setVisibility(View.VISIBLE);
-                    fab.show();
-                    notice.dismiss();
+                    Snackbar.make(view, "Fail to Connect Server!", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -124,5 +107,17 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void ShowLoadingMsg(){
+        mViewPager.beginFakeDrag();
+        fab.hide();
+        snk.show();
+    }
+
+    public void HideLoadingMsg(){
+        mViewPager.endFakeDrag();
+        fab.show();
+        snk.dismiss();
     }
 }

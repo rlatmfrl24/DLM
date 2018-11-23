@@ -10,16 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.soulkey.mdlm.WebActivity;
 import com.soulkey.mdlm.R;
 
 import java.util.List;
 
 public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder> {
-    private List<String> List_data;
+    private JsonArray item_array;
 
-    public LinkAdapter(List<String> dataset){
-        List_data = dataset;
+    public LinkAdapter(JsonArray dataset){
+        item_array = dataset;
         notifyDataSetChanged();
     }
 
@@ -33,27 +36,39 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull LinkViewHolder linkViewHolder, int i) {
-        linkViewHolder.mTextView.setText(List_data.get(i));
+        JsonObject item_data = item_array.get(i).getAsJsonObject();
+        linkViewHolder.mTextView_title.setText(item_data.get("title").getAsString());
+        linkViewHolder.mTextView_link.setText(item_data.get("link").getAsString());
+        //linkViewHolder.mTextView.setText(List_data.get(i));
     }
 
     @Override
     public int getItemCount() {
-        return List_data.size();
+        return item_array.size();
     }
 
     public class LinkViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView;
+        public TextView mTextView_title;
+        public TextView mTextView_link;
         public LinkViewHolder(@NonNull final View itemView) {
             super(itemView);
-            mTextView = (TextView) itemView.findViewById(R.id.ItemTextView);
+            mTextView_title = (TextView) itemView.findViewById(R.id.textview_title);
+            mTextView_link = (TextView) itemView.findViewById((R.id.textview_link));
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("muta", String.valueOf(mTextView.getText()));
-                    List_data.remove(mTextView.getText().toString());
+                    String selected_link = String.valueOf(mTextView_link.getText());
+                    Log.d("muta", selected_link);
+                    for(JsonElement je : item_array){
+                        JsonObject item = je.getAsJsonObject();
+                        if(item.get("link").getAsString().equals(selected_link)){
+                            item_array.remove(je);
+                            break;
+                        }
+                    }
                     notifyItemRemoved(getAdapterPosition());
                     Intent intent = new Intent(itemView.getContext(), WebActivity.class);
-                    intent.putExtra("url", String.valueOf(mTextView.getText()));
+                    intent.putExtra("url", selected_link);
                     Activity origin = (Activity)itemView.getContext();
                     origin.startActivity(intent);
                     //itemView.getContext().startActivity(intent);

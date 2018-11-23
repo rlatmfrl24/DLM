@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.JsonArray;
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.soulkey.mdlm.Presenter.LinkAdapter;
 import com.soulkey.mdlm.R;
@@ -24,7 +25,7 @@ public class PlaceholderFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private LinkAdapter mAdapter;
-    private List<String> list = new ArrayList<>();
+    private JsonArray item_array = new JsonArray();
 
     public PlaceholderFragment() {
     }
@@ -45,17 +46,17 @@ public class PlaceholderFragment extends Fragment {
         mRecyclerView = rootView.findViewById(R.id.recyclerview);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        //mRecyclerView.setHasFixedSize(true);
-        mAdapter = new LinkAdapter(list);
+        mRecyclerView.setHasFixedSize(true);
+        mAdapter = new LinkAdapter(item_array);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         hideLoading();
         return rootView;
     }
 
-    public void UpdateList(List<String> updated_list){
-        this.list = updated_list;
-        mAdapter = new LinkAdapter(list);
+    public void UpdateList(JsonArray update_list){
+        this.item_array = update_list;
+        mAdapter = new LinkAdapter(item_array);
         mRecyclerView.setAdapter(mAdapter);
     }
 
