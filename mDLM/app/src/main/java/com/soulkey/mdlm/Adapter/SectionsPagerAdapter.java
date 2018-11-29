@@ -18,7 +18,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         Log.d("muta", "fragment created.."+String.valueOf(position+1));
         return PlaceholderFragment.newInstance(position+1);
     }
-
     @Override
     public int getCount() {
         return 3;

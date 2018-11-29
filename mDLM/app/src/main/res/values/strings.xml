@@ -8,4 +8,5 @@
     <string name="floating_item_bmk">Go to Bookmark</string>
     <string name="floating_item_close">Update to DB</string>
     <string name="floating_item_check">Close &amp; Not update</string>
+    <string name="custom_log_tag">muta</string>
 </resources>

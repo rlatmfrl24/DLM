@@ -1,6 +1,8 @@
 package com.soulkey.mdlm.Activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.Snackbar;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private FloatingActionButton fab;
     private Snackbar snk;
+    private boolean hrm_request = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        hrm_request = preferences.getBoolean("pf_hrm_option", false);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -58,7 +64,11 @@ public class MainActivity extends AppCompatActivity {
                 Call<JsonElement> callback_Data = null;
                 switch (mViewPager.getCurrentItem()){
                     case 0:
-                        //callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        if(hrm_request) callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        else {
+                            Snackbar.make(view, "HRM request is disabled..", Snackbar.LENGTH_LONG).show();
+                            return;
+                        }
                         break;
                     case 1:
                         callback_Data = NetRetrofit.getInstance().getService().CallData_BP();

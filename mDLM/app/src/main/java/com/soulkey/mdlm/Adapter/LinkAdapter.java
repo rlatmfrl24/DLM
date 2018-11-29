@@ -18,23 +18,16 @@ import com.soulkey.mdlm.R;
 
 public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder> {
     private JsonArray item_array;
-    private boolean isReversed = false;
 
     public LinkAdapter(JsonArray dataset){
         item_array = dataset;
         notifyDataSetChanged();
     }
 
-    public LinkAdapter(JsonArray dataset, boolean flag){
-        item_array = dataset;
-        isReversed = true;
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
     public LinkViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v =  LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_item, viewGroup, false);
+        View v =  LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_link, viewGroup, false);
         LinkViewHolder vh = new LinkViewHolder(v);
         return vh;
     }
@@ -42,15 +35,8 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
     @Override
     public void onBindViewHolder(@NonNull LinkViewHolder linkViewHolder, int i) {
         JsonObject item_data = item_array.get(i).getAsJsonObject();
-
-        if(!isReversed){
-            linkViewHolder.mTextView_title.setText(item_data.get("title").getAsString());
-            linkViewHolder.mTextView_link.setText(item_data.get("link").getAsString());
-        }else{
-            linkViewHolder.mTextView_title.setText(item_data.get("link").getAsString());
-            linkViewHolder.mTextView_link.setText(item_data.get("title").getAsString());
-        }
-
+        linkViewHolder.mTextView_title.setText(item_data.get("title").getAsString());
+        linkViewHolder.mTextView_link.setText(item_data.get("link").getAsString());
     }
 
     @Override

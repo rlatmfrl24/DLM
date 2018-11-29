@@ -23,7 +23,6 @@
             android:name=".Activity.ActionActivity"
             android:parentActivityName=".Activity.MainActivity">
         </activity>
-
     </application>
 
 </manifest>

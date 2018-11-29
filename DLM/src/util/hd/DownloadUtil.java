@@ -239,12 +239,23 @@ public class DownloadUtil {
 		
 		try {
 			Elements img_list = new Elements();
-			while(img_list.size() == 0) {
-				driver.get(gal.getUrl());
-				Thread.sleep(1000);
-				Document doc = Jsoup.parse(driver.getPageSource());
-				img_list = doc.select(".img-url");
+			driver.get(gal.getUrl());
+			Thread.sleep(1000);
+			Document doc = Jsoup.parse(driver.getPageSource());
+			img_list = doc.select(".img-url");
+			
+			if(img_list.size() == 0) {
+				item.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						item.setText(2, "has no images..");
+						return;
+					}
+				});
+				return;
 			}
+			
 			pbar_selection = 1;
 			int max_selection = img_list.size();
 			List<Thread> threads = new ArrayList<>();
@@ -259,31 +270,35 @@ public class DownloadUtil {
 				work_pool.add(tmp);
 			}
 			
-			for(Elements partial_work : work_pool) {
-				for(Element e : partial_work) {
-					String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".png";
-					Runnable task = new Runnable() {					
-						@Override
-						public void run() {
-							ImageDownload(e.text(), save_path, 0);
-							item.getDisplay().asyncExec(new Runnable() {
-								@Override
-								public void run() {
-									// TODO Auto-generated method stub
-									item.setText(2, String.valueOf(pbar_selection)+"/"+String.valueOf(max_selection));
-									pbar_selection++;
-								}
-							});
-						}
-					};
-					Thread download_thread = new Thread(task);
-					download_thread.start();
-					threads.add(download_thread);
-				}
-				for(Thread t : threads) {
-					t.join();
+			if(work_pool.size() != 0) {
+				for(Elements partial_work : work_pool) {
+					for(Element e : partial_work) {
+						String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".png";
+						Runnable task = new Runnable() {					
+							@Override
+							public void run() {
+								ImageDownload(e.text(), save_path, 0);
+								item.getDisplay().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										// TODO Auto-generated method stub
+										item.setText(2, String.valueOf(pbar_selection)+"/"+String.valueOf(max_selection));
+										pbar_selection++;
+									}
+								});
+							}
+						};
+						Thread download_thread = new Thread(task);
+						download_thread.start();
+						threads.add(download_thread);
+					}
+					for(Thread t : threads) {
+						t.join();
+					}
 				}
 			}
+					
+
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

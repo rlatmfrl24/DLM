@@ -18,7 +18,7 @@ public class Webdriver {
 		options.addArguments("window-size=1920x1080");
 		options.addArguments("disable-gpu");
 		driver = new ChromeDriver(options);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
 	}
 	
 	public ChromeDriver getWebDriver() {

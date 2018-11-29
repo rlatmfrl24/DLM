@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.v7.preference.PreferenceCategory>
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:icon="@drawable/ic_sharp_assignment_returned_24px"
+            android:key="pf_hrm_option"
+            android:title="HRM 데이터 요청"
+            android:summary="서버에게 HRM 데이터 요청을 활성화합니다."
+            android:defaultValue="false" />
+        <android.support.v7.preference.Preference
+            android:icon="@drawable/ic_outline_info_24px"
+            android:title="Version"
+            android:summary="mDLM_release_2,5">
+        </android.support.v7.preference.Preference>
+    </android.support.v7.preference.PreferenceCategory>
+    <android.support.v7.preference.PreferenceCategory/>
+</android.support.v7.preference.PreferenceScreen>

@@ -83,17 +83,18 @@ public class BookmarkFragment extends Fragment {
                     public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                         for(JsonElement element : response.body().getAsJsonArray()){
                             JsonObject obj = element.getAsJsonObject();
+                            String authority;
                             try {
-                                URL domain = new URL(obj.get("link").getAsString());
-                                obj.addProperty("title", domain.getAuthority());
-                                item_array.add(obj);
+                                authority = new URL(obj.get("link").getAsString()).getAuthority();
                             } catch (MalformedURLException e) {
-                                obj.addProperty("title", "Undefined");
-                                item_array.add(obj);
+                                authority = "Undefined";
+                                Log.e("muta", "Unexceptable URL Error..");
                                 e.printStackTrace();
                             }
+                            obj.addProperty("title", authority);
+                            item_array.add(obj);
                         }
-                        mAdapter = new LinkAdapter(item_array, true);
+                        mAdapter = new LinkAdapter(item_array);
                         mRecyclerView.setAdapter(mAdapter);
                     }
 
