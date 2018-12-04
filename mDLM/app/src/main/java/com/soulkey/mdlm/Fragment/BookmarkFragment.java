@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -64,7 +65,7 @@ public class BookmarkFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new LinkAdapter(item_array);
+        mAdapter = new LinkAdapter(item_array, false);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -76,6 +77,7 @@ public class BookmarkFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.action_refresh:
                 item.setEnabled(false);
+                item_array = new JsonArray();
                 Log.d("muta", "refresh button called");
                 Call<JsonElement> callback_data = NetRetrofit.getInstance().getService().Insert_Query(new JsonGenerator().makeSelectJSON("tb_bookmark_info", "link", ""));
                 callback_data.enqueue(new Callback<JsonElement>() {
@@ -94,8 +96,9 @@ public class BookmarkFragment extends Fragment {
                             obj.addProperty("title", authority);
                             item_array.add(obj);
                         }
-                        mAdapter = new LinkAdapter(item_array);
+                        mAdapter = new LinkAdapter(item_array, false);
                         mRecyclerView.setAdapter(mAdapter);
+                        Toast.makeText(getContext(), R.string.toast_db_access_msg, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

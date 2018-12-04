@@ -1,6 +1,8 @@
 package com.soulkey.mdlm.Fragment;
 
 import android.os.Bundle;
+import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.view.Menu;
@@ -9,6 +11,8 @@ import android.view.MenuInflater;
 import com.soulkey.mdlm.R;
 
 public class SettingFragment extends PreferenceFragmentCompat {
+
+    private ListPreference mListPreference;
 
     public SettingFragment(){
     }

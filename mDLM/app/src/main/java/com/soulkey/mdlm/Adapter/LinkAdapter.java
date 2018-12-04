@@ -18,9 +18,16 @@ import com.soulkey.mdlm.R;
 
 public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder> {
     private JsonArray item_array;
+    private boolean isOpenWeb = true;
 
     public LinkAdapter(JsonArray dataset){
         item_array = dataset;
+        notifyDataSetChanged();
+    }
+
+    public LinkAdapter(JsonArray dataset, boolean isOpenWeb){
+        item_array = dataset;
+        this.isOpenWeb = isOpenWeb;
         notifyDataSetChanged();
     }
 
@@ -51,26 +58,30 @@ public class LinkAdapter extends RecyclerView.Adapter<LinkAdapter.LinkViewHolder
             super(itemView);
             mTextView_title = (TextView) itemView.findViewById(R.id.textview_title);
             mTextView_link = (TextView) itemView.findViewById((R.id.textview_link));
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String selected_link = String.valueOf(mTextView_link.getText());
-                    Log.d("muta", selected_link);
-                    for(JsonElement je : item_array){
-                        JsonObject item = je.getAsJsonObject();
-                        if(item.get("link").getAsString().equals(selected_link)){
-                            item_array.remove(je);
-                            break;
+
+            if(isOpenWeb){
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String selected_link = String.valueOf(mTextView_link.getText());
+                        Log.d("muta", selected_link);
+                        for(JsonElement je : item_array){
+                            JsonObject item = je.getAsJsonObject();
+                            if(item.get("link").getAsString().equals(selected_link)){
+                                item_array.remove(je);
+                                break;
+                            }
                         }
+                        notifyItemRemoved(getAdapterPosition());
+                        Intent intent = new Intent(itemView.getContext(), WebActivity.class);
+                        intent.putExtra("url", selected_link);
+                        intent.putExtra("title", mTextView_title.getText());
+                        Activity origin = (Activity)itemView.getContext();
+                        origin.startActivity(intent);
+                        //itemView.getContext().startActivity(intent);
                     }
-                    notifyItemRemoved(getAdapterPosition());
-                    Intent intent = new Intent(itemView.getContext(), WebActivity.class);
-                    intent.putExtra("url", selected_link);
-                    Activity origin = (Activity)itemView.getContext();
-                    origin.startActivity(intent);
-                    //itemView.getContext().startActivity(intent);
-                }
-            });
+                });
+            }
         }
     }
 }

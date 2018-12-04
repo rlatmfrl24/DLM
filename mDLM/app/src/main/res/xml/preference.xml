@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <android.support.v7.preference.PreferenceCategory>
-        <android.support.v7.preference.SwitchPreferenceCompat
-            android:icon="@drawable/ic_sharp_assignment_returned_24px"
-            android:key="pf_hrm_option"
-            android:title="HRM 데이터 요청"
-            android:summary="서버에게 HRM 데이터 요청을 활성화합니다."
-            android:defaultValue="false" />
+    <PreferenceCategory
+        android:key="pf_hrm_option"
+        android:title="@string/pref_option_title">
+        <ListPreference
+            android:key="pf_list_hrm_option"
+            android:title="@string/pref_hrm_option_title"
+            android:summary="@string/pref_hrm_option_desp"
+            android:defaultValue="3"
+            android:entries="@array/array_pf_hrm_option_select"
+            android:entryValues="@array/array_pf_hrm_option_value"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_server_title">
         <android.support.v7.preference.Preference
-            android:icon="@drawable/ic_outline_info_24px"
-            android:title="Version"
-            android:summary="mDLM_release_2,5">
+            android:title="@string/pref_server_ip_title"
+            android:summary="35.233.250.217">
         </android.support.v7.preference.Preference>
-    </android.support.v7.preference.PreferenceCategory>
-    <android.support.v7.preference.PreferenceCategory/>
+        <android.support.v7.preference.Preference
+            android:title="@string/pref_server_port_title"
+            android:summary="3000">
+        </android.support.v7.preference.Preference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:icon="@drawable/ic_outline_info_24px"
+        android:title="@string/pref_info_title">
+        <android.support.v7.preference.Preference
+            android:title="@string/pref_version_title"
+            android:summary="@string/pref_version_desp">
+        </android.support.v7.preference.Preference>
+    </PreferenceCategory>
 </android.support.v7.preference.PreferenceScreen>

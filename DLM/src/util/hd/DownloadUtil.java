@@ -44,11 +44,6 @@ public class DownloadUtil {
 		this.restClient = new RestClient();
 	}
 	
-	public void closeWebDriver() {
-		driver.close();
-		driver.quit();
-	}
-	
 	public Map<String, Gallery> getDownloadList(){
 		return download_list;
 	}
@@ -59,8 +54,7 @@ public class DownloadUtil {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				// TODO Auto-generated method stub
 				try {
-					Webdriver wd = new Webdriver();
-					driver = wd.getWebDriver();
+					driver = Webdriver.newInstance().getWebDriver();
 					monitor.beginTask("Getting List from Hiyobi..", pages+1);
 					download_list.clear();
 					List<String> skip_list = restClient.getListByColumn("tb_hiyobi_info", "h_code");
@@ -80,8 +74,9 @@ public class DownloadUtil {
 								item.setText(2, "Ready..");
 							}
 						}
-					});	
-					closeWebDriver();
+					});
+					driver.close();
+					driver.quit();
 				}catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -172,7 +167,7 @@ public class DownloadUtil {
 		try {
 			ziputil zu = new ziputil();
 			final HashMap<String, TableItem> item_map = new HashMap<>();
-			Runnable getItemData = new Runnable() {
+			table.getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
@@ -183,8 +178,7 @@ public class DownloadUtil {
 						item_map.notify();
 					}
 				}
-			};
-			table.getDisplay().asyncExec(getItemData);
+			});
 			synchronized (item_map) {
 				try {
 					item_map.wait();
@@ -193,8 +187,7 @@ public class DownloadUtil {
 					e.printStackTrace();
 				}
 			}
-			Webdriver wd = new Webdriver();
-			driver = wd.getWebDriver();
+			driver = Webdriver.newInstance().getWebDriver();
 			for(Entry<String, TableItem> entry : item_map.entrySet()) {
 				entry.getValue().getDisplay().asyncExec(new Runnable() {
 					public void run() {
@@ -226,7 +219,8 @@ public class DownloadUtil {
 					}
 				});
 			}
-			closeWebDriver();
+			driver.close();
+			driver.quit();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -274,7 +268,7 @@ public class DownloadUtil {
 				for(Elements partial_work : work_pool) {
 					for(Element e : partial_work) {
 						String save_path = folder.getPath()+"/"+e.text().substring(e.text().lastIndexOf('/'), e.text().length())+".png";
-						Runnable task = new Runnable() {					
+						Thread download_thread = new Thread(new Runnable() {
 							@Override
 							public void run() {
 								ImageDownload(e.text(), save_path, 0);
@@ -287,8 +281,7 @@ public class DownloadUtil {
 									}
 								});
 							}
-						};
-						Thread download_thread = new Thread(task);
+						});
 						download_thread.start();
 						threads.add(download_thread);
 					}

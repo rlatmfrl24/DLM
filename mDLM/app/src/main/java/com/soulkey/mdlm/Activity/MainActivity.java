@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private FloatingActionButton fab;
     private Snackbar snk;
-    private boolean hrm_request = false;
+    private int hrm_request = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setOffscreenPageLimit(2);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        hrm_request = preferences.getBoolean("pf_hrm_option", false);
+        hrm_request = Integer.valueOf(preferences.getString("pf_list_hrm_option", "3"));
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -64,7 +64,13 @@ public class MainActivity extends AppCompatActivity {
                 Call<JsonElement> callback_Data = null;
                 switch (mViewPager.getCurrentItem()){
                     case 0:
-                        if(hrm_request) callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        if(hrm_request==1) {
+                            callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        }
+                        else if(hrm_request ==2) {
+                            Snackbar.make(view, "This Function is not yet..", Snackbar.LENGTH_LONG).show();
+                            return;
+                        }
                         else {
                             Snackbar.make(view, "HRM request is disabled..", Snackbar.LENGTH_LONG).show();
                             return;

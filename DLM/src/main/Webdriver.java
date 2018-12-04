@@ -21,6 +21,11 @@ public class Webdriver {
 		driver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
 	}
 	
+	public static Webdriver newInstance() {
+		Webdriver wd = new Webdriver();
+		return wd;
+	}
+	
 	public ChromeDriver getWebDriver() {
 		return driver;
 	}
