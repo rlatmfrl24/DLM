@@ -1,4 +1,4 @@
-package com.soulkey.mdlm.APICall;
+package com.soulkey.mdlm.Model;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 
 public interface RetrofitService {
     @POST("db/")
-    Call<JsonElement> Insert_Query(@Body JsonObject jsonObject);
+    Call<JsonElement> Call_DBQuery(@Body JsonObject jsonObject);
 
     @GET("trends/hrm/")
     Call<JsonElement> CallData_HRM();

@@ -2,15 +2,13 @@
 <android.support.v7.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:key="pf_hrm_option"
+        android:key="pf_option"
         android:title="@string/pref_option_title">
-        <ListPreference
-            android:key="pf_list_hrm_option"
+        <SwitchPreferenceCompat
+            android:key="pf_hrm_option"
             android:title="@string/pref_hrm_option_title"
             android:summary="@string/pref_hrm_option_desp"
-            android:defaultValue="3"
-            android:entries="@array/array_pf_hrm_option_select"
-            android:entryValues="@array/array_pf_hrm_option_value"/>
+            android:defaultValue="false"/>
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/pref_server_title">
@@ -24,9 +22,9 @@
         </android.support.v7.preference.Preference>
     </PreferenceCategory>
     <PreferenceCategory
-        android:icon="@drawable/ic_outline_info_24px"
         android:title="@string/pref_info_title">
         <android.support.v7.preference.Preference
+            android:icon="@drawable/ic_outline_info_24px"
             android:title="@string/pref_version_title"
             android:summary="@string/pref_version_desp">
         </android.support.v7.preference.Preference>

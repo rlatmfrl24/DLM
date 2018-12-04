@@ -17,7 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.gson.JsonElement;
-import com.soulkey.mdlm.APICall.NetRetrofit;
+import com.soulkey.mdlm.Model.NetRetrofit;
 import com.soulkey.mdlm.Fragment.PlaceholderFragment;
 import com.soulkey.mdlm.Adapter.SectionsPagerAdapter;
 import com.soulkey.mdlm.R;
@@ -27,61 +27,46 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
+
     private FloatingActionButton fab;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
     private Snackbar snk;
-    private int hrm_request = 3;
+    private SharedPreferences preferences;
+    private ViewPager mViewPager;
+    private boolean hrm_request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
         mViewPager = (ViewPager) findViewById(R.id.container);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        snk = Snackbar.make(fab, R.string.msg_loading_server, Snackbar.LENGTH_INDEFINITE);
+
+        setSupportActionBar(toolbar);
+        preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-        hrm_request = Integer.valueOf(preferences.getString("pf_list_hrm_option", "3"));
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        snk = Snackbar.make(fab, "Loading Item from Sever..", Snackbar.LENGTH_INDEFINITE);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                Log.d("muta", "Retrofit called on Fragment "+String.valueOf(mViewPager.getCurrentItem()));
+                //Log.d("muta", "Retrofit called on Fragment "+String.valueOf(mViewPager.getCurrentItem()));
+                hrm_request = preferences.getBoolean("pf_hrm_option", false);
                 final PlaceholderFragment current = (PlaceholderFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
                 Call<JsonElement> callback_Data = null;
-                switch (mViewPager.getCurrentItem()){
-                    case 0:
-                        if(hrm_request==1) {
-                            callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
-                        }
-                        else if(hrm_request ==2) {
-                            Snackbar.make(view, "This Function is not yet..", Snackbar.LENGTH_LONG).show();
-                            return;
-                        }
-                        else {
-                            Snackbar.make(view, "HRM request is disabled..", Snackbar.LENGTH_LONG).show();
-                            return;
-                        }
-                        break;
-                    case 1:
-                        callback_Data = NetRetrofit.getInstance().getService().CallData_BP();
-                        break;
-                    case 2:
-                        callback_Data = NetRetrofit.getInstance().getService().CallData_DD();
-                        break;
+                if(hrm_request){
+                    callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                }
+                else {
+                    Snackbar.make(view, R.string.msg_hrm_request_disabled, Snackbar.LENGTH_SHORT).show();
+                    return;
                 }
                 if(callback_Data!=null){
                     current.showLoading();
@@ -97,12 +82,12 @@ public class MainActivity extends AppCompatActivity {
                         public void onFailure(Call<JsonElement> call, Throwable t) {
                             current.hideLoading();
                             HideLoadingMsg();
-                            Snackbar.make(view, "Fail to Connect Server!", Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(view, R.string.msg_connect_fail_server, Snackbar.LENGTH_LONG).show();
                             Log.e("muta", t.getMessage());
                         }
                     });
                 }else{
-                    Snackbar.make(view, "Fail to Connect Server!", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(view, R.string.msg_connect_fail_server, Snackbar.LENGTH_LONG).show();
                 }
             }
         });

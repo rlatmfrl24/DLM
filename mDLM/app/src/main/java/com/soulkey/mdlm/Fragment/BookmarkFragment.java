@@ -20,8 +20,8 @@ import android.widget.Toast;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.soulkey.mdlm.APICall.JsonGenerator;
-import com.soulkey.mdlm.APICall.NetRetrofit;
+import com.soulkey.mdlm.Model.JsonGenerator;
+import com.soulkey.mdlm.Model.NetRetrofit;
 import com.soulkey.mdlm.Activity.ActionActivity;
 import com.soulkey.mdlm.Adapter.LinkAdapter;
 import com.soulkey.mdlm.R;
@@ -79,7 +79,7 @@ public class BookmarkFragment extends Fragment {
                 item.setEnabled(false);
                 item_array = new JsonArray();
                 Log.d("muta", "refresh button called");
-                Call<JsonElement> callback_data = NetRetrofit.getInstance().getService().Insert_Query(new JsonGenerator().makeSelectJSON("tb_bookmark_info", "link", ""));
+                Call<JsonElement> callback_data = NetRetrofit.getInstance().getService().Call_DBQuery(new JsonGenerator().makeSelectJSON("tb_bookmark_info", "link", ""));
                 callback_data.enqueue(new Callback<JsonElement>() {
                     @Override
                     public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {

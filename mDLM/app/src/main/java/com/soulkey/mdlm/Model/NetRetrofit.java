@@ -1,4 +1,4 @@
-package com.soulkey.mdlm.APICall;
+package com.soulkey.mdlm.Model;
 
 import java.util.concurrent.TimeUnit;
 

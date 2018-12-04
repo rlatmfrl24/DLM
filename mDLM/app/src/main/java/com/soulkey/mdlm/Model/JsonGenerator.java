@@ -1,4 +1,4 @@
-package com.soulkey.mdlm.APICall;
+package com.soulkey.mdlm.Model;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
