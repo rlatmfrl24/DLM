@@ -1,4 +1,5 @@
 <resources>
+    <string name="main_title">Mobile Trends Checker</string>
     <string name="app_name">mDLM</string>
     <string name="tab_HRM">HRM</string>
     <string name="tab_BP">BP</string>
@@ -23,4 +24,5 @@
     <string name="toast_db_save_msg">DB 저장 완료</string>
     <string name="toast_db_fail_msg">DB 접속 실패!\n서버상태를 확인하세요</string>
     <string name="custom_log_tag">muta</string>
+    <string name="server_url">https://project-joyan.appspot.com/</string>
 </resources>

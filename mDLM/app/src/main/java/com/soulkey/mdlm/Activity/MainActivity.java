@@ -61,12 +61,22 @@ public class MainActivity extends AppCompatActivity {
                 hrm_request = preferences.getBoolean("pf_hrm_option", false);
                 final PlaceholderFragment current = (PlaceholderFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
                 Call<JsonElement> callback_Data = null;
-                if(hrm_request){
-                    callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
-                }
-                else {
-                    Snackbar.make(view, R.string.msg_hrm_request_disabled, Snackbar.LENGTH_SHORT).show();
-                    return;
+                switch (mViewPager.getCurrentItem()){
+                    case 0:
+                        if(hrm_request){
+                            callback_Data = NetRetrofit.getInstance().getService().CallData_HRM();
+                        }
+                        else {
+                            Snackbar.make(view, R.string.msg_hrm_request_disabled, Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
+                        break;
+                    case 1:
+                        callback_Data = NetRetrofit.getInstance().getService().CallData_BP();
+                        break;
+                    case 2:
+                        callback_Data = NetRetrofit.getInstance().getService().CallData_DD();
+                        break;
                 }
                 if(callback_Data!=null){
                     current.showLoading();

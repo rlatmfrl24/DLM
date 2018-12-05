@@ -1,6 +1,11 @@
 {
-  "name": "test",
-  "version": "0.0.0",
+  "name": "sDLM",
+  "version": "0.0.1",
+  "description": "",
+  "author": {
+    "name": "kimseulki",
+    "email": "397love@gmail.com"
+  },
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
