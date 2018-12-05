@@ -18,9 +18,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.WebActivity"></activity>
+        <activity android:name=".Activity.WebActivity"/>
         <activity
-            android:name=".Activity.ActionActivity"
+            android:name=".Activity.BookmarkActivity"
+            android:label="@string/action_bookmark"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".Activity.MainActivity">
+        </activity>
+        <activity
+            android:name=".Activity.SettingsActivity"
+            android:label="@string/action_settings"
+            android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".Activity.MainActivity">
         </activity>
     </application>

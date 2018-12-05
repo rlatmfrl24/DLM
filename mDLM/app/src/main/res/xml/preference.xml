@@ -2,31 +2,20 @@
 <android.support.v7.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:key="pf_option"
         android:title="@string/pref_option_title">
         <SwitchPreferenceCompat
             android:key="pf_hrm_option"
+            android:icon="@drawable/ic_sharp_assignment_returned_24px"
             android:title="@string/pref_hrm_option_title"
             android:summary="@string/pref_hrm_option_desp"
             android:defaultValue="false"/>
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_server_title">
         <android.support.v7.preference.Preference
-            android:title="@string/pref_server_ip_title"
-            android:summary="35.233.250.217">
-        </android.support.v7.preference.Preference>
-        <android.support.v7.preference.Preference
-            android:title="@string/pref_server_port_title"
-            android:summary="3000">
-        </android.support.v7.preference.Preference>
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_info_title">
+            android:icon="@drawable/ic_sharp_cached_24px"
+            android:title="@string/pref_server_title"
+            android:summary="@string/pref_server_address"/>
         <android.support.v7.preference.Preference
             android:icon="@drawable/ic_outline_info_24px"
             android:title="@string/pref_version_title"
-            android:summary="@string/pref_version_desp">
-        </android.support.v7.preference.Preference>
+            android:summary="@string/pref_version_desp"/>
     </PreferenceCategory>
 </android.support.v7.preference.PreferenceScreen>

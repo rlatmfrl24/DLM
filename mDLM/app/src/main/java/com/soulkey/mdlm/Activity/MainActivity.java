@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private Snackbar snk;
     private SharedPreferences preferences;
     private ViewPager mViewPager;
+    private TabLayout mTabLayout;
+    private Toolbar mToolbar;
     private boolean hrm_request;
 
     @Override
@@ -41,18 +43,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mViewPager = (ViewPager) findViewById(R.id.container);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         snk = Snackbar.make(fab, R.string.msg_loading_server, Snackbar.LENGTH_INDEFINITE);
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,16 +116,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Intent intent =  new Intent(this, ActionActivity.class);
-        if (id == R.id.action_settings) {
-            intent.putExtra("action", "setting");
-            startActivity(intent);
-            return true;
-        }else if(id == R.id.action_bookmark){
-            intent.putExtra("action", "bookmark");
-            startActivity(intent);
-            return true;
+        Intent intent = new Intent();
+
+        switch (id){
+            case R.id.action_bookmark:
+                intent =  new Intent(this, BookmarkActivity.class);
+                break;
+            case R.id.action_settings:
+                intent =  new Intent(this, SettingsActivity.class);
+                break;
         }
+        startActivity(intent);
         return super.onOptionsItemSelected(item);
     }
 

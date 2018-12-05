@@ -118,7 +118,9 @@ router.get('/hrm', function (req, res) {
         for(var i = 0; i < rows.length; i++){
             except_list.push(rows[i].link)
         }
-        puppeteer.launch()
+        puppeteer.launch({
+            args: ['--no-sandbox']
+        })
         .then(browser=>{
             console.log("GET:hrm/Launch Puppeteer")
             return browser.newPage()

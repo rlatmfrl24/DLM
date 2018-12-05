@@ -1,29 +1,23 @@
-package com.soulkey.mdlm.Fragment;
+package com.soulkey.mdlm.Activity;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.soulkey.mdlm.Adapter.LinkAdapter;
 import com.soulkey.mdlm.Model.JsonGenerator;
 import com.soulkey.mdlm.Model.NetRetrofit;
-import com.soulkey.mdlm.Activity.ActionActivity;
-import com.soulkey.mdlm.Adapter.LinkAdapter;
 import com.soulkey.mdlm.R;
 
 import java.net.MalformedURLException;
@@ -33,48 +27,37 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BookmarkFragment extends Fragment {
+public class BookmarkActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private LinkAdapter mAdapter;
+    private Toolbar mToolbar;
     private JsonArray item_array = new JsonArray();
 
-    public BookmarkFragment(){
-    }
-
-    public static BookmarkFragment newInstance(){
-        return new BookmarkFragment();
-    }
-
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+        setContentView(R.layout.activity_bookmark);
+        mToolbar = findViewById(R.id.toolbar_bookmark);
+        mRecyclerView = findViewById(R.id.recyclerview_bookmark);
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bookmark, container, false);
-        ActionBar actionbar = ((ActionActivity)getActivity()).getSupportActionBar();
-        actionbar.setTitle("Bookmark");
-        actionbar.setDisplayShowHomeEnabled(true);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mRecyclerView = view.findViewById(R.id.recyclerview_bookmark);
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new LinkAdapter(item_array, false);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        return view;
     }
-
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.action_refresh:
                 item.setEnabled(false);
                 item_array = new JsonArray();
@@ -98,7 +81,7 @@ public class BookmarkFragment extends Fragment {
                         }
                         mAdapter = new LinkAdapter(item_array, false);
                         mRecyclerView.setAdapter(mAdapter);
-                        Toast.makeText(getContext(), R.string.toast_db_access_msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.toast_db_access_msg, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -113,8 +96,8 @@ public class BookmarkFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().getMenuInflater().inflate(R.menu.menu_action, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_action, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }

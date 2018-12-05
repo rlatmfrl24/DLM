@@ -8,10 +8,9 @@
     <string name="action_bookmark">Bookmark</string>
     <string name="pref_option_title">Option</string>
     <string name="pref_hrm_option_title">Server에 HRM 데이터 요청</string>
-    <string name="pref_hrm_option_desp">이 옵션은 Server Down을 유발할 수 있습니다</string>
+    <string name="pref_hrm_option_desp">이 요청은 다소 느릴 수 있습니다</string>
     <string name="pref_server_title">Server</string>
-    <string name="pref_server_ip_title">IP</string>
-    <string name="pref_server_port_title">Port</string>
+    <string name="pref_server_address">https://project-joyan.appspot.com/</string>
     <string name="pref_info_title">Info</string>
     <string name="pref_version_title">Version</string>
     <string name="pref_version_desp">mDLM_release_2.5</string>
