@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 
 public interface RetrofitService {
     @POST("db/")
-    Call<JsonElement> Insert_Query(@Body JsonObject jsonObject);
+    Call<JsonElement> Call_DBQuery(@Body JsonObject jsonObject);
 
     @GET("trends/hrm/")
     Call<JsonElement> CallData_HRM();

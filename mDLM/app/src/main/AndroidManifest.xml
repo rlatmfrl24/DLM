@@ -10,16 +10,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WebActivity"></activity>
+        <activity android:name=".Activity.WebActivity"/>
+        <activity
+            android:name=".Activity.BookmarkActivity"
+            android:label="@string/action_bookmark"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".Activity.MainActivity">
+        </activity>
+        <activity
+            android:name=".Activity.SettingsActivity"
+            android:label="@string/action_settings"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".Activity.MainActivity">
+        </activity>
     </application>
 
 </manifest>
