@@ -3,6 +3,8 @@
 
 # 개요
 
+> **Notice: this repository is deprecated. the concept of this project will develop on 'herb-project'**
+
 Optimiza private break time
 Developing Experience
 
